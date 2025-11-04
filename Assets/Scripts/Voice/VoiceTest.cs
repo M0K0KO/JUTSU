@@ -17,6 +17,9 @@ public class VoiceTest : MonoBehaviour
     private TMP_Text _microphoneButtonText;
 
     [SerializeField] private TMP_Text outputText;
+    [SerializeField] private TMP_Text similarityInfoText;
+    [SerializeField] private string targetCommand;
+    [SerializeField] private float levenshteinDistanceRatioThreshold = 0.3f;
 
     private void Awake()
     {
@@ -60,6 +63,10 @@ public class VoiceTest : MonoBehaviour
 
         var text = res.Result;
         outputText.text = text;
+        similarityInfoText.text = $"Is Similar: {StringSimilarity.IsSimilar(text, targetCommand, levenshteinDistanceRatioThreshold)}\n" +
+                                  $"Levenshtein Dist Ratio: {StringSimilarity.GetLevenshteinDistanceRatio(text, targetCommand)}\n" +
+                                  $"Levenshtein Dist Ratio Threshold: {levenshteinDistanceRatioThreshold}\n" +
+                                  $"Normalized String: {StringSimilarity.Normalize(text)}, {StringSimilarity.Normalize(targetCommand)}\n";
     }
     
     
