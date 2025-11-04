@@ -1,8 +1,5 @@
 using System.Collections;
-using Mediapipe.Tasks;
 using Mediapipe.Tasks.Vision.HandLandmarker;
-using Mediapipe.Unity;
-using Mediapipe.Unity.Experimental;
 using Mediapipe.Unity.Sample;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -11,7 +8,7 @@ namespace Mediapipe.Unity.HandWorldLandmarkDetection
 {
     public class HandWorldLandmarkerRunner : HandWorldLandmarkVisionTaskApiRunner<HandLandmarker>
     {
-        [SerializeField] private HandWorldLandmarkProcesser processer;
+        [SerializeField] private HandWorldLandmarkVisualizer processor;
         
         private Experimental.TextureFramePool _textureFramePool;
 
@@ -104,7 +101,7 @@ namespace Mediapipe.Unity.HandWorldLandmarkDetection
         
         private void OnHandWorldLandmarkDetectionOutput(HandLandmarkerResult result, Image image, long timestamp)
         {
-            processer.DrawLater(result);
+            //processor.DrawLater(result);
             
             //Debug.Log($"OnHandWorldLandmarkDetectionOutput: {result}");
         }

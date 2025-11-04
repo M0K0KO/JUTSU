@@ -1,13 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Mediapipe.Tasks.Vision.GestureRecognizer;
 using Mediapipe.Tasks.Vision.HandLandmarker;
 using mptcc = Mediapipe.Tasks.Components.Containers;
 using UnityEngine;
 
-public class HandWorldLandmarkProcesser : MonoBehaviour
+public class HandWorldLandmarkVisualizer : MonoBehaviour
 {
-    public static HandWorldLandmarkProcesser instance;
+    public static HandWorldLandmarkVisualizer instance;
 
     private const int _AngleCount = 21;
     private const int _LandmarkCount = 21;
@@ -38,7 +39,7 @@ public class HandWorldLandmarkProcesser : MonoBehaviour
     };
 
     private readonly object _currentTargetLock = new object();
-    private HandLandmarkerResult _currentTarget;
+    private GestureRecognizerResult _currentTarget;
 
     private bool isStale = false;
 
@@ -111,9 +112,9 @@ public class HandWorldLandmarkProcesser : MonoBehaviour
         }
     }
 
-    public void DrawLater(HandLandmarkerResult target) => UpdateCurrentTarget(target);
+    public void DrawLater(GestureRecognizerResult target) => UpdateCurrentTarget(target);
 
-    private void UpdateCurrentTarget(HandLandmarkerResult newTarget)
+    private void UpdateCurrentTarget(GestureRecognizerResult newTarget)
     {
         lock (_currentTargetLock)
         {
@@ -131,7 +132,6 @@ public class HandWorldLandmarkProcesser : MonoBehaviour
             if (_currentTarget.handWorldLandmarks != null && _currentTarget.handWorldLandmarks.Count > 0)
             {
                 UpdateVisualsTargetPosition(_currentTarget.handWorldLandmarks);
-                UpdateHandAngles_ST(_currentTarget.handWorldLandmarks);
             }
         }
     }
@@ -145,75 +145,7 @@ public class HandWorldLandmarkProcesser : MonoBehaviour
             landmarkTargetPositions[i].z = -targets[0].landmarks[i].z * landmarkScale;
         }
     }
-
-    // function without Job System & BurstCompiler
-    // ---------------------------------------------------------------------------------------------------------------------------------
-    private void UpdateHandAngles_ST(IReadOnlyList<mptcc.Landmarks> targets)
-    {
-        if (targets == null || targets.Count == 0) return;
-
-        var target = targets[0].landmarks;
-
-
-        // --- 1. 엄지 (Thumb) (Angles 0-2) ---
-        Vector3 v_thumb_mcp = GetNormalizedVector(target[0], target[1]);
-        Vector3 v_thumb_pip = GetNormalizedVector(target[1], target[2]);
-        Vector3 v_thumb_dip = GetNormalizedVector(target[2], target[3]);
-        Vector3 v_thumb_tip = GetNormalizedVector(target[3], target[4]);
-        HandAngles[0] = Vector3.Angle(v_thumb_mcp, v_thumb_pip); // 엄지 MCP
-        HandAngles[1] = Vector3.Angle(v_thumb_pip, v_thumb_dip); // 엄지 PIP
-        HandAngles[2] = Vector3.Angle(v_thumb_dip, v_thumb_tip); // 엄지 DIP
-
-        // --- 2. 검지 (Index) (Angles 3-5) ---
-        Vector3 v_index_mcp = GetNormalizedVector(target[0], target[5]);
-        Vector3 v_index_pip = GetNormalizedVector(target[5], target[6]);
-        Vector3 v_index_dip = GetNormalizedVector(target[6], target[7]);
-        Vector3 v_index_tip = GetNormalizedVector(target[7], target[8]);
-        HandAngles[3] = (Vector3.Angle(v_index_mcp, v_index_pip)); // 검지 MCP
-        HandAngles[4] = (Vector3.Angle(v_index_pip, v_index_dip)); // 검지 PIP 
-        HandAngles[5] = (Vector3.Angle(v_index_dip, v_index_tip)); // 검지 DIP
-
-        // --- 3. 중지 (Middle) (Angles 6-8) ---
-        Vector3 v_mid_mcp = GetNormalizedVector(target[0], target[9]);
-        Vector3 v_mid_pip = GetNormalizedVector(target[9], target[10]);
-        Vector3 v_mid_dip = GetNormalizedVector(target[10], target[11]);
-        Vector3 v_mid_tip = GetNormalizedVector(target[11], target[12]);
-        HandAngles[6] = (Vector3.Angle(v_mid_mcp, v_mid_pip)); // 중지 MCP
-        HandAngles[7] = (Vector3.Angle(v_mid_pip, v_mid_dip)); // 중지 PIP
-        HandAngles[8] = (Vector3.Angle(v_mid_dip, v_mid_tip)); // 중지 DIP
-
-        // --- 4. 약지 (Ring) (Angles 9-11) ---
-        Vector3 v_ring_mcp = GetNormalizedVector(target[0], target[13]);
-        Vector3 v_ring_pip = GetNormalizedVector(target[13], target[14]);
-        Vector3 v_ring_dip = GetNormalizedVector(target[14], target[15]);
-        Vector3 v_ring_tip = GetNormalizedVector(target[15], target[16]);
-        HandAngles[9] = (Vector3.Angle(v_ring_mcp, v_ring_pip)); // 약지 MCP
-        HandAngles[10] = (Vector3.Angle(v_ring_pip, v_ring_dip)); // 약지 PIP
-        HandAngles[11] = (Vector3.Angle(v_ring_dip, v_ring_tip)); // 약지 DIP
-
-        // --- 5. 새끼 (Pinky) (Angles 12-14) ---
-        Vector3 v_pinky_mcp = GetNormalizedVector(target[0], target[17]);
-        Vector3 v_pinky_pip = GetNormalizedVector(target[17], target[18]);
-        Vector3 v_pinky_dip = GetNormalizedVector(target[18], target[19]);
-        Vector3 v_pinky_tip = GetNormalizedVector(target[19], target[20]);
-        HandAngles[12] = (Vector3.Angle(v_pinky_mcp, v_pinky_pip)); // 새끼 MCP
-        HandAngles[13] = (Vector3.Angle(v_pinky_pip, v_pinky_dip)); // 새끼 PIP
-        HandAngles[14] = (Vector3.Angle(v_pinky_dip, v_pinky_tip)); // 새끼 DIP
-    }
-
-    private Vector3 GetNormalizedVector(mptcc.Landmark p1, mptcc.Landmark p2)
-    {
-        // (p2 - p1) 벡터를 계산하고 정규화(길이 1)합니다.
-        return new Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalized;
-    }
-    // ---------------------------------------------------------------------------------------------------------------------------------
-
-    // function with Job System & BurstCompiler
-    //private void UpdateHandAngles_MT(IReadOnlyList<mptcc.Landmarks> targets)
-    //{
-    //   
-    //}
-
+    
     private void ActivateVisuals()
     {
         if (landmarkVisuals.Length > 0)

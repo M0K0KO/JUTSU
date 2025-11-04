@@ -13,7 +13,7 @@ public class GestureSolver : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            GestureType type = SolveGesture(HandWorldLandmarkProcesser.instance.HandAngles);
+            GestureType type = SolveGesture(HandWorldLandmarkVisualizer.instance.HandAngles);
 
             string indicatorText = "";
             switch (type)

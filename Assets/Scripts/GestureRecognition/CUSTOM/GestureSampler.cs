@@ -11,15 +11,15 @@ public class GestureSampler : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Alpha1))
         {
-            gestureData[0].AddSample(HandWorldLandmarkProcesser.instance.HandAngles);
+            gestureData[0].AddSample(HandWorldLandmarkVisualizer.instance.HandAngles);
         }
         else if (Input.GetKey(KeyCode.Alpha2))
         {
-            gestureData[1].AddSample(HandWorldLandmarkProcesser.instance.HandAngles);
+            gestureData[1].AddSample(HandWorldLandmarkVisualizer.instance.HandAngles);
         }
         else if (Input.GetKey(KeyCode.Alpha3))
         {
-            gestureData[2].AddSample(HandWorldLandmarkProcesser.instance.HandAngles);
+            gestureData[2].AddSample(HandWorldLandmarkVisualizer.instance.HandAngles);
         }
     }
 }
