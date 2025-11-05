@@ -6,69 +6,158 @@ using UnityEngine;
 
 public static class StringSimilarity
 {
-    /// <summary>
-    /// Determines whether two strings are similar based on the Levenshtein distance ratio or exact character differences for short strings.
-    /// </summary>
-    /// <param name="input">The input string to compare.</param>
-    /// <param name="target">The target string to compare against.</param>
-    /// <param name="threshold">The Levenshtein distance ratio threshold for similarity. Defaults to 0.3.</param>
-    /// <returns>A boolean indicating whether the strings are considered similar.</returns>
-    public static bool IsSimilar(string input, string target, float threshold = 0.3f)
+    private static readonly Regex AsteriskPattern = new Regex(@"\*[^*]*\*", RegexOptions.Compiled);
+    private static readonly Regex ParenthesesPattern = new Regex(@"\([^)]*\)", RegexOptions.Compiled);
+    private static readonly Regex PunctuationPattern = new Regex(@"[- .!?,""]", RegexOptions.Compiled);
+    
+    public static bool IsSimilar(string input, string target, float jaroWinklerThreshold = 0.8f, 
+        float levenshteinThreshold = 0.8f)
     {
-        if (string.IsNullOrEmpty(input) || string.IsNullOrEmpty(target)) return false;
-
-        int minLength = Mathf.Min(Normalize(input).Length, Normalize(target).Length);
-        if (minLength <= 3) return GetLevenshteinDistance(input, target) <= 2;
-        if (minLength <= 5) return GetLevenshteinDistance(input, target) <= 3;
+        if (string.IsNullOrEmpty(input) || string.IsNullOrEmpty(target))
+        {
+            Debug.LogWarning($"String is null or empty! input: {input}, target: {target}");
+            return false;
+        }
         
-        return GetLevenshteinDistanceRatio(input, target) <= threshold;
+        string normalizedInput = Normalize(input);
+        string normalizedTarget = Normalize(target);
+
+        if (string.IsNullOrEmpty(normalizedInput) || string.IsNullOrEmpty(normalizedTarget))
+        {
+            Debug.LogWarning("Normalized string is null or empty! " +
+                             $"normalized input: {normalizedInput}, normalized target: {normalizedTarget}");
+        }
+
+        if (IsTargetStringSingleWord(target))
+        {
+            // Use JW algorithm
+            float jaroWinklerSimilarity = GetJaroWinklerSimilarity(normalizedInput, normalizedTarget);
+            return jaroWinklerSimilarity >= jaroWinklerThreshold;
+        }
+
+        // Use Levenshtein Distance Similarity
+        float levenshteinDistanceSimilarity = GetLevenshteinDistanceSimilarity(normalizedInput, normalizedTarget);
+        return levenshteinDistanceSimilarity >= levenshteinThreshold;
     }
 
-    /// <summary>
-    /// Calculates the Levenshtein distance ratio between two strings, which is a normalized value representing their similarity.
-    /// </summary>
-    /// <param name="firstString">The first string to compare.</param>
-    /// <param name="secondString">The second string to compare.</param>
-    /// <returns>A float representing the Levenshtein distance ratio. A value of 0 indicates identical strings, while higher values indicate greater dissimilarity.</returns>
-    public static float GetLevenshteinDistanceRatio(string firstString, string secondString)
+    public static bool IsTargetStringSingleWord(string targetString)
     {
+        string trimmedTarget = targetString.Trim();
+
+        foreach (char character in trimmedTarget)
+        {
+            if (char.IsWhiteSpace(character))
+            {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    public static float GetJaroSimilarity(string firstString, string secondString)
+    {
+        if (firstString == secondString) return 1f;
+        
+        int firstLength = firstString.Length;
+        int secondLength = secondString.Length;
+
+        int matchDistance = Mathf.Max(0, Mathf.Max(firstLength, secondLength) / 2 - 1);
+
+        var firstMatch = new bool[firstLength];
+        var secondMatch = new bool[secondLength];
+
+        int matches = 0;
+
+        for (int i = 0; i < firstLength; i++)
+        {
+            int start = Mathf.Max(0, i - matchDistance);
+            int end = Mathf.Min(secondLength, i + matchDistance + 1);
+
+            for (int j = start; j < end; j++)
+            {
+                if (secondMatch[j]) continue;
+                if (firstString[i] != secondString[j]) continue;
+                firstMatch[i] = true;
+                secondMatch[j] = true;
+                matches++;
+                break;
+            }
+        }
+
+        if (matches == 0) return 0f;
+
+        int k = 0;
+        int transpositions = 0;
+
+        for (int i = 0; i < firstLength; i++)
+        {
+            if (!firstMatch[i]) continue;
+            while (!secondMatch[k]) k++;
+            if (firstString[i] != secondString[k]) transpositions++;
+            k++;
+        }
+
+        float m = matches;
+
+        return (m / firstLength + m / secondLength + (m - transpositions / 2f) / m) / 3f;
+    }
+
+    public static float GetJaroWinklerSimilarity(string firstString, string secondString)
+    {
+        if (firstString == secondString) return 1f;
+        if (firstString.Length == 0 || secondString.Length == 0) return 0f;
+        
+        float j = GetJaroSimilarity(firstString, secondString);
+        if (j == 0f) return 0f;
+        
+        int maxPrefix = Mathf.Min(4, Mathf.Min(firstString.Length, secondString.Length));
+        int prefix = 0;
+        while (prefix < maxPrefix && firstString[prefix] == secondString[prefix]) prefix++;
+        
+        if (j < 0.7f) return j;
+        
+        const float p = 0.1f;
+        
+        return j + prefix * p * (1f - j);
+    }
+
+    
+    public static float GetLevenshteinDistanceSimilarity(string firstString, string secondString)
+    {
+
+        if (firstString == secondString) return 1f;
+        
         int levenshteinDistance = GetLevenshteinDistance(firstString, secondString);
-        
-        int denominator = Mathf.Max(Normalize(firstString).Length, Normalize(secondString).Length);
+        int denominator = Mathf.Max(firstString.Length, secondString.Length);
 
-        if (denominator == 0) return 0f;
+        if (denominator == 0)
+        {
+            Debug.LogError("Max length of input strings is 0!");
+            return 0f;
+        }
         
-        return (float)levenshteinDistance / denominator;
+        float levenshteinDistanceSimilarity = Mathf.Clamp01(1 - (float)levenshteinDistance / denominator);
+        
+        return levenshteinDistanceSimilarity;
     }
-
-    /// <summary>
-    /// Normalizes a string by removing spaces, punctuation, and parentheses, and converting it to lowercase.
-    /// </summary>
-    /// <param name="stringToNormalize">The string to normalize.</param>
-    /// <returns>A normalized string with spaces, punctuation, and parentheses removed and converted to lowercase.</returns>
+    
     public static string Normalize(string stringToNormalize)
     {
-        if (stringToNormalize == null) return string.Empty;
+        if (string.IsNullOrEmpty(stringToNormalize)) return string.Empty;
         
-        string noParentheses = Regex.Replace(stringToNormalize, @"\([^)]*\)", "");
-        string normalizedString = Regex.Replace(noParentheses, "[ .!?,\"-]", "").ToLowerInvariant();
-        return normalizedString;
+        string asteriskBlockRemoved = AsteriskPattern.Replace(stringToNormalize, "");
+        string parenthesesBlockRemoved = ParenthesesPattern.Replace(asteriskBlockRemoved, "");
+        string punctuationRemoved = PunctuationPattern.Replace(parenthesesBlockRemoved, "");
+        string lowercaseConverted = punctuationRemoved.ToLowerInvariant();
+        return lowercaseConverted;
     }
-
-    /// <summary>
-    /// Calculates the Levenshtein distance between two strings, which is the minimum number of
-    /// single-character edits (insertions, deletions, or substitutions) required to transform one string into the other.
-    /// </summary>
-    /// <param name="firstString">The first string to compare.</param>
-    /// <param name="secondString">The second string to compare.</param>
-    /// <returns>The Levenshtein distance between the two normalized strings.</returns>
+    
     public static int GetLevenshteinDistance(string firstString, string secondString)
     {
-        string normalizedFirstString = Normalize(firstString);
-        string normalizedSecondString = Normalize(secondString);
         
-        int firstLength = normalizedFirstString.Length;
-        int secondLength = normalizedSecondString.Length;
+        int firstLength = firstString.Length;
+        int secondLength = secondString.Length;
         
         if (firstLength == 0) return secondLength;
         if (secondLength == 0) return firstLength;
@@ -93,7 +182,7 @@ public static class StringSimilarity
         {
             for (int i = 1; i <= firstLength; i++)
             {
-                int substitutionCost = (normalizedFirstString[i - 1] == normalizedSecondString[j - 1]) ? 0 : 1;
+                int substitutionCost = (firstString[i - 1] == secondString[j - 1]) ? 0 : 1;
 
                 int deletion = matrix[i - 1][j] + 1;
                 int insertion = matrix[i][j - 1] + 1;
@@ -107,4 +196,6 @@ public static class StringSimilarity
         
         return matrix[firstLength][secondLength];
     }
+    
+    
 }

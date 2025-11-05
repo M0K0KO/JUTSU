@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.github.homuler.mediapipe": "file:C:/Users/kevin/OneDrive/바탕 화면/com.github.homuler.mediapipe-0.16.2.tgz",
+    "com.github.homuler.mediapipe": "file:D:/Mediapipe_Project/com.github.homuler.mediapipe-0.16.2.tgz",
     "com.unity.ai.inference": "2.4.1",
     "com.unity.ai.navigation": "2.0.9",
     "com.unity.collab-proxy": "2.10.0",
