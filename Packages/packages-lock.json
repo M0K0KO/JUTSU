@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.github.homuler.mediapipe": {
-      "version": "file:C:/Users/kevin/OneDrive/바탕 화면/com.github.homuler.mediapipe-0.16.2.tgz",
+      "version": "file:D:/Mediapipe_Project/com.github.homuler.mediapipe-0.16.2.tgz",
       "depth": 0,
       "source": "local-tarball",
       "dependencies": {
