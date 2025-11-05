@@ -8,6 +8,9 @@ public class GestureIndicator : MonoBehaviour
 {
     public static GestureIndicator instance;
     
+    private readonly object _currentTextLock = new object();
+    private string _currentText;
+    
     [SerializeField] private TextMeshProUGUI gestureIndicatorText;
 
     private void Awake()
@@ -16,6 +19,7 @@ public class GestureIndicator : MonoBehaviour
         else Destroy(gameObject);
     }
 
+    
     public void ChangeGestureIndicatorText(string text)
     {
         gestureIndicatorText.text = text;

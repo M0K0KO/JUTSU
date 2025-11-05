@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
 using Mediapipe.Tasks.Vision.HandLandmarker;
 using mptcc = Mediapipe.Tasks.Components.Containers;
@@ -80,6 +81,18 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
         }
 
         DeactivateVisuals();
+        
+        ///////////////////////////////////////////////////
+        string modelPath = Path.Combine(Application.streamingAssetsPath, "gesture_recognizer.bytes");
+        Debug.Log($"모델 경로: {modelPath}");
+        Debug.Log($"파일 존재: {File.Exists(modelPath)}");
+    
+        if (File.Exists(modelPath))
+        {
+            FileInfo fileInfo = new FileInfo(modelPath);
+            Debug.Log($"파일 크기: {fileInfo.Length} bytes");
+        }
+        /// 
     }
 
     private void Update()
@@ -132,6 +145,7 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
             if (_currentTarget.handWorldLandmarks != null && _currentTarget.handWorldLandmarks.Count > 0)
             {
                 UpdateVisualsTargetPosition(_currentTarget.handWorldLandmarks);
+                GestureIndicator.instance.ChangeGestureIndicatorText(_currentTarget.gestures[0].categories[0].categoryName);
             }
         }
     }

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.IO;
 using Mediapipe.Tasks.Core;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
 using Mediapipe;
@@ -23,9 +24,11 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
 
     protected override IEnumerator Run()
     {
+        string modelPath = Path.Combine(Application.streamingAssetsPath, "gesture_recognizer_v1.bytes");
+        
         BaseOptions baseOptions = new BaseOptions(
             BaseOptions.Delegate.CPU, 
-            modelAssetPath: "gesture_recognizer.bytes"
+            modelAssetPath: modelPath
         );
 
         options = new GestureRecognizerOptions(
@@ -39,10 +42,10 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
             null,
             OnHandGestureRecognizerOutput);
 
-        yield return AssetLoader.PrepareAssetAsync(
-            $"gesture_recognizer.bytes");
+        yield return AssetLoader.PrepareAssetAsync(modelPath);
 
         taskApi = GestureRecognizer.CreateFromOptions(options, GpuManager.GpuResources);
+        Debug.Log($"using model from {modelPath}");
         
         var imageSource = ImageSourceProvider.ImageSource;
 
@@ -111,7 +114,8 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
         if (result.gestures != null)
         {
             HandWorldLandmarkVisualizer.instance.DrawLater(result);
-            Debug.Log($"HandGestureRecognizerOutput: {result.gestures[0].categories[0].categoryName}");
+            
+            //result.gestures[0].categories[0].categoryName
         }
     }
 }
