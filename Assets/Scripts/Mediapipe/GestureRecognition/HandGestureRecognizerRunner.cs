@@ -12,7 +12,6 @@ using RunningMode = Mediapipe.Tasks.Vision.Core.RunningMode;
 public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunner<GestureRecognizer>
 {
     private Mediapipe.Unity.Experimental.TextureFramePool _textureFramePool;
-    
     private GestureRecognizerOptions options;
 
     public override void Stop()
@@ -25,20 +24,20 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
     protected override IEnumerator Run()
     {
         string modelPath = Path.Combine(Application.streamingAssetsPath, "gesture_recognizer_v1.bytes");
-        
+
         BaseOptions baseOptions = new BaseOptions(
-            BaseOptions.Delegate.CPU, 
+            BaseOptions.Delegate.CPU,
             modelAssetPath: modelPath
         );
 
         options = new GestureRecognizerOptions(
-            baseOptions, 
-            RunningMode.LIVE_STREAM, 
-            1, 
-            0.5f, 
-            0.5f, 
-            0.5f, 
-            null, 
+            baseOptions,
+            RunningMode.LIVE_STREAM,
+            1,
+            0.5f,
+            0.5f,
+            0.5f,
+            null,
             null,
             OnHandGestureRecognizerOutput);
 
@@ -46,11 +45,11 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
 
         taskApi = GestureRecognizer.CreateFromOptions(options, GpuManager.GpuResources);
         Debug.Log($"using model from {modelPath}");
-        
+
         var imageSource = ImageSourceProvider.ImageSource;
 
         yield return imageSource.Play();
-        
+
         if (!imageSource.isPrepared)
         {
             Debug.LogError("Failed to start ImageSource, exiting...");
@@ -62,23 +61,21 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
             imageSource.textureHeight,
             TextureFormat.RGBA32,
             10);
-        
+
         var transformationOptions = imageSource.GetTransformationOptions();
         var flipHorizontally = transformationOptions.flipHorizontally;
         var flipVertically = transformationOptions.flipVertically;
         var imageProcessingOptions =
             new Mediapipe.Tasks.Vision.Core.ImageProcessingOptions(
                 rotationDegrees: (int)transformationOptions.rotationAngle);
-        
+
         AsyncGPUReadbackRequest req = default;
         var waitUntilReqDone = new WaitUntil(() => req.done);
-        var waitForEndOfFrame = new WaitForEndOfFrame();
-        var result = GestureRecognizerResult.Alloc(options.numHands);
-        
+
         var canUseGpuImage = SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3 &&
                              GpuManager.GpuResources != null;
         using var glContext = canUseGpuImage ? GpuManager.GetGlContext() : null;
-        
+
         while (true)
         {
             if (isPaused)
@@ -114,7 +111,8 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
         if (result.gestures != null)
         {
             HandWorldLandmarkVisualizer.instance.DrawLater(result);
-            
+
+            //Debug.Log(result.handWorldLandmarks[0].landmarks[0].z);
             //result.gestures[0].categories[0].categoryName
         }
     }

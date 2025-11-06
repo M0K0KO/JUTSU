@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Mediapipe;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
 using Mediapipe.Tasks.Vision.HandLandmarker;
 using mptcc = Mediapipe.Tasks.Components.Containers;
@@ -55,14 +56,35 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
     private Vector3[] landmarkTargetPositions = new Vector3[_LandmarkCount];
 
     private float landmarkScale = 20f;
+    
+    [Header("SmoothTime Options")]
     [SerializeField] private float visualsPositionSmoothTime = 0.2f;
+    [SerializeField] private float rootPositionSmoothTime = 0.8f;
+    
+    [Header("Position Control (X/Y)")]
+    public float minUnityX = -2.0f;
+    public float maxUnityX = 2.0f;
+    public float maxUnityY = 2.0f;
+    public float minUnityY = -2.0f;
+    private Vector3 initialPosition;
 
+    [Header("Depth Options")]
+    [SerializeField] private float minHandScale = 0.08f; // 가장 가까운 손의 Z값
+    [SerializeField] private float maxHandScale = 0.28f; // 가장 먼 손의 Z값
+    [SerializeField] private float maxUnityZ = 2f; // 가장 가까울 때 Unity Z 위치
+    [SerializeField] private float minUnityZ = -5f; // 가장 멀 때 Unity Z 위치
+    
+    private Vector3 _rootTargetPosition = Vector3.zero;
+    
     public float[] HandAngles { get; private set; } = new float[_AngleCount];
 
     private void Awake()
     {
         if (instance == null) instance = this;
         else Destroy(gameObject);
+        
+        _rootTargetPosition = transform.localPosition;
+        initialPosition = transform.localPosition;
     }
 
     private void Start()
@@ -83,7 +105,8 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
         DeactivateVisuals();
         
         ///////////////////////////////////////////////////
-        string modelPath = Path.Combine(Application.streamingAssetsPath, "gesture_recognizer.bytes");
+        /*
+         string modelPath = Path.Combine(Application.streamingAssetsPath, "gesture_recognizer.bytes");
         Debug.Log($"모델 경로: {modelPath}");
         Debug.Log($"파일 존재: {File.Exists(modelPath)}");
     
@@ -92,7 +115,8 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
             FileInfo fileInfo = new FileInfo(modelPath);
             Debug.Log($"파일 크기: {fileInfo.Length} bytes");
         }
-        /// 
+        */
+        ///////////////////////////////////////////////////
     }
 
     private void Update()
@@ -144,10 +168,40 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
 
             if (_currentTarget.handWorldLandmarks != null && _currentTarget.handWorldLandmarks.Count > 0)
             {
+                UpdateRootPosition(_currentTarget.handLandmarks);
                 UpdateVisualsTargetPosition(_currentTarget.handWorldLandmarks);
                 GestureIndicator.instance.ChangeGestureIndicatorText(_currentTarget.gestures[0].categories[0].categoryName);
+                
+
             }
         }
+    }
+
+    private void UpdateRootPosition(IReadOnlyList<mptcc.NormalizedLandmarks> landmarks2D)
+    {
+        Vector2 lm9 = new Vector2(landmarks2D[0].landmarks[1].x, landmarks2D[0].landmarks[1].y);
+        Vector2 lm10 = new Vector2(landmarks2D[0].landmarks[2].x, landmarks2D[0].landmarks[2].y);
+        Vector2 lm11 = new Vector2(landmarks2D[0].landmarks[3].x, landmarks2D[0].landmarks[3].y);
+        Vector2 lm12 = new Vector2(landmarks2D[0].landmarks[4].x, landmarks2D[0].landmarks[4].y);
+        float dist1 = Vector2.Distance(lm9, lm10);
+        float dist2 = Vector2.Distance(lm10, lm11);
+        float dist3 = Vector2.Distance(lm11, lm12);
+        float middleFingerLengthSum = Mathf.Floor((dist1 + dist2 + dist3) * 100f) / 100f;
+        //Debug.Log($"Middle Finger Length Sum: {middleFingerLengthSum}");
+        float normalizedDepthFactor = Mathf.InverseLerp(minHandScale, maxHandScale, middleFingerLengthSum);
+        float targetZPosition = Mathf.Lerp(minUnityZ, maxUnityZ, normalizedDepthFactor);
+
+        
+        float normalizedX = landmarks2D[0].landmarks[0].x;
+        float normalizedY = landmarks2D[0].landmarks[0].y;
+        float targetXPosition = Mathf.Lerp(minUnityX, maxUnityX, normalizedX);
+        float targetYPosition = Mathf.Lerp(maxUnityY, minUnityY, normalizedY);
+
+        _rootTargetPosition = initialPosition + new Vector3(
+            targetXPosition,
+            targetYPosition,
+            targetZPosition
+        );
     }
 
     private void UpdateVisualsTargetPosition(IReadOnlyList<mptcc.Landmarks> targets)
@@ -186,10 +240,17 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
 
     private void MoveVisuals()
     {
+        transform.localPosition = Vector3.Lerp(
+            transform.localPosition,
+            _rootTargetPosition,
+            rootPositionSmoothTime);
+        
         for (int i = 0; i < _LandmarkCount; i++)
         {
-            landmarkVisuals[i].transform.localPosition = Vector3.Lerp(landmarkVisuals[i].transform.localPosition,
-                landmarkTargetPositions[i], visualsPositionSmoothTime);
+            landmarkVisuals[i].transform.localPosition = Vector3.Lerp(
+                landmarkVisuals[i].transform.localPosition,
+                landmarkTargetPositions[i], 
+                visualsPositionSmoothTime);
         }
     }
 
