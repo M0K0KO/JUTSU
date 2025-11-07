@@ -59,7 +59,7 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
     
     [Header("SmoothTime Options")]
     [SerializeField] private float visualsPositionSmoothTime = 0.2f;
-    [SerializeField] private float rootPositionSmoothTime = 0.8f;
+    [SerializeField] private float rootPositionSmoothTime = 0.2f;
     
     [Header("Position Control (X/Y)")]
     public float minUnityX = -2.0f;
@@ -67,6 +67,7 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
     public float maxUnityY = 2.0f;
     public float minUnityY = -2.0f;
     private Vector3 initialPosition;
+    
 
     [Header("Depth Options")]
     [SerializeField] private float minHandScale = 0.08f; // 가장 가까운 손의 Z값
@@ -74,7 +75,7 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
     [SerializeField] private float maxUnityZ = 2f; // 가장 가까울 때 Unity Z 위치
     [SerializeField] private float minUnityZ = -5f; // 가장 멀 때 Unity Z 위치
     
-    private Vector3 _rootTargetPosition = Vector3.zero;
+    public Vector3 rootTargetPosition = Vector3.zero;
     
     public float[] HandAngles { get; private set; } = new float[_AngleCount];
 
@@ -83,7 +84,7 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
         if (instance == null) instance = this;
         else Destroy(gameObject);
         
-        _rootTargetPosition = transform.localPosition;
+        rootTargetPosition = transform.localPosition;
         initialPosition = transform.localPosition;
     }
 
@@ -168,16 +169,14 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
 
             if (_currentTarget.handWorldLandmarks != null && _currentTarget.handWorldLandmarks.Count > 0)
             {
-                UpdateRootPosition(_currentTarget.handLandmarks);
+                UpdateRootTransform(_currentTarget.handLandmarks);
                 UpdateVisualsTargetPosition(_currentTarget.handWorldLandmarks);
                 GestureIndicator.instance.ChangeGestureIndicatorText(_currentTarget.gestures[0].categories[0].categoryName);
-                
-
             }
         }
     }
 
-    private void UpdateRootPosition(IReadOnlyList<mptcc.NormalizedLandmarks> landmarks2D)
+    private void UpdateRootTransform(IReadOnlyList<mptcc.NormalizedLandmarks> landmarks2D)
     {
         Vector2 lm9 = new Vector2(landmarks2D[0].landmarks[1].x, landmarks2D[0].landmarks[1].y);
         Vector2 lm10 = new Vector2(landmarks2D[0].landmarks[2].x, landmarks2D[0].landmarks[2].y);
@@ -186,9 +185,8 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
         float dist1 = Vector2.Distance(lm9, lm10);
         float dist2 = Vector2.Distance(lm10, lm11);
         float dist3 = Vector2.Distance(lm11, lm12);
-        float middleFingerLengthSum = Mathf.Floor((dist1 + dist2 + dist3) * 100f) / 100f;
-        //Debug.Log($"Middle Finger Length Sum: {middleFingerLengthSum}");
-        float normalizedDepthFactor = Mathf.InverseLerp(minHandScale, maxHandScale, middleFingerLengthSum);
+        float thumbLengthSum = Mathf.Floor((dist1 + dist2 + dist3) * 100f) / 100f;
+        float normalizedDepthFactor = Mathf.InverseLerp(minHandScale, maxHandScale, thumbLengthSum);
         float targetZPosition = Mathf.Lerp(minUnityZ, maxUnityZ, normalizedDepthFactor);
 
         
@@ -197,7 +195,7 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
         float targetXPosition = Mathf.Lerp(minUnityX, maxUnityX, normalizedX);
         float targetYPosition = Mathf.Lerp(maxUnityY, minUnityY, normalizedY);
 
-        _rootTargetPosition = initialPosition + new Vector3(
+        rootTargetPosition = initialPosition + new Vector3(
             targetXPosition,
             targetYPosition,
             targetZPosition
@@ -213,7 +211,7 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
             landmarkTargetPositions[i].z = -targets[0].landmarks[i].z * landmarkScale;
         }
     }
-    
+
     private void ActivateVisuals()
     {
         if (landmarkVisuals.Length > 0)
@@ -242,7 +240,7 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
     {
         transform.localPosition = Vector3.Lerp(
             transform.localPosition,
-            _rootTargetPosition,
+            rootTargetPosition,
             rootPositionSmoothTime);
         
         for (int i = 0; i < _LandmarkCount; i++)
@@ -262,4 +260,4 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
                 landmarkVisuals[_connections[i].Item2].transform.position);
         }
     }
-}
+}   
