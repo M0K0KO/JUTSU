@@ -10,8 +10,8 @@ public static class StringSimilarity
     private static readonly Regex ParenthesesPattern = new Regex(@"\([^)]*\)", RegexOptions.Compiled);
     private static readonly Regex PunctuationPattern = new Regex(@"[- .!?,""]", RegexOptions.Compiled);
     
-    public static bool IsSimilar(string input, string target, float jaroWinklerThreshold = 0.8f, 
-        float levenshteinThreshold = 0.8f)
+    public static bool IsSimilar(string input, string target, float jaroWinklerThreshold = 0.7f, 
+        float levenshteinThreshold = 0.7f)
     {
         if (string.IsNullOrEmpty(input) || string.IsNullOrEmpty(target))
         {
