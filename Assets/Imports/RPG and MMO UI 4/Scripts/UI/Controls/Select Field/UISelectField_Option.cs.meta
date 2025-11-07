@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 59b78e7577f6fcb4682af3d89d40b168
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 81866
+  packageName: RPG & MMO UI 4
+  packageVersion: 1.7
+  assetPath: Assets/RPG and MMO UI 4/Scripts/UI/Controls/Select Field/UISelectField_Option.cs
+  uploadId: 746577

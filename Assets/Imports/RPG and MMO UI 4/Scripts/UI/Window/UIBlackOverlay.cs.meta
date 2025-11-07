@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 8b0aec806f927014c9eccadafb1ec4d5
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 81866
+  packageName: RPG & MMO UI 4
+  packageVersion: 1.7
+  assetPath: Assets/RPG and MMO UI 4/Scripts/UI/Window/UIBlackOverlay.cs
+  uploadId: 746577

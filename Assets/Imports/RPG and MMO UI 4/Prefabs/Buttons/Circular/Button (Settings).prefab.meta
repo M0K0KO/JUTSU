@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: addd78af38837ff47a534404c902dfd6
+timeCreated: 1485190376
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 81866
+  packageName: RPG & MMO UI 4
+  packageVersion: 1.7
+  assetPath: Assets/RPG and MMO UI 4/Prefabs/Buttons/Circular/Button (Settings).prefab
+  uploadId: 746577

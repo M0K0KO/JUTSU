@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: dbc4725b62ea33d4ca782665b0541d7c
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 81866
+  packageName: RPG & MMO UI 4
+  packageVersion: 1.7
+  assetPath: Assets/RPG and MMO UI 4/Scripts/UI/Databases/Serializables/UIItemInfo.cs
+  uploadId: 746577

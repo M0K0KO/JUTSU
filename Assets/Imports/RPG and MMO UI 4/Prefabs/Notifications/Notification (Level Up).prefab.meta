@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0e792007894344640ac45facddfbd37e
+timeCreated: 1485190434
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 81866
+  packageName: RPG & MMO UI 4
+  packageVersion: 1.7
+  assetPath: Assets/RPG and MMO UI 4/Prefabs/Notifications/Notification (Level Up).prefab
+  uploadId: 746577

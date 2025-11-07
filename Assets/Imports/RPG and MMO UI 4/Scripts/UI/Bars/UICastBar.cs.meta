@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: d5546a30af8b20a459cb38adbe1b9347
+timeCreated: 1484754316
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 81866
+  packageName: RPG & MMO UI 4
+  packageVersion: 1.7
+  assetPath: Assets/RPG and MMO UI 4/Scripts/UI/Bars/UICastBar.cs
+  uploadId: 746577

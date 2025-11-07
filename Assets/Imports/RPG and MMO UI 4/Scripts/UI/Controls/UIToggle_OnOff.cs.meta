@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 15d7ea5020e431e4d84518ef15056a0f
+timeCreated: 1428000089
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 81866
+  packageName: RPG & MMO UI 4
+  packageVersion: 1.7
+  assetPath: Assets/RPG and MMO UI 4/Scripts/UI/Controls/UIToggle_OnOff.cs
+  uploadId: 746577
