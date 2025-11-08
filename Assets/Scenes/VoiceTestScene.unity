@@ -608,21 +608,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bc03a4c19604ea394e364f8fc632928, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxLengthSec: 60
+  maxLengthSec: 30
   loop: 0
   frequency: 16000
   chunksLengthSec: 0.5
-  echo: 0
+  echo: 1
   useVad: 1
-  vadUpdateRateSec: 0.1
-  vadContextSec: 30
+  vadUpdateRateSec: 0.05
+  vadContextSec: 10
   vadLastSec: 1.25
   vadThd: 1
   vadFreqThd: 100
   vadIndicatorImage: {fileID: 0}
-  vadStop: 0
+  vadStop: 1
   dropVadPart: 1
-  vadStopTime: 3
+  vadStopTime: 1.5
   microphoneDropdown: {fileID: 0}
   microphoneDefaultLabel: Default microphone
 --- !u!4 &299703663
@@ -716,7 +716,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
+  m_VertexColorAlwaysGammaSpace: 1
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -921,14 +921,14 @@ MonoBehaviour:
   translateToEnglish: 0
   strategy: 0
   noContext: 1
-  singleSegment: 0
+  singleSegment: 1
   enableTokens: 0
-  initialPrompt: 'Skill Commands: Kon, Domain Expansion Infinite Void, Fireball Jutsu,
-    Bang, Repulsor Beam.'
+  initialPrompt: 'Skill Commands: "Ryoiki Tenkai Muryo Kusho", "Bam", "Za Warudo",
+    "Amateras", "Kage Bunshin No Jutsu", "Kon"'
   stepSec: 3
   keepSec: 0.2
   lengthSec: 10
-  updatePrompt: 1
+  updatePrompt: 0
   dropOldBuffer: 0
   useVad: 1
   tokensTimestamps: 0
@@ -995,7 +995,7 @@ MonoBehaviour:
   microphoneButton: {fileID: 254853024}
   outputText: {fileID: 1278855256}
   similarityInfoText: {fileID: 1432292979}
-  targetCommand: Kon
+  targetCommand: Bam
 --- !u!1 &1428944346
 GameObject:
   m_ObjectHideFlags: 0

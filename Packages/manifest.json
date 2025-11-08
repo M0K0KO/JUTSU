@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.github.homuler.mediapipe": "file:D:/Mediapipe_Project/com.github.homuler.mediapipe-0.16.2.tgz",
+    "com.unity.2d.sprite": "1.0.0",
     "com.unity.ai.inference": "2.4.1",
     "com.unity.ai.navigation": "2.0.9",
     "com.unity.animation.rigging": "1.3.1",
