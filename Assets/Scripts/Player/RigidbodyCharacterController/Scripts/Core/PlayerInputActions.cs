@@ -260,6 +260,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Jutsu"",
+                    ""type"": ""Button"",
+                    ""id"": ""f465e0c0-e400-44ca-bcbd-73a1c2fb3f2b"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -271,6 +280,17 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Shoot"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a4b9c674-7314-491d-a46b-34d9a38220d4"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jutsu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -291,6 +311,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         // Action
         m_Action = asset.FindActionMap("Action", throwIfNotFound: true);
         m_Action_Shoot = m_Action.FindAction("Shoot", throwIfNotFound: true);
+        m_Action_Jutsu = m_Action.FindAction("Jutsu", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
@@ -599,6 +620,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Action;
     private List<IActionActions> m_ActionActionsCallbackInterfaces = new List<IActionActions>();
     private readonly InputAction m_Action_Shoot;
+    private readonly InputAction m_Action_Jutsu;
     /// <summary>
     /// Provides access to input actions defined in input action map "Action".
     /// </summary>
@@ -614,6 +636,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Action/Shoot".
         /// </summary>
         public InputAction @Shoot => m_Wrapper.m_Action_Shoot;
+        /// <summary>
+        /// Provides access to the underlying input action "Action/Jutsu".
+        /// </summary>
+        public InputAction @Jutsu => m_Wrapper.m_Action_Jutsu;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -643,6 +669,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Shoot.started += instance.OnShoot;
             @Shoot.performed += instance.OnShoot;
             @Shoot.canceled += instance.OnShoot;
+            @Jutsu.started += instance.OnJutsu;
+            @Jutsu.performed += instance.OnJutsu;
+            @Jutsu.canceled += instance.OnJutsu;
         }
 
         /// <summary>
@@ -657,6 +686,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Shoot.started -= instance.OnShoot;
             @Shoot.performed -= instance.OnShoot;
             @Shoot.canceled -= instance.OnShoot;
+            @Jutsu.started -= instance.OnJutsu;
+            @Jutsu.performed -= instance.OnJutsu;
+            @Jutsu.canceled -= instance.OnJutsu;
         }
 
         /// <summary>
@@ -755,5 +787,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnShoot(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Jutsu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnJutsu(InputAction.CallbackContext context);
     }
 }

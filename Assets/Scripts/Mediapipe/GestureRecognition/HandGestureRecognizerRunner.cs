@@ -110,10 +110,27 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
     {
         if (result.gestures != null)
         {
-            HandWorldLandmarkVisualizer.instance.DrawLater(result);
+            Debug.Log(result.handWorldLandmarks.Count);
+
+            HandWorldLandmarkVisualizer.instance.DrawLater(result, GetRecognizedGestureType(result));
 
             //Debug.Log(result.handWorldLandmarks[0].landmarks[0].z);
-            //result.gestures[0].categories[0].categoryName
+            Debug.Log(result.gestures[0].categories[0].categoryName);
+        }
+    }
+
+    private GestureType GetRecognizedGestureType(GestureRecognizerResult result)
+    {
+        string bestGesture = result.gestures[0].categories[0].categoryName;
+
+        if (bestGesture == "none") return GestureType.None;
+        
+        switch (bestGesture)
+        {
+            case "kon":
+                return GestureType.Kon;       
+            default:
+                return GestureType.None;
         }
     }
 }

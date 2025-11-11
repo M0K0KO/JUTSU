@@ -8,17 +8,20 @@ public class AttackState : BaseState
     
     public override void OnEnterState()
     {
-        stateMachine.mover.EnableMove();
+        stateMachine.player.mover.EnableMove();
+        
+        stateMachine.player.mover.EnableRotation();
         PivotTowardsTargetDirection();
-        stateMachine.mover.DisableRotation();
-        stateMachine.animationController.TriggerAnimParam("attack");
+        stateMachine.player.mover.DisableRotation();
+        
+        stateMachine.player.animController.TriggerAnimParam("attack");
     }
     
     public override void OnUpdateState()
     {
         if (nextCombo)
         {
-            stateMachine.animationController.TriggerAnimParam("attack");
+            stateMachine.player.animController.TriggerAnimParam("attack");
         }
     }
     
@@ -28,7 +31,7 @@ public class AttackState : BaseState
 
     public override void OnExitState()
     {
-        stateMachine.animationController.ResetTriggerAnimParam("attack");
+        stateMachine.player.animController.ResetTriggerAnimParam("attack");
         nextCombo = false;
     }
 
@@ -40,16 +43,16 @@ public class AttackState : BaseState
             targetDirection = stateMachine.currentTargetEnemy.transform.position - stateMachine.transform.position;
         else
             // snap the rotation towards camera forward
-            targetDirection = stateMachine.playerCam.transform.forward;
+            targetDirection = stateMachine.player.playerCam.transform.forward;
         
         targetDirection.y = 0;
         targetDirection.Normalize();
-        stateMachine.mover.Rotate(targetDirection, false);
+        stateMachine.player.mover.Rotate(targetDirection, false);
     }
 
     public void BufferAttackInput()
     {
-        AnimatorStateInfo stateInfo = stateMachine.animationController.animator.GetCurrentAnimatorStateInfo(1);
+        AnimatorStateInfo stateInfo = stateMachine.player.animator.GetCurrentAnimatorStateInfo(1);
         if (!stateInfo.IsName("Empty") && stateInfo.normalizedTime >= 0.35f)
         {
             nextCombo = true;

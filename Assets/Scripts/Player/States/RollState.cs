@@ -9,20 +9,22 @@ public class RollState : BaseState
 
     public override void OnEnterState()
     {
-        if (!stateMachine.isStrafing) PivotTowardsMoveDirection();
-        stateMachine.mover.DisableRotation();
-        stateMachine.mover.EnableMove();
+        stateMachine.player.mover.EnableRotation();
+        PivotTowardsMoveDirection();
+        stateMachine.player.mover.DisableRotation();
+        
+        stateMachine.player.mover.EnableMove();
         
         Vector3 rollDir = Vector2.zero;
-        if (stateMachine.playerInput.MoveInput != Vector2.zero)
-            rollDir = stateMachine.mover.GetCameraRelativeMoveDirection(stateMachine.playerInput.MoveInput);
+        if (stateMachine.player.playerInput.MoveInput != Vector2.zero)
+            rollDir = stateMachine.player.mover.GetCameraRelativeMoveDirection(stateMachine.player.playerInput.MoveInput);
         else
             rollDir = new Vector3(stateMachine.transform.forward.x, 0f, stateMachine.transform.forward.z).normalized;
-        rollCoroutine = stateMachine.StartCoroutine(stateMachine.mover.Roll(rollDir));
+        rollCoroutine = stateMachine.StartCoroutine(stateMachine.player.mover.Roll(rollDir));
         
-        stateMachine.animationController.UpdateAnimParam("horizontalMoveAmount", stateMachine.playerInput.MoveInput.x);
-        stateMachine.animationController.UpdateAnimParam("verticalMoveAmount", stateMachine.playerInput.MoveInput.y);
-        stateMachine.animationController.TriggerAnimParam("roll");
+        stateMachine.player.animController.UpdateAnimParam("horizontalMoveAmount", stateMachine.player.playerInput.MoveInput.x);
+        stateMachine.player.animController.UpdateAnimParam("verticalMoveAmount", stateMachine.player.playerInput.MoveInput.y);
+        stateMachine.player.animController.TriggerAnimParam("roll");
     }
     
     public override void OnUpdateState()
@@ -35,17 +37,18 @@ public class RollState : BaseState
 
     public override void OnExitState()
     {
-        stateMachine.animationController.ResetTriggerAnimParam("roll");
+        stateMachine.player.animController.ResetTriggerAnimParam("roll");
+        if (rollCoroutine != null) stateMachine.StopCoroutine(rollCoroutine);
     }
     
     private void PivotTowardsMoveDirection()
     {
         Vector3 targetDirection = Vector3.zero;
 
-        targetDirection = stateMachine.mover.GetCameraRelativeMoveDirection(stateMachine.playerInput.MoveInput);
+        targetDirection = stateMachine.player.mover.GetCameraRelativeMoveDirection(stateMachine.player.playerInput.MoveInput);
         
         targetDirection.y = 0;
         targetDirection.Normalize();
-        stateMachine.mover.Rotate(targetDirection, false);
+        stateMachine.player.mover.Rotate(targetDirection, false);
     }
 }

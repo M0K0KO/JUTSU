@@ -12,10 +12,7 @@ public class PlayerStateMachine : MonoBehaviour
     public BaseState currentState;
 
 
-    public PlayerInput playerInput { get; private set; }
-    public PlayerAnimationController animationController { get; private set; }
-    public PlayerMover mover { get; private set; }
-    public Camera playerCam { get; private set; }
+    public PlayerManager player { get; private set; }
 
     [Header("Enemy Detection")]
     [SerializeField]
@@ -30,10 +27,7 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void Awake()
     {
-        playerInput = GetComponent<PlayerInput>();
-        animationController = GetComponent<PlayerAnimationController>();
-        mover = GetComponent<PlayerMover>();
-        playerCam = Camera.main;
+        player = GetComponent<PlayerManager>();
     }
 
     private void Start()
@@ -50,14 +44,6 @@ public class PlayerStateMachine : MonoBehaviour
         CheckRollInput();
         CheckAttackInput();
         CheckLockOn();
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        if (Input.GetMouseButtonDown(1))
-        {
-            CheckNearbyEnemies(out GameObject target);
-            EventManager.TriggerOnCameraStateChange(PlayerCameraState.Skill, target.transform);
-        }
-        ////////////////////////////////////////////////////////////////////////////////////////////
     }
 
     private void FixedUpdate()
@@ -72,14 +58,13 @@ public class PlayerStateMachine : MonoBehaviour
         currentState.OnEnterState();
     }
 
-
     #region CheckInput
 
     private void CheckRollInput()
     {
-        if (playerInput.RollInput)
+        if (player.playerInput.RollInput)
         {
-            playerInput.ClearRollInput();
+            player.playerInput.ClearRollInput();
 
             if (currentState != rollState)
             {
@@ -90,9 +75,9 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void CheckAttackInput()
     {
-        if (playerInput.AttackInput)
+        if (player.playerInput.AttackInput)
         {
-            playerInput.ClearAttackInput();
+            player.playerInput.ClearAttackInput();
 
             if (currentState != rollState && currentState != attackState)
             {
@@ -107,9 +92,9 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void CheckLockOn()
     {
-        if (playerInput.LockOnInput)
+        if (player.playerInput.LockOnInput)
         {
-            playerInput.ClearLockOnInput();
+            player.playerInput.ClearLockOnInput();
             if (!isStrafing)
             {
                 if (CheckNearbyEnemies(out GameObject target))
@@ -142,23 +127,25 @@ public class PlayerStateMachine : MonoBehaviour
         currentState.OnEnterState();
     }
 
-    private bool CheckNearbyEnemies(out GameObject target)
+    public bool CheckNearbyEnemies(out GameObject target, bool useDetectionRange = true)
     {
+        float detectionRange = useDetectionRange ? enemyDetectionRange : Mathf.Infinity;
+        
         Collider[] nearbyEnemies = new Collider[20];
         int enemyCount = Physics.OverlapSphereNonAlloc(transform.position,
-            enemyDetectionRange, nearbyEnemies, enemyLayerMask);
+            detectionRange, nearbyEnemies, enemyLayerMask);
 
         if (enemyCount > 0)
         {
             Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
-            Vector2 targetScreenPosition = playerCam.WorldToScreenPoint(nearbyEnemies[0].transform.position);
+            Vector2 targetScreenPosition = player.playerCam.WorldToScreenPoint(nearbyEnemies[0].transform.position);
             float nearestDistance = Vector2.Distance(screenCenter, targetScreenPosition);
             Collider nearestEnemy = nearbyEnemies[0];
 
             for (int i = 1; i < enemyCount; i++)
             {
                 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
-                targetScreenPosition = playerCam.WorldToScreenPoint(nearbyEnemies[i].transform.position);
+                targetScreenPosition = player.playerCam.WorldToScreenPoint(nearbyEnemies[i].transform.position);
                 float distance = Vector2.Distance(screenCenter, targetScreenPosition);
 
                 if (distance < nearestDistance)

@@ -6,22 +6,23 @@ public class RunState : BaseState
     
     public override void OnEnterState()
     {
-        stateMachine.mover.EnableMove();
-        stateMachine.mover.ChangeSpeedToRunSpeed();
+        stateMachine.player.mover.EnableMove();
+        stateMachine.player.mover.EnableRotation();
+        stateMachine.player.mover.ChangeSpeedToRunSpeed();
     }
     
     public override void OnUpdateState()
     {        
-        stateMachine.mover.EnableRotation();
+        stateMachine.player.mover.EnableRotation();
         
-        stateMachine.mover.Move(stateMachine.mover.GetCameraRelativeMoveDirection(stateMachine.playerInput.MoveInput));
-        stateMachine.mover.Rotate(stateMachine.mover.GetCameraRelativeMoveDirection(stateMachine.playerInput.MoveInput));
+        stateMachine.player.mover.Move(stateMachine.player.mover.GetCameraRelativeMoveDirection(stateMachine.player.playerInput.MoveInput));
+        stateMachine.player.mover.Rotate(stateMachine.player.mover.GetCameraRelativeMoveDirection(stateMachine.player.playerInput.MoveInput));
         
-        if (stateMachine.playerInput.MoveInput == Vector2.zero)
+        if (stateMachine.player.playerInput.MoveInput == Vector2.zero)
         {
             stateMachine.ChangeState(stateMachine.idleState);
         }
-        else if (!stateMachine.playerInput.RunInput)
+        else if (!stateMachine.player.playerInput.RunInput)
         {
             stateMachine.ChangeState(stateMachine.walkState);
         }

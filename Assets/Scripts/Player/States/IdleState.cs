@@ -6,19 +6,19 @@ public class IdleState : BaseState
     
     public override void OnEnterState()
     {
-        stateMachine.mover.DisableMove();
-        
-        stateMachine.mover.ChangeSpeedToZero();
+        stateMachine.player.mover.DisableMove();
+        stateMachine.player.mover.EnableRotation();
+        stateMachine.player.mover.ChangeSpeedToZero();
     }
     
     public override void OnUpdateState()
     {
         if (stateMachine.isStrafing)
-            stateMachine.mover.StrafeRotate();
+            stateMachine.player.mover.StrafeRotate();
         
-        if (stateMachine.playerInput.MoveInput != Vector2.zero)
+        if (stateMachine.player.playerInput.MoveInput != Vector2.zero)
         {
-            if (stateMachine.playerInput.RunInput)
+            if (stateMachine.player.playerInput.RunInput)
                 stateMachine.ChangeState(stateMachine.runState);
             else
                 stateMachine.ChangeState(stateMachine.walkState);

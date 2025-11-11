@@ -32,23 +32,12 @@ public class PlayerMover : MonoBehaviour
     public bool canRotate { get; private set; } = true;
     public bool canRoll { get; private set; } = true;
 
-    // Built-In Components References
-    public CharacterController cc { get; private set; }
-
-    // References
-    private PlayerStateMachine stateMachine;
-    private PlayerAnimationController animationController;
-    private Camera playerCam;
+    private PlayerManager player;
 
 
     private void Awake()
     {
-        cc = GetComponent<CharacterController>();
-
-        stateMachine = GetComponent<PlayerStateMachine>();
-        animationController = GetComponent<PlayerAnimationController>();
-
-        playerCam = Camera.main;
+        player = GetComponent<PlayerManager>();
     }
 
     private void Update()
@@ -74,7 +63,7 @@ public class PlayerMover : MonoBehaviour
 
     public Vector3 GetCameraRelativeMoveDirection(Vector2 moveInput)
     {
-        Vector3 moveDirection = moveInput.x * playerCam.transform.right + moveInput.y * playerCam.transform.forward;
+        Vector3 moveDirection = moveInput.x * player.playerCam.transform.right + moveInput.y * player.playerCam.transform.forward;
         horizontalMoveAmount = moveDirection.x;
         verticalMoveAmount = moveDirection.z;
         moveDirection.y = 0;
@@ -86,7 +75,7 @@ public class PlayerMover : MonoBehaviour
     {
         if (!canMove) return;
 
-        cc.Move(moveDirection * (moveSpeed * Time.deltaTime));
+        player.cc.Move(moveDirection * (moveSpeed * Time.deltaTime));
     }
 
     public void EnableMove() => canMove = true;
@@ -96,7 +85,7 @@ public class PlayerMover : MonoBehaviour
     public void ChangeSpeedToWalkSpeed() => moveSpeed = walkSpeed;
     public void ChangeSpeedToRunSpeed() => moveSpeed = runSpeed;
 
-    public void ApplyGravity() => cc.Move(Vector3.down * (gravitySpeed * Time.deltaTime));
+    public void ApplyGravity() => player.cc.Move(Vector3.down * (gravitySpeed * Time.deltaTime));
 
     public void Rotate(Vector3 moveDirection, bool smooth = true)
     {
@@ -112,9 +101,9 @@ public class PlayerMover : MonoBehaviour
 
     public void StrafeRotate()
     {
-        if (!stateMachine.isStrafing) return;
+        if (!player.stateMachine.isStrafing) return;
 
-        Vector3 targetDirection = stateMachine.currentTargetEnemy.transform.position - transform.position;
+        Vector3 targetDirection = player.stateMachine.currentTargetEnemy.transform.position - transform.position;
         targetDirection.y = 0;
         targetDirection.Normalize();
 
@@ -134,7 +123,7 @@ public class PlayerMover : MonoBehaviour
         while (elapsedTime <= rollDuration)
         {
             float eval = elapsedTime / rollDuration;
-            cc.Move(rollDirection * (rollSpeed * rollSpeedCurve.Evaluate(eval) * Time.deltaTime));
+            player.cc.Move(rollDirection * (rollSpeed * rollSpeedCurve.Evaluate(eval) * Time.deltaTime));
             elapsedTime += Time.deltaTime;
             yield return null;
         }

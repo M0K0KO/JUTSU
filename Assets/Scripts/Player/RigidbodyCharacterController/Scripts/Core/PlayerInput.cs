@@ -9,6 +9,7 @@ public class PlayerInput : MonoBehaviour
     public bool RollInput { get; private set; }
     public bool AttackInput { get; private set; }
     public bool LockOnInput { get; private set; }
+    public bool JutsuInput { get; private set; }
 
     private PlayerInputActions _playerInputActions;
 
@@ -18,6 +19,7 @@ public class PlayerInput : MonoBehaviour
     private InputAction _look;
     private InputAction _attack;
     private InputAction _lockOn;
+    private InputAction _jutsu;
 
     
     #region Built-In Functions
@@ -31,6 +33,7 @@ public class PlayerInput : MonoBehaviour
         _look = _playerInputActions.Camera.Look;
         _attack = _playerInputActions.Action.Shoot;
         _lockOn = _playerInputActions.Camera.LockOn;
+        _jutsu = _playerInputActions.Action.Jutsu;
     }
 
     private void OnEnable()
@@ -51,6 +54,8 @@ public class PlayerInput : MonoBehaviour
         _lockOn.canceled += OnLockOn;
 
         _attack.performed += OnAttack;
+
+        _jutsu.performed += OnJutsu;
     }
 
     private void OnDisable()
@@ -71,6 +76,8 @@ public class PlayerInput : MonoBehaviour
         _lockOn.canceled -= OnLockOn;
         
         _attack.performed -= OnAttack;
+
+        _jutsu.performed -= OnJutsu;
     }
 
     private void OnDestroy()
@@ -109,11 +116,17 @@ public class PlayerInput : MonoBehaviour
     {
         AttackInput = true;
     }
+
+    private void OnJutsu(InputAction.CallbackContext context)
+    {
+        JutsuInput = true;
+    }
     #endregion
     
     #region ClearInput
     public void ClearRollInput() => RollInput = false;
     public void ClearAttackInput() => AttackInput = false;
     public void ClearLockOnInput() => LockOnInput = false;
+    public void ClearJutsuInput() => JutsuInput = false;
     #endregion
 }
