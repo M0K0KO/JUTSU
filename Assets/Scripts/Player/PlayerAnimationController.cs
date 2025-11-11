@@ -13,6 +13,11 @@ public class PlayerAnimationController : MonoBehaviour
         player = GetComponent<PlayerManager>();
     }
 
+    private void OnAnimatorMove()
+    {
+        return;
+    }
+
     private void LateUpdate()
     {
         LerpUpdateAnimParam("moveAmount", player.mover.GetMoveAmount());

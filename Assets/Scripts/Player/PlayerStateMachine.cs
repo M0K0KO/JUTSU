@@ -21,6 +21,7 @@ public class PlayerStateMachine : MonoBehaviour
     [SerializeField] private LayerMask enemyLayerMask = 0;
 
     public GameObject currentTargetEnemy { get; private set; }
+    public Transform currentTargetHitTarget { get; private set; }
 
 
     public bool isStrafing { get; private set; } = false;
@@ -155,11 +156,14 @@ public class PlayerStateMachine : MonoBehaviour
                 }
             }
 
-            target = nearestEnemy.gameObject;
+            Target_Test enemy = nearestEnemy.gameObject.GetComponent<Target_Test>();
+            target = enemy.cameraTarget;
+            currentTargetHitTarget = enemy.hitTarget;
             return true;
         }
 
         target = null;
+        currentTargetHitTarget = null;
         return false;
     }
 }

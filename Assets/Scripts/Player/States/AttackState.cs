@@ -43,7 +43,7 @@ public class AttackState : BaseState
             targetDirection = stateMachine.currentTargetEnemy.transform.position - stateMachine.transform.position;
         else
             // snap the rotation towards camera forward
-            targetDirection = stateMachine.player.playerCam.transform.forward;
+            targetDirection = stateMachine.player.transform.forward;
         
         targetDirection.y = 0;
         targetDirection.Normalize();
