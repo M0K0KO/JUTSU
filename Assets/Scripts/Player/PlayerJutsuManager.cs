@@ -13,11 +13,14 @@ public class PlayerJutsuManager : MonoBehaviour
     private PlayerManager player;
 
     [Header("Sequence Settings")]
-    [SerializeField] private float sequenceMaxDuration;
+    [SerializeField]
+    private float sequenceMaxDuration;
+
     [SerializeField, Range(0.1f, 0.9f)] private float slowedTimeScale;
 
     [Header("Jutsu List")]
-    [SerializeField] private List<Jutsu> jutsuList;
+    [SerializeField]
+    private List<Jutsu> jutsuList;
 
     public bool isUsingJutsu { get; private set; } = false;
 
@@ -47,7 +50,7 @@ public class PlayerJutsuManager : MonoBehaviour
         if (player.playerInput.JutsuInput)
         {
             player.playerInput.ClearJutsuInput();
-            
+
             // if (cooldown~~)
             if (!isUsingJutsu)
                 StartCoroutine(JutsuMode());
@@ -56,9 +59,8 @@ public class PlayerJutsuManager : MonoBehaviour
 
     public IEnumerator JutsuMode()
     {
-        
         isUsingJutsu = true;
-        
+
         player.stateMachine.CheckNearbyEnemies(out GameObject target, false);
         PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Jutsu, target.transform);
 
@@ -74,7 +76,7 @@ public class PlayerJutsuManager : MonoBehaviour
 
         Task<string> voiceTask = null;
         CancellationTokenSource cts = new CancellationTokenSource();
-        
+
         Debug.Log("Jutsu Mode: Started. Waiting for gesture...");
 
         try
@@ -86,7 +88,7 @@ public class PlayerJutsuManager : MonoBehaviour
                 if (!jutsuGestureTrigger)
                 {
                     detectedGesture = HandWorldLandmarkVisualizer.instance.currentGesture;
-                    if (detectedGesture != GestureType.None)
+                    if (detectedGesture != GestureType.None && jutsuDict.ContainsKey(detectedGesture))
                     {
                         jutsu = GetJutsu(detectedGesture);
                         expectedVoiceCommand = GetJutsuVoiceCommand(detectedGesture);
@@ -102,7 +104,8 @@ public class PlayerJutsuManager : MonoBehaviour
                     if (HandWorldLandmarkVisualizer.instance.currentGesture != detectedGesture)
                     {
                         Debug.Log("[Canceled] Gesture was not held. Cancelling Jutsu.");
-                        break; 
+                        cts.Cancel();
+                        break;
                     }
 
                     if (voiceTask != null && voiceTask.IsCompleted)
@@ -123,7 +126,8 @@ public class PlayerJutsuManager : MonoBehaviour
                         {
                             Debug.LogWarning($"[Phase 2] Voice task faulted: {voiceTask.Exception}");
                         }
-                        break; 
+
+                        break;
                     }
                 }
 
@@ -141,10 +145,6 @@ public class PlayerJutsuManager : MonoBehaviour
             {
                 HandWorldLandmarkVisualizer.instance.DeactivateVisuals();
             }
-            if (VoiceRecognitionManager.instance != null && VoiceRecognitionManager.instance.microphoneRecord != null)
-            {
-                VoiceRecognitionManager.instance.microphoneRecord.StopRecord();
-            }
 
             if (isTriggered && jutsu != null)
             {
@@ -155,55 +155,133 @@ public class PlayerJutsuManager : MonoBehaviour
             {
                 Debug.Log("Jutsu Sequence Ended (Timeout or Failed)");
             }
-            
+
             if (PlayerCameraStateHandler.instance != null && target != null)
             {
                 PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Strafe, target.transform);
             }
             else if (PlayerCameraStateHandler.instance != null)
             {
-                PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Strafe, null); 
+                PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Strafe, null);
             }
-            
+
             isUsingJutsu = false;
         }
     }
-    
+
     private async Task<string> RecognizeVoiceAsync(CancellationToken ct)
     {
+        var mic = VoiceRecognitionManager.instance.microphoneRecord;
+        var whisper = VoiceRecognitionManager.instance.whipserManager;
+        
         TaskCompletionSource<string> tcs = new TaskCompletionSource<string>();
+        OnRecordStopDelegate onStop = null;
+        bool isCompleted = false;
 
-        OnVoiceRecognizedDelegate onResult = null;
-        onResult = (result) =>
+        try
         {
-            tcs.TrySetResult(result);
-        };
+            Debug.Log("[Voice] Starting voice recognition...");
+            
+            onStop = async (chunk) =>
+            {
+                if (isCompleted) return; 
+                
+                try
+                {
+                    Debug.Log($"[Voice] Recording stopped. Audio length: {chunk.Length}s, Voice detected: {chunk.IsVoiceDetected}");
+                    Debug.Log($"[Voice] Audio data size: {chunk.Data.Length} samples, Frequency: {chunk.Frequency}Hz");
+                    
+                    Debug.Log("[Voice] Processing audio with Whisper...");
+                    var result = await whisper.GetTextAsync(chunk.Data, chunk.Frequency, chunk.Channels);
+                    
+                    if (result != null && !string.IsNullOrEmpty(result.Result))
+                    {
+                        var transcription = result.Result.Trim();
+                        Debug.Log($"[Voice] ✓ Transcription complete: '{transcription}'");
+                        tcs.TrySetResult(transcription);
+                    }
+                    else
+                    {
+                        Debug.Log("[Voice] ✗ Transcription returned empty");
+                        tcs.TrySetResult(string.Empty);
+                    }
+                    
+                    isCompleted = true;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[Voice] Error in OnRecordStop handler: {e}");
+                    tcs.TrySetException(e);
+                    isCompleted = true;
+                }
+            };
 
-        VoiceRecognitionManager.instance.whipserManager.OnVoiceRecognized += onResult;
-        VoiceRecognitionManager.instance.microphoneRecord.StartRecord();
-        
-        using (ct.Register(() => tcs.TrySetCanceled(ct)))
+           mic.OnRecordStop += onStop;
+           
+            
+            if (!mic.IsRecording)
+            {
+                mic.StartRecord();
+                Debug.Log("[Voice] 🎤 Microphone recording started (waiting for speech...)");
+            }
+            else
+            {
+                Debug.LogWarning("[Voice] Microphone is already recording!");
+            }
+            
+            using (ct.Register(() => 
+            {
+                if (isCompleted) return;
+                
+                Debug.Log("[Voice] Voice recognition cancelled by token");
+                if (mic != null && mic.IsRecording)
+                {
+                    mic.StopRecord(); 
+                }
+                else
+                {
+                    tcs.TrySetCanceled(ct);
+                    isCompleted = true;
+                }
+            }))
+            {
+                var result = await tcs.Task;
+                
+                if (onStop != null)
+                {
+                    mic.OnRecordStop -= onStop;
+                }
+                
+                return result;
+            }
+        }
+        catch (OperationCanceledException)
         {
-            VoiceRecognitionManager.instance.whipserManager.OnVoiceRecognized += onResult;
-            VoiceRecognitionManager.instance.microphoneRecord.StartRecord();
-        
-            try
+            Debug.Log("[Voice] Voice recognition was canceled");
+            return string.Empty;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[Voice] Voice recognition failed: {e.Message}\n{e.StackTrace}");
+            return string.Empty;
+        }
+        finally
+        {
+            if (onStop != null && mic != null)
             {
-                return await tcs.Task;
+                try
+                {
+                    mic.OnRecordStop -= onStop;
+                }
+                catch { }
             }
-            catch (OperationCanceledException)
             {
-                Debug.Log("RecognizeVoiceAsync was canceled by CancellationToken.");
-                return string.Empty; 
-            }
-            finally
-            {
-                VoiceRecognitionManager.instance.whipserManager.OnVoiceRecognized -= onResult;
-                VoiceRecognitionManager.instance.microphoneRecord.StopRecord();
+                mic.StopRecord();
+                Debug.Log("[Voice] Microphone recording stopped (cleanup)");
             }
         }
     }
-    
+
     private Action GetJutsu(GestureType gestureType)
     {
         switch (gestureType)

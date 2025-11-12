@@ -3000,9 +3000,13 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 334764981372165316, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: vadStopTime
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7268904971573669472, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
       propertyPath: modelPath
-      value: ggml_small.en.bin
+      value: ggml-small.en.bin
       objectReference: {fileID: 0}
     - target: {fileID: 8303174728611474242, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
       propertyPath: whipserManager
@@ -4593,7 +4597,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9660ae5337ff6ca42868a61cca257fc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerJutsuManager
-  sequenceMaxDuration: 3
+  sequenceMaxDuration: 20
   slowedTimeScale: 0.4
   jutsuList:
   - {fileID: 11400000, guid: 0f66913499e6d7d4caa59bbd443b8827, type: 2}
