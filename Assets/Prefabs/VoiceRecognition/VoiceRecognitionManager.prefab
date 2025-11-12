@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 16894249831309572}
   - component: {fileID: 8303174728611474242}
-  - component: {fileID: 1051289764498053039}
-  - component: {fileID: 3251029879383358889}
+  - component: {fileID: 334764981372165316}
+  - component: {fileID: 7268904971573669472}
   m_Layer: 0
   m_Name: VoiceRecognitionManager
   m_TagString: Untagged
@@ -46,7 +46,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cae4ef2bbd35f594c8cc0a1e7490e2c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VoiceRecognitionManager
---- !u!114 &1051289764498053039
+  microphoneRecord: {fileID: 0}
+  whipserManager: {fileID: 0}
+--- !u!114 &334764981372165316
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -55,9 +57,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 8458106223662138469}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bc03a4c19604ea394e364f8fc632928, type: 3}
+  m_Script: {fileID: 11500000, guid: cdfb6b8779e1b3b49a5e947e0fbac5be, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::Whisper.Utils.MicrophoneRecord
   maxLengthSec: 30
   loop: 0
   frequency: 16000
@@ -75,7 +77,7 @@ MonoBehaviour:
   vadStopTime: 1.5
   microphoneDropdown: {fileID: 0}
   microphoneDefaultLabel: Default microphone
---- !u!114 &3251029879383358889
+--- !u!114 &7268904971573669472
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -84,11 +86,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8458106223662138469}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9370225a2ca94276b870d5f87b0db55, type: 3}
+  m_Script: {fileID: 11500000, guid: 2817236232809fb4eaf41f6fa500a003, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::Whisper.WhisperManager
   logLevel: 1
-  modelPath: ggml-small.en.bin
+  modelPath: Whisper/ggml-tiny.bin
   isModelPathInStreamingAssets: 1
   initOnAwake: 1
   useGpu: 1
@@ -99,8 +101,7 @@ MonoBehaviour:
   noContext: 1
   singleSegment: 1
   enableTokens: 0
-  initialPrompt: 'Skill Commands: "Ryoiki Tenkai Muryo Kusho", "Bam", "Za Warudo",
-    "Amateras", "Kage Bunshin No Jutsu", "Kon"'
+  initialPrompt: 'Skill Commands: "Kon"'
   stepSec: 3
   keepSec: 0.2
   lengthSec: 10

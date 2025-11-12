@@ -28,7 +28,6 @@ public class VoiceTest : MonoBehaviour
 
         _microphoneButtonText = microphoneButton.GetComponentInChildren<TMP_Text>();
         
-        
         _microphoneRecord.OnRecordStop += OnRecordStop;
         
         microphoneButton.onClick.AddListener(OnMicrophoneButtonClicked);

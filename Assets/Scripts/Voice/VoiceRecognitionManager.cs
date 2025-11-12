@@ -6,17 +6,14 @@ using Whisper.Utils;
 public class VoiceRecognitionManager : MonoBehaviour
 {
     public static VoiceRecognitionManager instance;
-    
-    public MicrophoneRecord microphoneRecord { get; private set; }
-    public WhisperManager whipserManager { get; private set; }
+
+    public MicrophoneRecord microphoneRecord;
+    public WhisperManager whipserManager;
 
     private void Awake()
     {
         if (instance == null) { instance = this; }
         else Destroy(gameObject);
-        
-        if (microphoneRecord == null) microphoneRecord = GetComponent<MicrophoneRecord>();
-        if (whipserManager == null) whipserManager = GetComponent<WhisperManager>();
     }
 
     private void Start()

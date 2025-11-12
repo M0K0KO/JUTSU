@@ -3000,6 +3000,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7268904971573669472, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: modelPath
+      value: ggml_small.en.bin
+      objectReference: {fileID: 0}
+    - target: {fileID: 8303174728611474242, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: whipserManager
+      value: 
+      objectReference: {fileID: 3522575328527517265}
+    - target: {fileID: 8303174728611474242, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: microphoneRecord
+      value: 
+      objectReference: {fileID: 3522575328527517264}
     - target: {fileID: 8458106223662138469, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
       propertyPath: m_Name
       value: VoiceRecognitionManager
@@ -3009,6 +3021,28 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+--- !u!114 &3522575328527517264 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 334764981372165316, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+  m_PrefabInstance: {fileID: 3522575328527517262}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdfb6b8779e1b3b49a5e947e0fbac5be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Whisper.Utils.MicrophoneRecord
+--- !u!114 &3522575328527517265 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7268904971573669472, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+  m_PrefabInstance: {fileID: 3522575328527517262}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2817236232809fb4eaf41f6fa500a003, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Whisper.WhisperManager
 --- !u!4 &3681400751574448761
 Transform:
   m_ObjectHideFlags: 0
@@ -4561,6 +4595,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerJutsuManager
   sequenceMaxDuration: 3
   slowedTimeScale: 0.4
+  jutsuList:
+  - {fileID: 11400000, guid: 0f66913499e6d7d4caa59bbd443b8827, type: 2}
 --- !u!114 &8633285590241109385
 MonoBehaviour:
   m_ObjectHideFlags: 0
