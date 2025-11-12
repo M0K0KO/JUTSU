@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Whisper;
 using Whisper.Utils;
@@ -26,7 +27,8 @@ public class VoiceTest : MonoBehaviour
         _microphoneRecord = FindFirstObjectByType<MicrophoneRecord>();
 
         _microphoneButtonText = microphoneButton.GetComponentInChildren<TMP_Text>();
-
+        
+        
         _microphoneRecord.OnRecordStop += OnRecordStop;
         
         microphoneButton.onClick.AddListener(OnMicrophoneButtonClicked);
@@ -37,6 +39,7 @@ public class VoiceTest : MonoBehaviour
         microphoneButton.onClick.RemoveListener(OnMicrophoneButtonClicked);
     }
 
+    // 이거는 지금 버튼 클릭인데 이 안에 있는 함수인
     private void OnMicrophoneButtonClicked()
     {
         if (!_microphoneRecord.IsRecording)
