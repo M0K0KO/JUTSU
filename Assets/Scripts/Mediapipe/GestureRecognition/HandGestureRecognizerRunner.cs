@@ -23,7 +23,9 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
 
     protected override IEnumerator Run()
     {
-        string modelPath = Path.Combine(Application.streamingAssetsPath, "gesture_recognizer_v1.bytes");
+        string modelPath = Path.Combine(
+            Application.streamingAssetsPath, 
+            "gesture_recognizer_v1.bytes");
 
         BaseOptions baseOptions = new BaseOptions(
             BaseOptions.Delegate.CPU,
@@ -110,7 +112,7 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
     {
         if (result.gestures != null)
         {
-            Debug.Log(result.handWorldLandmarks.Count);
+            //Debug.Log(result.handWorldLandmarks.Count);
 
             HandWorldLandmarkVisualizer.instance.DrawLater(result, GetRecognizedGestureType(result));
 

@@ -38,7 +38,7 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log(currentState);
+        //Debug.Log(currentState);
 
         currentState.OnUpdateState();
 
