@@ -17,11 +17,14 @@ public class MoumeeCloseButton : MonoBehaviour, IPointerEnterHandler, IPointerEx
     {
         _audioSource = GetComponent<AudioSource>();
         _buttonBackground = GetComponent<Image>();
+    }
+
+    private void OnEnable()
+    {
         _buttonBackground.color = new Color(1f, 1f, 1f, 0f);
         _buttonCross = transform.GetChild(0).GetComponent<Image>();
         _buttonCross.color = Color.white;
     }
-
 
     public void OnPointerEnter(PointerEventData eventData)
     {
