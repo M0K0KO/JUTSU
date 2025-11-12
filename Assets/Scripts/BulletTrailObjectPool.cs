@@ -1,10 +1,13 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
 public class BulletTrailObjectPool : MonoBehaviour
 {
     public static BulletTrailObjectPool instance;
+
+    public Dictionary<int, BulletTrailManager> bulletTrailManagers = new Dictionary<int, BulletTrailManager>();
     
     [SerializeField] private GameObject bulletTrailPrefab;
 
@@ -30,6 +33,8 @@ public class BulletTrailObjectPool : MonoBehaviour
     {
         GameObject obj = Instantiate(bulletTrailPrefab);
         obj.SetActive(false);
+
+        bulletTrailManagers.Add(obj.GetInstanceID(), obj.GetComponent<BulletTrailManager>());
         return obj;
     }
     

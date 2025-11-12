@@ -21,6 +21,7 @@ public class PlayerVFXManager : MonoBehaviour
     public void SpawnBulletTrail()
     {
         GameObject obj = BulletTrailObjectPool.instance.pool.Get();
+        int instanceID = obj.GetInstanceID();
         
         Vector3 origin = muzzleFlashPos.position;
 
@@ -40,8 +41,8 @@ public class PlayerVFXManager : MonoBehaviour
                 destination = origin + player.transform.forward * 100f;
             }
         }
-        destination += new Vector3(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f),Random.Range(-0.1f, 0.1f));
+        destination += new Vector3(Random.Range(-0.2f, 0.2f), Random.Range(-0.2f, 0.2f),Random.Range(-0.2f, 0.2f));
         
-        obj.GetComponent<BulletTrailManager>().SetPosition(origin, destination);
+        BulletTrailObjectPool.instance.bulletTrailManagers[instanceID].SetPosition(origin, destination);
     }
 }
