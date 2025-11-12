@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(AudioSource))]
 public class MoumeeSlider : MonoBehaviour, IPointerEnterHandler
 {
     [SerializeField] private AudioClip hoverSound;

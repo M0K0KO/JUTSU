@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5976379819289775797}
   - component: {fileID: 3781743577757301103}
-  - component: {fileID: 7001260369972139899}
   m_Layer: 0
   m_Name: MicrophoneRecord
   m_TagString: Untagged
@@ -62,15 +61,3 @@ MonoBehaviour:
   vadStopTime: 1.5
   microphoneDropdown: {fileID: 0}
   microphoneDefaultLabel: Default microphone
---- !u!114 &7001260369972139899
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1096077664597899981}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01d23406db9c2fe4d8312db3dd6234dd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DontDestroyOnLoadObject

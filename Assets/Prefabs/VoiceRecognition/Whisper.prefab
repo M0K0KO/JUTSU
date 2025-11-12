@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5185260740758520392}
   - component: {fileID: 8507243954462333581}
-  - component: {fileID: 6036260646686900474}
   m_Layer: 0
   m_Name: Whisper
   m_TagString: Untagged
@@ -67,15 +66,3 @@ MonoBehaviour:
   useVad: 1
   tokensTimestamps: 0
   audioCtx: 0
---- !u!114 &6036260646686900474
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5998152059442813635}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01d23406db9c2fe4d8312db3dd6234dd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DontDestroyOnLoadObject
