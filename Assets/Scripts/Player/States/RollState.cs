@@ -9,10 +9,13 @@ public class RollState : BaseState
 
     public override void OnEnterState()
     {
-        stateMachine.player.mover.EnableRotation();
-        PivotTowardsMoveDirection();
-        stateMachine.player.mover.DisableRotation();
-        
+        if (!stateMachine.isStrafing || stateMachine.player.playerInput.RunInput)
+        {
+            stateMachine.player.mover.EnableRotation();
+            PivotTowardsMoveDirection();
+            stateMachine.player.mover.DisableRotation();
+        }
+
         stateMachine.player.mover.EnableMove();
         
         Vector3 rollDir = Vector2.zero;

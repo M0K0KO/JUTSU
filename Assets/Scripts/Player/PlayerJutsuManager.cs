@@ -26,6 +26,9 @@ public class PlayerJutsuManager : MonoBehaviour
 
     private Dictionary<GestureType, Jutsu> jutsuDict = new Dictionary<GestureType, Jutsu>();
 
+    private const int gestureQueueCapacity = 20;
+    private Queue<GestureType> gestureQueue = new Queue<GestureType>(gestureQueueCapacity);
+
     private void Awake()
     {
         player = GetComponent<PlayerManager>();
@@ -39,10 +42,6 @@ public class PlayerJutsuManager : MonoBehaviour
         {
             jutsuDict.Add(jutsu.gestureType, jutsu);
         }
-    }
-
-    private void OnDestroy()
-    {
     }
 
     private void Update()
@@ -93,6 +92,11 @@ public class PlayerJutsuManager : MonoBehaviour
                         jutsu = GetJutsu(detectedGesture);
                         expectedVoiceCommand = GetJutsuVoiceCommand(detectedGesture);
 
+                        for (int i = 0; i < gestureQueueCapacity; i++)
+                        {
+                            gestureQueue.Enqueue(detectedGesture);
+                        }
+
                         jutsuGestureTrigger = true;
                         Debug.Log(
                             $"[Phase 1] Gesture '{detectedGesture}' detected. Listening for '{expectedVoiceCommand}'...");
@@ -101,12 +105,6 @@ public class PlayerJutsuManager : MonoBehaviour
                 }
                 else
                 {
-                    if (HandWorldLandmarkVisualizer.instance.currentGesture != detectedGesture)
-                    {
-                        Debug.Log("[Canceled] Gesture was not held. Cancelling Jutsu.");
-                        cts.Cancel();
-                        break;
-                    }
 
                     if (voiceTask != null && voiceTask.IsCompleted)
                     {
@@ -129,8 +127,16 @@ public class PlayerJutsuManager : MonoBehaviour
 
                         break;
                     }
-                }
 
+                    gestureQueue.CapacitySafeEnqueue(HandWorldLandmarkVisualizer.instance.currentGesture, gestureQueueCapacity);
+                    
+                    if (gestureQueue.GetCount(detectedGesture) == 0)
+                    {
+                        Debug.Log("[Canceled] Gesture was not held. Cancelling Jutsu.");
+                        cts.Cancel();
+                        break;
+                    }
+                }
                 yield return null;
             }
         }
@@ -165,6 +171,8 @@ public class PlayerJutsuManager : MonoBehaviour
                 PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Strafe, null);
             }
 
+            gestureQueue.Clear();
+            
             isUsingJutsu = false;
         }
     }
