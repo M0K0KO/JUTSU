@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Collide
+  - Global Resource
   layers:
   - Default
   - TransparentFX
@@ -32,10 +33,10 @@ TagManager:
   - 
   - 
   - 
+  - GroundTest
   - 
   - 
-  - 
-  - 
+  - Player
   - Enemy
   - 
   m_SortingLayers:

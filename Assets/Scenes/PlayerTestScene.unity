@@ -1715,6 +1715,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SNAP_Tower_Battlements_01
       objectReference: {fileID: 0}
+    - target: {fileID: 6924207495545542848, guid: 043944c305dcbeb42936b06456c1c05e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8713895743861340064, guid: 043944c305dcbeb42936b06456c1c05e, type: 3}
       propertyPath: m_Convex
       value: 0
@@ -1740,6 +1744,10 @@ PrefabInstance:
     - target: {fileID: 2625983783384924801, guid: 59a7abf59cb5da943995437eb7298049, type: 3}
       propertyPath: m_Name
       value: SNAP_Tower_Battlements_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 2625983783384924801, guid: 59a7abf59cb5da943995437eb7298049, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8257053648944558223, guid: 59a7abf59cb5da943995437eb7298049, type: 3}
       propertyPath: m_LocalScale.x
