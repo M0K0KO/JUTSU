@@ -1355,9 +1355,10 @@ GameObject:
   - component: {fileID: 7162529137248607969}
   - component: {fileID: 3277904515638433655}
   - component: {fileID: 7359770131645422659}
+  - component: {fileID: 2598504130840598434}
   m_Layer: 5
   m_Name: Microphone Dropdown
-  m_TagString: Untagged
+  m_TagString: MicrophoneDropdown
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1475,6 +1476,18 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_AlphaFadeSpeed: 0.15
+--- !u!114 &2598504130840598434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946548604374367260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76a4a51b7d5576d448cc7dc635511946, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MicrophoneDropdownInitializer
 --- !u!1 &1971527969812935171
 GameObject:
   m_ObjectHideFlags: 0

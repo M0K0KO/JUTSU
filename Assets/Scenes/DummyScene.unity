@@ -2153,6 +2153,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 556338196473380086, guid: 7967e244ff0d4b74c9ae07ee307857e7, type: 3}
   m_PrefabInstance: {fileID: 1408951999}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1408952002 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7359770131645422659, guid: 7967e244ff0d4b74c9ae07ee307857e7, type: 3}
+  m_PrefabInstance: {fileID: 1408951999}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d0b652f32a2cc243917e4028fa0f046, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Dropdown
 --- !u!1 &1514653073
 GameObject:
   m_ObjectHideFlags: 0
@@ -2165,6 +2176,7 @@ GameObject:
   - component: {fileID: 1514653076}
   - component: {fileID: 1514653075}
   - component: {fileID: 1514653074}
+  - component: {fileID: 1514653078}
   m_Layer: 5
   m_Name: Pause Menu Canvas
   m_TagString: Untagged
@@ -2257,6 +2269,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1514653078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1514653073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76a4a51b7d5576d448cc7dc635511946, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MicrophoneDropdownInitializer
+  microphoneDropdown: {fileID: 1408952002}
 --- !u!1 &1538756471
 GameObject:
   m_ObjectHideFlags: 0
@@ -2395,6 +2420,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1538756471}
   m_CullTransparentMesh: 1
+--- !u!1001 &1641516197
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 970.35455
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 562.2714
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8458106223662138469, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_Name
+      value: VoiceRecognitionManager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
 --- !u!1 &1655297555
 GameObject:
   m_ObjectHideFlags: 0
@@ -2635,3 +2717,4 @@ SceneRoots:
   - {fileID: 1276709786}
   - {fileID: 1514653077}
   - {fileID: 1706976508}
+  - {fileID: 1641516197}

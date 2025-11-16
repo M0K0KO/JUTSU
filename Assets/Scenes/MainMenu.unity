@@ -269,63 +269,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 425503287}
   m_CullTransparentMesh: 1
---- !u!1001 &448997041
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5998152059442813635, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
-      propertyPath: m_Name
-      value: Whisper
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
 --- !u!1 &604333307
 GameObject:
   m_ObjectHideFlags: 0
@@ -1559,67 +1502,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!1001 &1275718536
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1096077664597899981, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
-      propertyPath: m_Name
-      value: MicrophoneRecord
-      objectReference: {fileID: 0}
-    - target: {fileID: 3781743577757301103, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
-      propertyPath: microphoneDropdown
-      value: 
-      objectReference: {fileID: 1811702265}
-    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
 --- !u!1 &1584001473
 GameObject:
   m_ObjectHideFlags: 0
@@ -1777,6 +1659,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1656012595}
   - component: {fileID: 1656012594}
+  - component: {fileID: 1656012597}
   - component: {fileID: 1656012596}
   m_Layer: 0
   m_Name: Main Menu Controller
@@ -1911,6 +1794,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1656012597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1656012593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76a4a51b7d5576d448cc7dc635511946, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MicrophoneDropdownInitializer
+  microphoneDropdown: {fileID: 1874387369}
 --- !u!1 &1679446828
 GameObject:
   m_ObjectHideFlags: 0
@@ -1923,7 +1819,6 @@ GameObject:
   - component: {fileID: 1679446832}
   - component: {fileID: 1679446831}
   - component: {fileID: 1679446830}
-  - component: {fileID: 1679446829}
   m_Layer: 5
   m_Name: Main Menu Canvas
   m_TagString: Untagged
@@ -1931,19 +1826,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1679446829
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1679446828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b10c611388f4bc489a4e82f55864277, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  canvasScaler: {fileID: 1679446831}
 --- !u!114 &1679446830
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2030,17 +1912,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &1811702265 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7359770131645422659, guid: 7967e244ff0d4b74c9ae07ee307857e7, type: 3}
-  m_PrefabInstance: {fileID: 2183713632470239399}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d0b652f32a2cc243917e4028fa0f046, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Dropdown
 --- !u!1 &1855158770
 GameObject:
   m_ObjectHideFlags: 0
@@ -2287,6 +2158,17 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1874387369 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7359770131645422659, guid: 7967e244ff0d4b74c9ae07ee307857e7, type: 3}
+  m_PrefabInstance: {fileID: 2183713632470239399}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d0b652f32a2cc243917e4028fa0f046, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Dropdown
 --- !u!1 &2048785965
 GameObject:
   m_ObjectHideFlags: 0
@@ -2331,6 +2213,93 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f90009ebffb453479ca7a9a0d4a543f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OptionLoader
+--- !u!1001 &2125363264
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 16894249831309572, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8303174728611474242, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: whipserManager
+      value: 
+      objectReference: {fileID: 2125363265}
+    - target: {fileID: 8303174728611474242, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: microphoneRecord
+      value: 
+      objectReference: {fileID: 2125363266}
+    - target: {fileID: 8458106223662138469, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: m_Name
+      value: VoiceRecognitionManager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+--- !u!114 &2125363265 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7268904971573669472, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+  m_PrefabInstance: {fileID: 2125363264}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2817236232809fb4eaf41f6fa500a003, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Whisper.WhisperManager
+--- !u!114 &2125363266 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 334764981372165316, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+  m_PrefabInstance: {fileID: 2125363264}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdfb6b8779e1b3b49a5e947e0fbac5be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Whisper.Utils.MicrophoneRecord
 --- !u!222 &1912073373254027740
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2818,6 +2787,5 @@ SceneRoots:
   - {fileID: 1679446833}
   - {fileID: 1656012595}
   - {fileID: 843095276}
-  - {fileID: 448997041}
-  - {fileID: 1275718536}
   - {fileID: 2048785966}
+  - {fileID: 2125363264}

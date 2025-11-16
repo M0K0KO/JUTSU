@@ -46,8 +46,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cae4ef2bbd35f594c8cc0a1e7490e2c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VoiceRecognitionManager
-  microphoneRecord: {fileID: 0}
-  whipserManager: {fileID: 0}
+  microphoneRecord: {fileID: 334764981372165316}
+  whipserManager: {fileID: 7268904971573669472}
 --- !u!114 &334764981372165316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -72,9 +72,9 @@ MonoBehaviour:
   vadThd: 1
   vadFreqThd: 100
   vadIndicatorImage: {fileID: 0}
-  vadStop: 1
+  vadStop: 0
   dropVadPart: 1
-  vadStopTime: 1.5
+  vadStopTime: 1
   microphoneDropdown: {fileID: 0}
   microphoneDefaultLabel: Default microphone
 --- !u!114 &7268904971573669472
@@ -90,7 +90,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Whisper.WhisperManager
   logLevel: 1
-  modelPath: Whisper/ggml-tiny.bin
+  modelPath: ggml-small.en.bin
   isModelPathInStreamingAssets: 1
   initOnAwake: 1
   useGpu: 1
