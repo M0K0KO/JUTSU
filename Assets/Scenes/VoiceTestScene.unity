@@ -1360,7 +1360,7 @@ MonoBehaviour:
   noContext: 1
   singleSegment: 1
   enableTokens: 0
-  initialPrompt: 'Skill Commands: "Kon"'
+  initialPrompt: 'Skill Commands: "Ryoiki Tenkai Muryokusho"'
   stepSec: 3
   keepSec: 0.2
   lengthSec: 10

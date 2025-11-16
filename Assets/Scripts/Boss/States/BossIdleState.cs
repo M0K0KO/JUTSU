@@ -13,10 +13,7 @@ public class BossIdleState : BossBaseState
 
     public override void OnEnter()
     {
-        StateMachine.BossAnimator.CrossFadeInFixedTime("Idle", 0.5f);
-        StateMachine.BossAgent.updatePosition = false;
-        StateMachine.BossAgent.updateRotation = false;
-        StateMachine.BossAgent.isStopped = true; 
+        StateMachine.BossAnimator.SetBool("shouldMove", false);
         StateMachine.BossAgent.ResetPath();
         _stateEnterTime = Time.time;
     }
@@ -25,7 +22,7 @@ public class BossIdleState : BossBaseState
     {
         if (Time.time - _stateEnterTime >= IdleWaitDuration)
         {
-            StateMachine.ChangeState(StateMachine.StrafeState);
+            StateMachine.ChangeState(StateMachine.ChaseState);
         }
         
     }

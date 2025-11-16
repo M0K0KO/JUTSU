@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class BossStateMachine : MonoBehaviour
+public class BossStateMachine : MonoBehaviour, IDamgeable
 {
     [HideInInspector] public Animator BossAnimator { get; private set; }
     [HideInInspector] public NavMeshAgent BossAgent { get; private set; }
@@ -12,20 +12,28 @@ public class BossStateMachine : MonoBehaviour
     
     
     public BossIdleState IdleState { get; private set; }
-    public BossStrafeState StrafeState { get; private set; }
+    public BossChaseState ChaseState { get; private set; }
 
     public BossBaseState CurrentState { get; private set; }
-   
+
+    private Vector2 _velocity;
+    private Vector2 _smoothDeltaPosition;
 
     private void InitStateMachine()
     {
         BossAnimator = GetComponent<Animator>();
+        BossAnimator.applyRootMotion = true;
+        
         BossAgent = GetComponent<NavMeshAgent>();
+        BossAgent.updatePosition = false;
+        BossAgent.updateRotation = false;
+        
         BossTransform = transform;
+        
         PlayerGameObject = GameObject.FindGameObjectWithTag("Player");
         
         IdleState = new BossIdleState(this);
-        StrafeState = new BossStrafeState(this);
+        ChaseState = new BossChaseState(this);
         
         CurrentState = IdleState;
         CurrentState.OnEnter();
@@ -42,7 +50,16 @@ public class BossStateMachine : MonoBehaviour
     {
         InitStateMachine();
     }
-    
+
+    private void OnAnimatorMove()
+    {
+        Vector3 newPos = transform.position + BossAnimator.deltaPosition;
+        newPos.y = BossAgent.nextPosition.y;
+        transform.position = newPos;
+        BossAgent.nextPosition = newPos;
+        
+        CurrentState.OnAnimatorMove();
+    }
 
     private void Update()
     {
@@ -62,5 +79,10 @@ public class BossStateMachine : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         CurrentState.OnTriggerEnter(other);   
+    }
+
+    public void TakeDamage(bool shouldPlayHitReaction = false)
+    {
+        
     }
 }
