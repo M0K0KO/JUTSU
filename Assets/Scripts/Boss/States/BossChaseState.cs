@@ -44,7 +44,7 @@ public class BossChaseState :BossBaseState
         float distToPlayer = Vector3.Distance(playerPosition, agent.transform.position);
         if (distToPlayer <= _attackDistance)
         {
-            StateMachine.ChangeState(StateMachine.IdleState);
+            StateMachine.ChangeState(StateMachine.ChargeAttackState);
             return;
         }
     }

@@ -13,6 +13,7 @@ public class BossStateMachine : MonoBehaviour, IDamgeable
     
     public BossIdleState IdleState { get; private set; }
     public BossChaseState ChaseState { get; private set; }
+    public BossChargeAttackState ChargeAttackState { get; private set; }
 
     public BossBaseState CurrentState { get; private set; }
 
@@ -34,6 +35,7 @@ public class BossStateMachine : MonoBehaviour, IDamgeable
         
         IdleState = new BossIdleState(this);
         ChaseState = new BossChaseState(this);
+        ChargeAttackState = new BossChargeAttackState(this);
         
         CurrentState = IdleState;
         CurrentState.OnEnter();
