@@ -4,10 +4,14 @@ using UnityEngine.AI;
 
 public class BossChaseState :BossBaseState
 {
-    private float _attackDistance = 4f;
+    private float _attackDistance = 4.5f;
+    private NavMeshAgent _agent;
+    private Animator _animator;
     
     public BossChaseState(BossStateMachine stateMachine) : base(stateMachine)
     {
+        _agent = stateMachine.BossAgent;
+        _animator = stateMachine.BossAnimator;
     }
 
     public override void OnEnter()
@@ -23,30 +27,31 @@ public class BossChaseState :BossBaseState
                                     StateMachine.BossTransform.position);
         Quaternion targetRotation = Quaternion.Euler(0f, lookRotation.eulerAngles.y, 0f);
         StateMachine.transform.rotation =
-            UnrealInterp.QInterpTo(StateMachine.transform.rotation, targetRotation, Time.deltaTime, 4f);
-        
-    }
+            UnrealInterp.QInterpTo(StateMachine.transform.rotation, targetRotation, Time.deltaTime, 4f * _animator.speed);
 
-    public override void OnFixedUpdate()
-    {
-        NavMeshAgent agent = StateMachine.BossAgent;
         GameObject player = StateMachine.PlayerGameObject;
         if (!player) return;
 
         Vector3 playerPosition = player.transform.position;
-
         float currentAnimLocomotionValue = StateMachine.BossAnimator.GetFloat("locomotion");
         float newAnimLocomotionValue = UnrealInterp.FInterpTo(currentAnimLocomotionValue, 1f, Time.deltaTime, 2f);
         StateMachine.BossAnimator.SetFloat("locomotion", newAnimLocomotionValue);
 
-        agent.SetDestination(playerPosition);
+        _agent.SetDestination(playerPosition);
 
-        float distToPlayer = Vector3.Distance(playerPosition, agent.transform.position);
+        float distToPlayer = Vector3.Distance(playerPosition, _agent.transform.position);
         if (distToPlayer <= _attackDistance)
         {
             StateMachine.ChangeState(StateMachine.ChargeAttackState);
             return;
         }
+
+        if (StateMachine.CanShockwaveAttack)
+        {
+            StateMachine.ChangeState(StateMachine.ShockwaveAttackState);
+            return;
+        }
+        
     }
 
     public override void OnExit(){}

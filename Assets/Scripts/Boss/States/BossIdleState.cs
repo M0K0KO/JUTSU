@@ -4,7 +4,7 @@ public class BossIdleState : BossBaseState
 {
     private float _stateEnterTime;
 
-    private const float IdleWaitDuration = 1.3f;
+    private const float IdleWaitDuration = 0.85f;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public BossIdleState(BossStateMachine stateMachine) : base(stateMachine)
     {

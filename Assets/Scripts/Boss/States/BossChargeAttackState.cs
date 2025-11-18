@@ -1,27 +1,30 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class BossChargeAttackState : BossBaseState
 {
     private int _attackIndex = 1;
     private int _attackCount = 2;
     private Animator _animator;
+    private NavMeshAgent _agent;
     private Transform _bossTransform;
     private GameObject _player;
     private bool _shouldRotate = true;
     private float _rotationTimer;
-    private float _rotationDuration = 0.5f;
+    private float _rotationDuration = 0.85f;
 
     public BossChargeAttackState(BossStateMachine stateMachine) : base(stateMachine)
     {
         _animator = stateMachine.BossAnimator;
+        _agent = stateMachine.BossAgent;
         _bossTransform = stateMachine.BossTransform;
         _player = stateMachine.PlayerGameObject;
     }
 
     public override void OnEnter()
     {
-        StateMachine.BossAnimator.SetBool("shouldMove", false);
-        StateMachine.BossAgent.ResetPath();
+        _animator.SetBool("shouldMove", false);
+        _agent.ResetPath();
         _rotationTimer =_rotationDuration;
         _shouldRotate = true;
         int triggerHash = GetAttackTriggerHash(_attackIndex);
@@ -43,8 +46,9 @@ public class BossChargeAttackState : BossBaseState
                 {
                     targetRotation = Quaternion.LookRotation(toPlayer);
                 }
-                
-                _bossTransform.rotation = UnrealInterp.QInterpTo(currentRotation, targetRotation, Time.deltaTime, 4f);
+
+                float scaledInterpSpeed = 4f * _animator.speed;
+                _bossTransform.rotation = UnrealInterp.QInterpTo(currentRotation, targetRotation, Time.deltaTime, scaledInterpSpeed);
                 
                 _rotationTimer -= Time.deltaTime;
             }

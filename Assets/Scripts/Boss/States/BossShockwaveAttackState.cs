@@ -1,16 +1,25 @@
 using UnityEngine;
+using UnityEngine.AI;
 
-public class BossShockwaveAttackState : MonoBehaviour
+public class BossShockwaveAttackState : BossBaseState
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private Animator _animator;
+    private NavMeshAgent _agent;
+    
+    private int _attackHash = Animator.StringToHash("shockwaveAttack");
+    
+    public BossShockwaveAttackState(BossStateMachine stateMachine) : base(stateMachine)
     {
-        
+        _animator = stateMachine.BossAnimator;
+        _agent = stateMachine.BossAgent;
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void OnEnter()
     {
+        StateMachine.CanShockwaveAttack = false;
+        _animator.SetBool("shouldMove", false);
+        _animator.SetTrigger(_attackHash);
+        _agent.ResetPath();
         
     }
 }

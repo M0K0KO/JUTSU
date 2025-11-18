@@ -30,7 +30,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7538641250047582777}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0.00013406524, y: 0.00015696423, z: -81.00356}
 --- !u!1 &667654042921462489
 GameObject:
   m_ObjectHideFlags: 0
@@ -103,6 +103,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6508838057691193038}
+  - component: {fileID: 8898326540813462692}
   m_Layer: 30
   m_Name: GOLEM_ R Hand
   m_TagString: Untagged
@@ -128,6 +129,27 @@ Transform:
   - {fileID: 3925248534501256671}
   m_Father: {fileID: 4872074127996004847}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &8898326540813462692
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1632687048744696789}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.85
+  m_Center: {x: -0.73, y: 0.12, z: 0.12}
 --- !u!1 &1698393036400728766
 GameObject:
   m_ObjectHideFlags: 0
@@ -390,6 +412,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8885997363468143459}
+  - component: {fileID: 7342665577955194667}
   m_Layer: 30
   m_Name: GOLEM_ L Hand
   m_TagString: Untagged
@@ -415,6 +438,27 @@ Transform:
   - {fileID: 7063821806491169377}
   m_Father: {fileID: 7308523462994853602}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &7342665577955194667
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4190795288577530365}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.85
+  m_Center: {x: -0.73, y: 0.12, z: -0.12}
 --- !u!1 &4361387048512296575
 GameObject:
   m_ObjectHideFlags: 0
@@ -996,8 +1040,10 @@ GameObject:
   - component: {fileID: 3319375786569942194}
   - component: {fileID: 4465058005720826977}
   - component: {fileID: 1594698041730188780}
+  - component: {fileID: 4653245747067268144}
   - component: {fileID: 967148701703339147}
   - component: {fileID: 3964411680973072277}
+  - component: {fileID: 1155326309257905252}
   m_Layer: 30
   m_Name: Boss
   m_TagString: Untagged
@@ -1105,6 +1151,20 @@ NavMeshAgent:
   m_BaseOffset: 0.04
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &4653245747067268144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7236904134877496802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 196f2f2842c9b5148b19c577453dd2ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossManager
+  leftHandCollider: {fileID: 7342665577955194667}
+  rightHandCollider: {fileID: 8898326540813462692}
 --- !u!114 &967148701703339147
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1129,8 +1189,164 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c53715997ec92e41bf206517d4a925b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossSoundEffect
-  footstepAudioSource: {fileID: 0}
-  footstepAudioClips: []
+  footstepAudioSource: {fileID: 5806741926712735556}
+  footstepAudioClips:
+  - {fileID: 8300000, guid: e2edb25d38071de46ad981bbcf207d0f, type: 3}
+  - {fileID: 8300000, guid: a6ac37b63d799aa41b4fb7a60986ae35, type: 3}
+  - {fileID: 8300000, guid: 71967bf4b08b057459532a85f23fcbec, type: 3}
+  - {fileID: 8300000, guid: be1e417e8186e0948a85ff47b213e655, type: 3}
+--- !u!114 &1155326309257905252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7236904134877496802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 180ecf9b41d478f468eb3e9083753217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineImpulseSource
+  ImpulseDefinition:
+    ImpulseChannel: 1
+    ImpulseShape: 0
+    CustomImpulseShape:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 4.7644124
+        outSlope: 4.7644124
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.112007596
+        value: 0.5336504
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.19186169
+        value: -0.78890455
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.26615232
+        value: 0.80745655
+        inSlope: -0.55555886
+        outSlope: -0.55555886
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.39648014
+        value: -0.28548598
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.4872582
+        value: 0.22752172
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.6121912
+        value: -0.52153087
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.68428427
+        value: 0.4547117
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.8117125
+        value: -0.28975892
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.86917514
+        value: 0.10999618
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: -0.84078956
+        outSlope: -0.84078956
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    ImpulseDuration: 0.3
+    ImpulseType: 0
+    DissipationRate: 0.25
+    RawSignal: {fileID: 0}
+    AmplitudeGain: 1
+    FrequencyGain: 1
+    RepeatMode: 0
+    Randomize: 1
+    TimeEnvelope:
+      AttackShape:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      DecayShape:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      AttackTime: 0
+      SustainTime: 0.2
+      DecayTime: 0.7
+      ScaleWithImpact: 1
+      HoldForever: 0
+    ImpactRadius: 100
+    DirectionMode: 0
+    DissipationMode: 2
+    DissipationDistance: 100
+    PropagationSpeed: 343
+  DefaultVelocity: {x: 0, y: -0.25, z: 0}
 --- !u!1 &7303806779595495526
 GameObject:
   m_ObjectHideFlags: 0
@@ -1365,10 +1581,10 @@ AudioSource:
   m_GameObject: {fileID: 8537710554700677515}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: -2327767307933450636, guid: 8db561b85f1bd2948b7e25752b217a87, type: 2}
+  OutputAudioMixerGroup: {fileID: -6479866593033489483, guid: 8db561b85f1bd2948b7e25752b217a87, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
