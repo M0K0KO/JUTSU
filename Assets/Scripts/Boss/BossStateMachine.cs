@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class BossStateMachine : MonoBehaviour, IDamgeable
+public class BossStateMachine : MonoBehaviour, IDamageable
 {
     [HideInInspector] public Animator BossAnimator { get; private set; }
     [HideInInspector] public NavMeshAgent BossAgent { get; private set; }

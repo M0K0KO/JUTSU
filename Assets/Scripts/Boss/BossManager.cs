@@ -1,27 +1,40 @@
 using System;
 using Unity.Cinemachine;
 using UnityEngine;
+using DG.Tweening;
 
-public class BossManager : MonoBehaviour, IDamgeable
+public class BossManager : MonoBehaviour, IDamageable
 {
     [HideInInspector] public BossStateMachine StateMachine { get; private set; }
     [HideInInspector] public BossSoundEffect SoundEffect { get; private set; }
-    [SerializeField] private Collider leftHandCollider;
-    [SerializeField] private Collider rightHandCollider;
+    [SerializeField] private BossHand leftHand;
+    [SerializeField] private BossHand rightHand;
+    [SerializeField] private GameObject shockwaveSphere;
     
     private CinemachineImpulseSource _impulseSource;
+
+    private bool _shockwaveHitPlayer = false;
+    private float _shockwaveHitWidth = 0.5f;
 
     private void Awake()
     {
         StateMachine = GetComponent<BossStateMachine>();
         _impulseSource = GetComponent<CinemachineImpulseSource>();
+        
+        leftHand.OnBossHandPlayerTriggerEnter += OnLeftHandPlayerTriggerEnter;
+        rightHand.OnBossHandPlayerTriggerEnter += OnRightHandPlayerTriggerEnter;
+    }
 
-        leftHandCollider.enabled = false;
-        rightHandCollider.enabled = false;
+    private void OnDestroy()
+    {
+        leftHand.OnBossHandPlayerTriggerEnter -= OnLeftHandPlayerTriggerEnter;
+        rightHand.OnBossHandPlayerTriggerEnter -= OnRightHandPlayerTriggerEnter;
     }
 
     private void Update()
     {
+        
+#if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             if (StateMachine.CurrentState != StateMachine.ChargeAttackState &&
@@ -29,6 +42,68 @@ public class BossManager : MonoBehaviour, IDamgeable
             {
                 StateMachine.ChangeState(StateMachine.NormalHitState);
             }
+        }
+#endif
+
+        if (shockwaveSphere.activeInHierarchy && !_shockwaveHitPlayer)
+        {
+            float currentRadius = shockwaveSphere.transform.localScale.x / 2f;
+            Vector3 shockwavePosition = shockwaveSphere.transform.position;
+            Vector3 toPlayer = StateMachine.PlayerGameObject.transform.position - shockwavePosition;
+            toPlayer.y = 0f;
+            float distance = toPlayer.magnitude;
+
+            if (Mathf.Abs(currentRadius - distance) <= _shockwaveHitWidth)
+            {
+                _shockwaveHitPlayer = true;
+                Debug.Log("Shockwave Hit!");
+                if (StateMachine.PlayerGameObject.TryGetComponent<IDamageable>(out IDamageable damageable))
+                {
+                    damageable.TakeDamage(true, GestureType.None);
+                }
+            }
+        }
+        
+        
+    }
+
+    public void StartShockwave()
+    {
+        Renderer sphereRenderer = shockwaveSphere.GetComponent<Renderer>();
+
+        _shockwaveHitPlayer = false;
+        
+        Vector3 currentPosition = transform.position;
+        currentPosition.y = 0f;
+        sphereRenderer.material.SetFloat("_Opacity", 1f);
+        shockwaveSphere.transform.position = currentPosition;
+        shockwaveSphere.transform.localScale = Vector3.zero;
+        shockwaveSphere.SetActive(true);
+        
+        Sequence shockwaveSequence = DOTween.Sequence();
+        shockwaveSequence.Append(shockwaveSphere.transform.DOScale(60f, 2f).SetEase(Ease.OutSine));
+        shockwaveSequence.Insert(1.6f, sphereRenderer.material.DOFloat(0f, "_Opacity", 0.4f).SetEase(Ease.OutExpo));
+        shockwaveSequence.OnComplete((() =>
+        {
+            shockwaveSphere.SetActive(false);
+        }));
+    }
+
+    private void OnLeftHandPlayerTriggerEnter(Collider other)
+    {
+        if (other.TryGetComponent(out IDamageable damageable))
+        {
+            damageable.TakeDamage(true, GestureType.None);
+            leftHand.HandCollider.enabled = false;
+        }
+    }
+
+    private void OnRightHandPlayerTriggerEnter(Collider other)
+    {
+        if (other.TryGetComponent(out IDamageable damageable))
+        {
+            damageable.TakeDamage(true, GestureType.None);
+            rightHand.HandCollider.enabled = false;
         }
     }
 
@@ -53,6 +128,24 @@ public class BossManager : MonoBehaviour, IDamgeable
         _impulseSource.GenerateImpulse();
     }
 
-    
+    public void EnableLeftHandTrigger()
+    {
+        leftHand.HandCollider.enabled = true;
+    }
+
+    public void DisableLeftHandTrigger()
+    {
+        leftHand.HandCollider.enabled = false;
+    }
+
+    public void EnableRightHandTrigger()
+    {
+        rightHand.HandCollider.enabled = true;
+    }
+
+    public void DisableRightHandTrigger()
+    {
+        rightHand.HandCollider.enabled = false;
+    }
     
 }
