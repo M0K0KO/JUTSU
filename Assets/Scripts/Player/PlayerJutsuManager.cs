@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Mediapipe.Unity.HandWorldLandmarkDetection;
+using Unity.Cinemachine;
 using UnityEngine;
 using Whisper;
 using Whisper.Utils;
@@ -22,13 +23,16 @@ public class PlayerJutsuManager : MonoBehaviour
     [SerializeField]
     private List<Jutsu> jutsuList;
 
-
     [Header("Muryokusho")]
     [SerializeField] private Material bloomQuadMaterial;
     [SerializeField] private Material dissolveMaterial;
     [SerializeField] private Transform intersectionSphereTransform;
     [SerializeField] private MuryokushoSequenceData muryokushoSequenceData;
-    
+
+    [Header("Aka")]
+    [SerializeField] private GameObject AkaObject;
+    [SerializeField] private AkaSequenceData akaSequenceData;
+    private Transform akaSpawnHandLandmark;
     
 
 public bool isUsingJutsu { get; private set; } = false;
@@ -67,7 +71,8 @@ public bool isUsingJutsu { get; private set; } = false;
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            Muryokusho();
+            //Muryokusho();
+            Aka();
         }
     }
 
@@ -182,10 +187,6 @@ public bool isUsingJutsu { get; private set; } = false;
             if (PlayerCameraStateHandler.instance != null && target != null)
             {
                 PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Strafe, target.transform);
-            }
-            else if (PlayerCameraStateHandler.instance != null)
-            {
-                PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Strafe, null);
             }
 
             gestureQueue.Clear();
@@ -387,4 +388,52 @@ public bool isUsingJutsu { get; private set; } = false;
         dissolveMaterial.SetFloat("_Cutoff_Height", muryokushoSequenceData.minCutoffHeight);
         intersectionSphereTransform.localScale = Vector3.zero;
     }
+
+
+    private void Aka()
+    {
+        StartCoroutine(AkaSequence());
+    }
+
+    private IEnumerator AkaSequence()
+    {
+        Vector3 spawnPos = akaSpawnHandLandmark.position + Vector3.up * 0.3f;
+        
+        GameObject aka = Instantiate(AkaObject, spawnPos, Quaternion.identity);
+        AkaManager akaManager = aka.GetComponent<AkaManager>();
+
+        
+        float elapsedTime = 0f;
+        while (elapsedTime < akaSequenceData.waitDuration)
+        {
+            elapsedTime += Time.unscaledDeltaTime;
+            aka.transform.position = Vector3.Lerp(aka.transform.position, akaSpawnHandLandmark.position + Vector3.up * 0.3f,
+                akaSequenceData.akaLerpSpeed * Time.unscaledDeltaTime);
+            yield return null;
+        }
+        
+        aka.GetComponent<CinemachineImpulseSource>().GenerateImpulse();
+        
+        Vector3 initialDirection = player.stateMachine.currentTargetHitTarget.position - aka.transform.position;
+        
+        while (true)
+        {
+            Vector3 direction = player.stateMachine.currentTargetHitTarget.position - aka.transform.position;
+            direction.Normalize();
+
+            aka.transform.position += direction * (akaSequenceData.akaSpeed * Time.unscaledDeltaTime);
+
+            if (akaManager.isHit)
+            {
+                EventManager.TriggerOnAkaHit(initialDirection, akaSequenceData.pushDuration);
+                break;
+            }
+            
+            yield return null;
+        }
+
+        yield return null;
+    }
+
+    public void RegisterAkaSpawnPoint(Transform fingertip) => akaSpawnHandLandmark = fingertip; 
 }
