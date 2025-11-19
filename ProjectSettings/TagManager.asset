@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Collide
+  - Global Resource
   - MicrophoneDropdown
   layers:
   - Default
@@ -33,10 +34,10 @@ TagManager:
   - 
   - 
   - 
+  - GroundTest
   - 
   - 
-  - 
-  - 
+  - Player
   - Enemy
   - 
   m_SortingLayers:

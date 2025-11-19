@@ -22,7 +22,16 @@ public class PlayerJutsuManager : MonoBehaviour
     [SerializeField]
     private List<Jutsu> jutsuList;
 
-    public bool isUsingJutsu { get; private set; } = false;
+
+    [Header("Muryokusho")]
+    [SerializeField] private Material bloomQuadMaterial;
+    [SerializeField] private Material dissolveMaterial;
+    [SerializeField] private Transform intersectionSphereTransform;
+    [SerializeField] private MuryokushoSequenceData muryokushoSequenceData;
+    
+    
+
+public bool isUsingJutsu { get; private set; } = false;
 
     private Dictionary<GestureType, Jutsu> jutsuDict = new Dictionary<GestureType, Jutsu>();
 
@@ -54,11 +63,18 @@ public class PlayerJutsuManager : MonoBehaviour
             if (!isUsingJutsu)
                 StartCoroutine(JutsuMode());
         }
+
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            Muryokusho();
+        }
     }
 
     public IEnumerator JutsuMode()
     {
         isUsingJutsu = true;
+        EventManager.TriggerOnJustuModeEnter();
 
         player.stateMachine.CheckNearbyEnemies(out GameObject target, false);
         PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Jutsu, target.transform);
@@ -155,6 +171,7 @@ public class PlayerJutsuManager : MonoBehaviour
             if (isTriggered && jutsu != null)
             {
                 Debug.Log("Jutsu Sequence Ended (Triggered)");
+                EventManager.TriggerOnJutsuActivation(detectedGesture);
                 jutsu();
             }
             else
@@ -174,6 +191,7 @@ public class PlayerJutsuManager : MonoBehaviour
             gestureQueue.Clear();
             
             isUsingJutsu = false;
+            EventManager.TriggerOnJustuModeExit();
         }
     }
 
@@ -306,5 +324,67 @@ public class PlayerJutsuManager : MonoBehaviour
     private void Kon()
     {
         Debug.Log("SUMMONING FOX DEVIL");
+    }
+
+    private void Muryokusho()
+    {
+        StartCoroutine(MuryokushoSequence());
+    }
+
+    private IEnumerator MuryokushoSequence()
+    {
+        bool isSkyboxChanged = false;
+        
+        float elapsedTime = 0f;
+        while (elapsedTime < muryokushoSequenceData.quadBloomDuration)
+        {
+            elapsedTime += Time.unscaledDeltaTime;
+            float alphaValue =
+                muryokushoSequenceData.quadBloomCurve.Evaluate(elapsedTime / muryokushoSequenceData.quadBloomDuration);
+            bloomQuadMaterial.SetFloat("_Alpha", alphaValue);
+
+            if (elapsedTime > 0.2f)
+            {
+                isSkyboxChanged = true;
+                RenderSettings.skybox = muryokushoSequenceData.spaceSkyboxMaterial;
+                dissolveMaterial.SetFloat("_Cutoff_Height", muryokushoSequenceData.maxCutoffHeight);
+            }
+
+            yield return null;
+        }
+
+        elapsedTime = 0f;
+        while (elapsedTime < muryokushoSequenceData.intersectionDuration)
+        {
+            elapsedTime += Time.unscaledDeltaTime;
+            
+            float curveValue = 
+                muryokushoSequenceData.intersectionSphereScaleCurve.Evaluate(elapsedTime / muryokushoSequenceData.intersectionDuration);
+            float scaleValue = muryokushoSequenceData.minIntersectionSphereScale + muryokushoSequenceData.intersectionSphereScaleRange * curveValue;
+            
+            intersectionSphereTransform.localScale = new Vector3(scaleValue, scaleValue, scaleValue);
+            
+            yield return null;
+        }
+        
+
+        elapsedTime = 0f;
+        while (elapsedTime < muryokushoSequenceData.dissolveDuration)
+        {
+            elapsedTime += Time.unscaledDeltaTime;
+            
+            float curveValue = muryokushoSequenceData.cutoffCurve.Evaluate(
+                elapsedTime / muryokushoSequenceData.dissolveDuration);
+            dissolveMaterial.SetFloat("_Cutoff_Height",
+                muryokushoSequenceData.maxCutoffHeight - curveValue * muryokushoSequenceData.cutOffHeightRange);
+            
+            yield return null;
+        }
+        
+        //if (isSkyboxChanged) RenderSettings.skybox = muryokushoSequenceData.originalSkyboxMaterial;
+        
+        bloomQuadMaterial.SetFloat("_Alpha", 0f);
+        dissolveMaterial.SetFloat("_Cutoff_Height", muryokushoSequenceData.minCutoffHeight);
+        intersectionSphereTransform.localScale = Vector3.zero;
     }
 }
