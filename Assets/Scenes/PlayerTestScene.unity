@@ -1085,6 +1085,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 30
       objectReference: {fileID: 0}
+    - target: {fileID: 3142305762833931004, guid: 162e5cb847b737f4d982971d67a629a3, type: 3}
+      propertyPath: m_TagString
+      value: Boss
+      objectReference: {fileID: 0}
     - target: {fileID: 3142305762833931006, guid: 162e5cb847b737f4d982971d67a629a3, type: 3}
       propertyPath: m_Layer
       value: 30
@@ -1145,6 +1149,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3142305762833931004, guid: 162e5cb847b737f4d982971d67a629a3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 681092871}
+    - targetCorrespondingSourceObject: {fileID: 3142305762833931004, guid: 162e5cb847b737f4d982971d67a629a3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 681092875}
   m_SourcePrefab: {fileID: 100100000, guid: 162e5cb847b737f4d982971d67a629a3, type: 3}
 --- !u!1 &681092869 stripped
 GameObject:
@@ -1193,6 +1200,33 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3142305762834286300, guid: 162e5cb847b737f4d982971d67a629a3, type: 3}
   m_PrefabInstance: {fileID: 681092868}
   m_PrefabAsset: {fileID: 0}
+--- !u!54 &681092875
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 681092869}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 2
 --- !u!1 &738449105
 GameObject:
   m_ObjectHideFlags: 0
@@ -1203,7 +1237,7 @@ GameObject:
   m_Component:
   - component: {fileID: 738449107}
   - component: {fileID: 738449106}
-  m_Layer: 0
+  m_Layer: 28
   m_Name: Hand Landmark Visualizer
   m_TagString: Untagged
   m_Icon: {fileID: 7174288486110832750, guid: 0000000000000000d000000000000000, type: 0}
@@ -1263,8 +1297,8 @@ GameObject:
   m_Component:
   - component: {fileID: 937129846}
   - component: {fileID: 937129849}
-  - component: {fileID: 937129848}
   - component: {fileID: 937129847}
+  - component: {fileID: 937129850}
   m_Layer: 0
   m_Name: Overlay Camera
   m_TagString: Untagged
@@ -1331,14 +1365,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!81 &937129848
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 937129845}
-  m_Enabled: 1
 --- !u!20 &937129849
 Camera:
   m_ObjectHideFlags: 0
@@ -1372,13 +1398,13 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 60.000004
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 1610612736
+    m_Bits: 1879048192
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -1390,6 +1416,38 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &937129850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 937129845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72ece51f2901e7445ab60da3685d6b5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineBrain
+  ShowDebugText: 0
+  ShowCameraFrustum: 1
+  IgnoreTimeScale: 1
+  WorldUpOverride: {fileID: 0}
+  ChannelMask: -1
+  UpdateMethod: 2
+  BlendUpdateMethod: 1
+  LensModeOverride:
+    Enabled: 0
+    DefaultMode: 2
+  DefaultBlend:
+    Style: 1
+    Time: 2
+    CustomCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  CustomBlends: {fileID: 0}
 --- !u!1 &989584133
 GameObject:
   m_ObjectHideFlags: 0
@@ -1510,7 +1568,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1025034395}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -1849,7 +1907,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 67108983
+    m_Bits: 1140850807
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -2420,6 +2478,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1935746829}
   - component: {fileID: 1935746828}
+  - component: {fileID: 1935746830}
   m_Layer: 0
   m_Name: Global Volume
   m_TagString: Untagged
@@ -2459,6 +2518,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1935746830
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1935746827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e21816b753673a4b87705b3456e57bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlobalVolumeManager
+  originalVignetteIntensity: 0.2
+  jutsuModeVignetteIntensity: 0.3
+  vignetteSmoothSpeed: 1.5
 --- !u!1 &1950098837
 GameObject:
   m_ObjectHideFlags: 0
@@ -5101,6 +5175,8 @@ MonoBehaviour:
   dissolveMaterial: {fileID: 2100000, guid: 296cd90ff46bfe6439f7655156654a68, type: 2}
   intersectionSphereTransform: {fileID: 1876509574}
   muryokushoSequenceData: {fileID: 11400000, guid: c6642009f11edcb40bc381dfb4466b33, type: 2}
+  AkaObject: {fileID: 6974980043953679038, guid: d83e61e0554d44646ac4879765cf95b5, type: 3}
+  akaSequenceData: {fileID: 11400000, guid: 6127c7d690a94f24cac8d2004f8770fa, type: 2}
 --- !u!114 &8633285590241109385
 MonoBehaviour:
   m_ObjectHideFlags: 0

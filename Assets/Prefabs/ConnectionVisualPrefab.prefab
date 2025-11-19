@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7804439773481007264}
   - component: {fileID: 790371089353436553}
   - component: {fileID: 5821863718738957184}
-  m_Layer: 0
+  m_Layer: 28
   m_Name: ConnectionVisualPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}

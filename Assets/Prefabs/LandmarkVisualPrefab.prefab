@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6234601564357774603}
   - component: {fileID: 2789266589336139180}
   - component: {fileID: 1750692654459930542}
-  m_Layer: 0
+  m_Layer: 28
   m_Name: LandmarkVisualPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}

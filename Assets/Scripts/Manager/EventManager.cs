@@ -28,4 +28,11 @@ public static class EventManager
     {
         OnJustuModeExit?.Invoke();
     }
+
+    public static Action<Vector3, float> OnAkaHit;
+
+    public static void TriggerOnAkaHit(Vector3 initialDirection, float pushDuration)
+    {
+        OnAkaHit?.Invoke(initialDirection, pushDuration);
+    }
 }
