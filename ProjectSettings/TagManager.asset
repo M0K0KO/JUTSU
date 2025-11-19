@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Collide
   - Global Resource
+  - MicrophoneDropdown
   layers:
   - Default
   - TransparentFX

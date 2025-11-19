@@ -9,8 +9,16 @@ public static class StringSimilarity
     private static readonly Regex AsteriskPattern = new Regex(@"\*[^*]*\*", RegexOptions.Compiled);
     private static readonly Regex ParenthesesPattern = new Regex(@"\([^)]*\)", RegexOptions.Compiled);
     private static readonly Regex PunctuationPattern = new Regex(@"[- .!?,""]", RegexOptions.Compiled);
-    
-    public static bool IsSimilar(string input, string target, float jaroWinklerThreshold = 0.7f, 
+
+    /// <summary>
+    /// Determines whether two strings are similar based on the Jaro-Winkler and Levenshtein distance algorithms.
+    /// </summary>
+    /// <param name="input">The input string to compare.</param>
+    /// <param name="target">The target string to compare against.</param>
+    /// <param name="jaroWinklerThreshold">The similarity threshold for the Jaro-Winkler algorithm. Default is 0.7.</param>
+    /// <param name="levenshteinThreshold">The similarity threshold for the Levenshtein algorithm. Default is 0.7.</param>
+    /// <returns>True if the input string is similar to the target string based on the specified thresholds; otherwise, false.</returns>
+    public static bool IsSimilar(string input, string target, float jaroWinklerThreshold = 0.7f,
         float levenshteinThreshold = 0.7f)
     {
         if (string.IsNullOrEmpty(input) || string.IsNullOrEmpty(target))
@@ -27,7 +35,7 @@ public static class StringSimilarity
             Debug.LogWarning("Normalized string is null or empty! " +
                              $"normalized input: {normalizedInput}, normalized target: {normalizedTarget}");
         }
-
+        
         if (IsTargetStringSingleWord(target))
         {
             // Use JW algorithm
@@ -40,6 +48,11 @@ public static class StringSimilarity
         return levenshteinDistanceSimilarity >= levenshteinThreshold;
     }
 
+    /// <summary>
+    /// Checks whether the target string consists of a single word without any whitespace characters.
+    /// </summary>
+    /// <param name="targetString">The target string to evaluate.</param>
+    /// <returns>True if the target string is a single word with no whitespace; otherwise, false.</returns>
     public static bool IsTargetStringSingleWord(string targetString)
     {
         string trimmedTarget = targetString.Trim();
@@ -141,7 +154,13 @@ public static class StringSimilarity
         
         return levenshteinDistanceSimilarity;
     }
-    
+
+    /// <summary>
+    /// Normalizes a string by removing asterisk-enclosed text blocks, parenthesis-enclosed text, punctuation,
+    /// and converting the string to lowercase.
+    /// </summary>
+    /// <param name="stringToNormalize">The input string to normalize.</param>
+    /// <returns>A normalized string with asterisk-enclosed blocks, parenthesis-enclosed blocks, and punctuation removed, converted to lowercase.</returns>
     public static string Normalize(string stringToNormalize)
     {
         if (string.IsNullOrEmpty(stringToNormalize)) return string.Empty;
