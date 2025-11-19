@@ -9,14 +9,23 @@ public static class EventManager
         OnCameraStateChange?.Invoke(state, target);
     }
 
-
-    public delegate void GestureRecognition(GestureType gestureType);
-    public static GestureRecognition OnGestureRecognition;
-    public static void TriggerOnGestureRecognition(GestureType gestureType)
+    public static Action OnJustuModeEnter;
+    public static void TriggerOnJustuModeEnter()
     {
-        if (gestureType == GestureType.None) return;
-        
-        Debug.Log($"TriggerOnGestureRecognition {gestureType.ToString()}");
-        OnGestureRecognition?.Invoke(gestureType);
+        OnJustuModeEnter?.Invoke();
+    }
+
+    public static Action<GestureType> OnJutsuActivation;
+
+    public static void TriggerOnJutsuActivation(GestureType type)
+    {
+        OnJutsuActivation?.Invoke(type);
+    }
+    
+    public static Action OnJustuModeExit;
+
+    public static void TriggerOnJustuModeExit()
+    {
+        OnJustuModeExit?.Invoke();
     }
 }

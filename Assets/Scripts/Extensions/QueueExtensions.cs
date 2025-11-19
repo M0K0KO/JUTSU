@@ -17,5 +17,4 @@ public static class QueueExtensions
             
         queue.Enqueue(value);
     }
-    
 }
