@@ -1,88 +1,60 @@
 using System;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.Audio;
 
 public class MusicController : MonoBehaviour
 {
-    [SerializeField] private AudioClip battleIntroClip;
-    [SerializeField] private AudioClip battleLoopClip;
+    [SerializeField] private AudioClip musicClip;
     
     private AudioSource _musicAudioSource;
-    private AudioLowPassFilter _lowPassFilter;
-
-    private bool _isSlowMotion = false;
-    
-    private MusicState _musicState;
-
-    public enum MusicState
-    {
-        None,
-        Intro,
-        Loop,
-    }
+    [SerializeField] private AudioMixer audioMixer;
     
     private void Awake()
     {
-        _musicState = MusicState.None;
         _musicAudioSource = GetComponent<AudioSource>();
-        _musicAudioSource.playOnAwake = false;
-        
-        _lowPassFilter = GetComponent<AudioLowPassFilter>();
-        _lowPassFilter.cutoffFrequency = 22000f;
-    }
-
-    private void Start()
-    {
-        _musicAudioSource.clip = battleIntroClip;
-        _musicAudioSource.loop = false;
+        _musicAudioSource.clip = musicClip;
+        _musicAudioSource.loop = true;
         _musicAudioSource.Play();
-        _musicState = MusicState.Intro;
+
+        audioMixer.SetFloat("CutoffBGM", 22000f);
+        audioMixer.SetFloat("ResonanceBGM", 1f);
+        audioMixer.SetFloat("CutoffSFX", 22000f);
+        audioMixer.SetFloat("ResonanceSFX", 1f);
+
+        EventManager.OnCameraStateChange += OnCameraStateChange;
+
+
     }
 
-    private void Update()
+    private void OnDestroy()
     {
-        // TODO: instead of changing in update, make it event driven using delegates.
-        
-        if (!_isSlowMotion && Time.timeScale < 0.95f)
-        {
-            _isSlowMotion = true;
-            DOTween.To(() => _lowPassFilter.cutoffFrequency, x => _lowPassFilter.cutoffFrequency = x, 800, 0.3f);
-            DOTween.To(() => _musicAudioSource.volume, x => _musicAudioSource.volume = x, 0.8f, 0.3f);
-            
-        }
-        else if (_isSlowMotion && Time.timeScale >= 0.95f)
-        {
-            _isSlowMotion = false;
-            DOTween.To(() => _lowPassFilter.cutoffFrequency, x => _lowPassFilter.cutoffFrequency = x, 22000, 0.3f);
-            DOTween.To(() => _musicAudioSource.volume, x => _musicAudioSource.volume = x, 1f, 0.3f);
-        }
+        EventManager.OnCameraStateChange -= OnCameraStateChange;
+    }
 
-        
-
-        switch (_musicState)
+    private void OnCameraStateChange(PlayerCameraState state, Transform target)
+    {
+        switch (state)
         {
-            case MusicState.Intro:
+            case PlayerCameraState.Jutsu:
             {
-                if (!_musicAudioSource.isPlaying)
-                {
-                    _musicState = MusicState.Loop;
-                    _musicAudioSource.clip = battleLoopClip;
-                    _musicAudioSource.loop = true;
-                    _musicAudioSource.Play();
-                }
-
+                ModifyLowpassFilter(1000f, 4f, 0.25f);
                 break;
             }
-            case MusicState.Loop:
+            default:
             {
-                if (!_musicAudioSource.isPlaying)
-                {
-                    _musicState = MusicState.None;
-                    _musicAudioSource.Stop();
-                }
+                ModifyLowpassFilter(22000f, 1f, 0.25f);
                 break;
             }
         }
+    }
+
+    private void ModifyLowpassFilter(float cutoffFrequency, float resonance, float transitionDuration)
+    {
+        audioMixer.DOSetFloat("CutoffBGM", cutoffFrequency, transitionDuration);
+        audioMixer.DOSetFloat("CutoffSFX", cutoffFrequency, transitionDuration);
+        audioMixer.DOSetFloat("ResonanceBGM", resonance, transitionDuration);
+        audioMixer.DOSetFloat("ResonanceSFX", resonance, transitionDuration);
     }
     
     
