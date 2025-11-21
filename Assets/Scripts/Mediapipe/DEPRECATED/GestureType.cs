@@ -4,8 +4,9 @@ using UnityEngine;
 
 public enum GestureType
 {
-    Open,
-    Close,
     Kon,
+    Aka,
+    Muryokusho,
+    Punch,
     None
 }
