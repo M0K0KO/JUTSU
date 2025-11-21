@@ -1,13 +1,15 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerStateMachine : MonoBehaviour
+public class PlayerStateMachine : MonoBehaviour, IDamageable
 {
     public IdleState idleState { get; private set; }
     public WalkState walkState { get; private set; }
     public RunState runState { get; private set; }
     public RollState rollState { get; private set; }
     public AttackState attackState { get; private set; }
+    public HitState hitState { get; private set; }
 
     public BaseState currentState;
 
@@ -24,6 +26,9 @@ public class PlayerStateMachine : MonoBehaviour
     public Transform currentTargetHitTarget { get; private set; }
 
 
+    private const int hitAnimationQueueInitialCapacity = 5;
+    public Queue<bool> hitAnimationQueue = new Queue<bool>(hitAnimationQueueInitialCapacity); 
+
     public bool isStrafing { get; private set; } = false;
 
     private void Awake()
@@ -38,9 +43,14 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void Update()
     {
-        //Debug.Log(currentState);
-
+        Debug.Log(currentState);
+        
         currentState.OnUpdateState();
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            TakeDamage();
+        }
 
         CheckRollInput();
         CheckAttackInput();
@@ -63,6 +73,8 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void CheckRollInput()
     {
+        if (currentState == hitState) return;
+        
         if (player.playerInput.RollInput)
         {
             player.playerInput.ClearRollInput();
@@ -76,6 +88,8 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void CheckAttackInput()
     {
+        if (currentState == hitState) return;
+        
         if (player.playerInput.AttackInput)
         {
             player.playerInput.ClearAttackInput();
@@ -123,6 +137,7 @@ public class PlayerStateMachine : MonoBehaviour
         runState = new RunState(this);
         rollState = new RollState(this);
         attackState = new AttackState(this);
+        hitState = new HitState(this);
 
         currentState = idleState;
         currentState.OnEnterState();
@@ -165,5 +180,19 @@ public class PlayerStateMachine : MonoBehaviour
         target = null;
         currentTargetHitTarget = null;
         return false;
+    }
+
+    public void TakeDamage(bool shouldPlayHitReaction = false, GestureType gestureType = GestureType.None)
+    {
+        if (currentState == rollState) return;
+        
+        if (currentState != hitState)
+        {
+            ChangeState(hitState);
+        }
+        else
+        {
+            hitAnimationQueue.CapacitySafeEnqueue(true, hitAnimationQueueInitialCapacity);
+        }
     }
 }
