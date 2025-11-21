@@ -29,7 +29,6 @@ public class PlayerJutsuManager : MonoBehaviour
     [Header("Muryokusho")]
     [SerializeField]
     private Material bloomQuadMaterial;
-
     [SerializeField] private Material dissolveMaterial;
     [SerializeField] private Transform intersectionSphereTransform;
     [SerializeField] private MuryokushoSequenceData muryokushoSequenceData;
@@ -396,6 +395,8 @@ public class PlayerJutsuManager : MonoBehaviour
 
     private IEnumerator MuryokushoSequence()
     {
+        EventManager.TriggerOnMuryokushoStart();
+        
         bool isSkyboxChanged = false;
 
         float elapsedTime = 0f;
@@ -489,7 +490,7 @@ public class PlayerJutsuManager : MonoBehaviour
             yield return null;
         }
         
-        
+        EventManager.TriggerOnMuryokushoEnd();
     }
 
 
