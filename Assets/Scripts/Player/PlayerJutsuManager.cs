@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mediapipe.Unity.HandWorldLandmarkDetection;
 using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 using Whisper;
 using Whisper.Utils;
@@ -33,6 +34,12 @@ public class PlayerJutsuManager : MonoBehaviour
     [SerializeField] private GameObject AkaObject;
     [SerializeField] private AkaSequenceData akaSequenceData;
     private Transform akaSpawnHandLandmark;
+
+    [Header("Kon")]
+    [SerializeField] private GameObject konWolfInstance;
+    [SerializeField] private Animator konWolfAnimator;
+    [SerializeField] private Material konWolfMaterial;
+    [SerializeField] private KonSequenceData konSequenceData;
     
 
 public bool isUsingJutsu { get; private set; } = false;
@@ -45,7 +52,6 @@ public bool isUsingJutsu { get; private set; } = false;
     private void Awake()
     {
         player = GetComponent<PlayerManager>();
-
         //VoiceRecognitionManager.instance.microphoneRecord.OnRecordStop += OnRecordStop;
     }
 
@@ -72,7 +78,8 @@ public bool isUsingJutsu { get; private set; } = false;
         if (Input.GetKeyDown(KeyCode.Q))
         {
             //Muryokusho();
-            Aka();
+            //Aka();
+            Kon();
         }
     }
 
@@ -324,9 +331,59 @@ public bool isUsingJutsu { get; private set; } = false;
 
     private void Kon()
     {
-        Debug.Log("SUMMONING FOX DEVIL");
+        StartCoroutine(KonSequence());
     }
 
+    private IEnumerator KonSequence()
+    {
+        var targetTransform = player.stateMachine.currentTargetHitTarget.transform.root;
+        Vector3 playerPos = player.transform.position;
+        Vector3 bossPos = targetTransform.position;
+        
+        Vector3 dirToBoss = bossPos - playerPos;
+        dirToBoss.y = 0;
+        dirToBoss.Normalize();
+
+        Vector3 rightDir = Vector3.Cross(Vector3.up, dirToBoss);
+
+        Vector3 spawnPos = bossPos + (rightDir * konSequenceData.spawnOffset.x) + Vector3.up * konSequenceData.spawnOffset.y;
+        Vector3 lookDir = bossPos - spawnPos;
+        lookDir.y = 0;
+
+        Quaternion lookRotation = Quaternion.LookRotation(lookDir);
+        Quaternion finalRot = Quaternion.Euler(-55f, lookRotation.eulerAngles.y, 0f);
+        
+        konWolfInstance.transform.position = spawnPos;
+        konWolfInstance.transform.rotation = finalRot;
+        
+        
+        player.impulseManager.KonRumbleImpulse();
+        yield return new WaitForSeconds(konSequenceData.rumbleDuration);
+        
+
+        float animationSpeed = konSequenceData.animationPlaybackSpeedCurve.Evaluate(0);
+        konWolfAnimator.SetFloat("AttackSpeed", animationSpeed);
+        konWolfAnimator.Play("Attack8");
+
+        yield return null;
+        
+        AnimatorStateInfo stateInfo = konWolfAnimator.GetCurrentAnimatorStateInfo(0);
+        
+        while (stateInfo.IsTag("Attack"))
+        {
+            animationSpeed = konSequenceData.animationPlaybackSpeedCurve.Evaluate(stateInfo.normalizedTime);
+            Debug.Log($"{animationSpeed}");
+            konWolfAnimator.SetFloat("AttackSpeed", animationSpeed);
+            
+            stateInfo = konWolfAnimator.GetCurrentAnimatorStateInfo(0);
+
+            yield return null;
+        }
+
+        yield return null;
+    }
+    
+    
     private void Muryokusho()
     {
         StartCoroutine(MuryokushoSequence());

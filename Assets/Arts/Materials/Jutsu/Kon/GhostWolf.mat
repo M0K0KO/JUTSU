@@ -26,7 +26,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
-  m_LightmapFlags: 2
+  m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -52,15 +52,19 @@ Material:
     m_Ints: []
     m_Floats:
     - _Alpha: 0
+    - _EdgeGlowPower: 4.12
     - _FragNoiseScale: 25
     - _FragTimeScale: 0.2
-    - _FresnelPower: 3
+    - _FresnelPower: 1.5
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _StepEdge: 0
+    - _SummonHeight: 0
     - _VertNoiseScale: 20
     - _VertTimeScale: 0.2
     - _VertexOffsetScale: 0.015
     m_Colors:
-    - _Color: {r: 0, g: 10.597599, b: 1012.0572, a: 1}
+    - _Color: {r: 3.6410048, g: 7.2210793, b: 231.5694, a: 1}
+    - _EdgeGlowColor: {r: 1.7746989, g: 6.3907704, b: 16.94838, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

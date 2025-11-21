@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "MuryokushoSequenceData", menuName = "MuryokushoSequenceData", order = 1)]
+[CreateAssetMenu(fileName = "MuryokushoSequenceData", menuName = "SO/MuryokushoSequenceData", order = 1)]
 public class MuryokushoSequenceData : ScriptableObject
 {
     [Header("Bloom Quad")]
