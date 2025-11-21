@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 665b7dfeba676f14b949fe41b7071dbc, type: 3}
+  m_Name: AkaSequenceData
+  m_EditorClassIdentifier: Assembly-CSharp::AkaSequenceData
+  waitDuration: 3
+  pushDuration: 2
+  akaLerpSpeed: 3
+  akaSpeed: 20

@@ -12,6 +12,8 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
 {
     public static HandWorldLandmarkVisualizer instance;
 
+    [SerializeField] private PlayerManager player;
+
     private const int _AngleCount = 21;
     private const int _LandmarkCount = 21;
 
@@ -55,7 +57,7 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
 
     private Vector3[] landmarkTargetPositions = new Vector3[_LandmarkCount];
 
-    private float landmarkScale = 20f;
+    [SerializeField] private float landmarkScale = 20f;
     
     [Header("SmoothTime Options")]
     [SerializeField] private float visualsPositionSmoothTime = 0.2f;
@@ -74,6 +76,11 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
     [SerializeField] private float maxHandScale = 0.28f; // 가장 먼 손의 Z값
     [SerializeField] private float maxUnityZ = 2f; // 가장 가까울 때 Unity Z 위치
     [SerializeField] private float minUnityZ = -5f; // 가장 멀 때 Unity Z 위치
+    
+    [SerializeField] private float detectionTimeout = 0.1f; 
+    private float lastDataReceivedTime;
+    
+    public GestureType currentGesture { get; private set; } = GestureType.None;
     
     public Vector3 rootTargetPosition = Vector3.zero;
     
@@ -96,6 +103,11 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
             landmark.transform.SetParent(gameObject.transform);
             landmarkVisuals[i] = landmark;
 
+            if (i == 8)
+            {
+                player.jutsu.RegisterAkaSpawnPoint(landmark.transform);
+            }
+
             var connection = Instantiate(connectionVisualPrefab, transform);
             connection.transform.SetParent(gameObject.transform);
             connectionVisuals[i] = connection;
@@ -104,6 +116,8 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
         }
 
         DeactivateVisuals();
+        
+        lastDataReceivedTime = Time.time;
         
         ///////////////////////////////////////////////////
         /*
@@ -122,22 +136,6 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
 
     private void Update()
     {
-        if (_currentTarget.handWorldLandmarks != null)
-        {
-            if (_currentTarget.handWorldLandmarks.Count == 0)
-            {
-                DeactivateVisuals();
-            }
-            else
-            {
-                ActivateVisuals();
-            }
-        }
-        else
-        {
-            DeactivateVisuals();
-        }
-
         MoveVisuals();
         DrawConnections();
     }
@@ -148,30 +146,45 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
         {
             SyncNow();
         }
+
+        if (Time.time - lastDataReceivedTime > detectionTimeout)
+        {
+            DeactivateVisuals();
+        }
     }
 
-    public void DrawLater(GestureRecognizerResult target) => UpdateCurrentTarget(target);
+    public void DrawLater(GestureRecognizerResult target, GestureType gestureType)
+    {
+        UpdateCurrentTarget(target, gestureType);
+    }
 
-    private void UpdateCurrentTarget(GestureRecognizerResult newTarget)
+    private void UpdateCurrentTarget(GestureRecognizerResult newTarget, GestureType gestureType)
     {
         lock (_currentTargetLock)
         {
             newTarget.CloneTo(ref _currentTarget);
+            currentGesture = gestureType;
             isStale = true;
         }
     }
 
+    // Unity API Calls
     private void SyncNow()
     {
         lock (_currentTargetLock)
         {
             isStale = false;
-
+            lastDataReceivedTime = Time.time;
+            
             if (_currentTarget.handWorldLandmarks != null && _currentTarget.handWorldLandmarks.Count > 0)
             {
+                if (player.jutsu.isUsingJutsu) ActivateVisuals();
                 UpdateRootTransform(_currentTarget.handLandmarks);
                 UpdateVisualsTargetPosition(_currentTarget.handWorldLandmarks);
-                GestureIndicator.instance.ChangeGestureIndicatorText(_currentTarget.gestures[0].categories[0].categoryName);
+            }
+            else
+            {
+                DeactivateVisuals();
             }
         }
     }
@@ -212,7 +225,7 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
         }
     }
 
-    private void ActivateVisuals()
+    public void ActivateVisuals()
     {
         if (landmarkVisuals.Length > 0)
         {
@@ -224,7 +237,7 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
         }
     }
 
-    private void DeactivateVisuals()
+    public void DeactivateVisuals()
     {
         if (landmarkVisuals.Length > 0)
         {
@@ -241,14 +254,14 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
         transform.localPosition = Vector3.Lerp(
             transform.localPosition,
             rootTargetPosition,
-            rootPositionSmoothTime);
+            rootPositionSmoothTime * Time.unscaledDeltaTime);
         
         for (int i = 0; i < _LandmarkCount; i++)
         {
             landmarkVisuals[i].transform.localPosition = Vector3.Lerp(
                 landmarkVisuals[i].transform.localPosition,
                 landmarkTargetPositions[i], 
-                visualsPositionSmoothTime);
+                visualsPositionSmoothTime * Time.unscaledDeltaTime);
         }
     }
 

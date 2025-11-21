@@ -2,8 +2,12 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
-  tags: []
+  serializedVersion: 3
+  tags:
+  - Collide
+  - Global Resource
+  - MicrophoneDropdown
+  - Boss
   layers:
   - Default
   - TransparentFX
@@ -11,6 +15,7 @@ TagManager:
   - 
   - Water
   - UI
+  - TempCast
   - 
   - 
   - 
@@ -30,12 +35,11 @@ TagManager:
   - 
   - 
   - 
+  - GroundTest
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - HandLandmark
+  - Player
+  - Enemy
   - 
   m_SortingLayers:
   - name: Default
@@ -50,27 +54,3 @@ TagManager:
   - Light Layer 5
   - Light Layer 6
   - Light Layer 7
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 

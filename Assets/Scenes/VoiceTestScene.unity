@@ -255,6 +255,40 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1112319}
   m_CullTransparentMesh: 1
+--- !u!1 &5138119 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1096077664597899981, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
+  m_PrefabInstance: {fileID: 5275937463613512903}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5138122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5138119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdfb6b8779e1b3b49a5e947e0fbac5be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Whisper.Utils.MicrophoneRecord
+  maxLengthSec: 30
+  loop: 0
+  frequency: 16000
+  chunksLengthSec: 0.5
+  echo: 0
+  useVad: 1
+  vadUpdateRateSec: 0.05
+  vadContextSec: 10
+  vadLastSec: 1.25
+  vadThd: 1
+  vadFreqThd: 100
+  vadIndicatorImage: {fileID: 0}
+  vadStop: 1
+  dropVadPart: 1
+  vadStopTime: 1.5
+  microphoneDropdown: {fileID: 0}
+  microphoneDefaultLabel: Default microphone
 --- !u!1 &178655945
 GameObject:
   m_ObjectHideFlags: 0
@@ -579,67 +613,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 254853022}
   m_CullTransparentMesh: 1
---- !u!1 &299703661
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 299703663}
-  - component: {fileID: 299703662}
-  m_Layer: 0
-  m_Name: MicrophoneRecord
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &299703662
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 299703661}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bc03a4c19604ea394e364f8fc632928, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxLengthSec: 60
-  loop: 0
-  frequency: 16000
-  chunksLengthSec: 0.5
-  echo: 0
-  useVad: 1
-  vadUpdateRateSec: 0.1
-  vadContextSec: 30
-  vadLastSec: 1.25
-  vadThd: 1
-  vadFreqThd: 100
-  vadIndicatorImage: {fileID: 0}
-  vadStop: 0
-  dropVadPart: 1
-  vadStopTime: 3
-  microphoneDropdown: {fileID: 0}
-  microphoneDefaultLabel: Default microphone
---- !u!4 &299703663
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 299703661}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1234647953
 GameObject:
   m_ObjectHideFlags: 0
@@ -716,7 +689,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
+  m_VertexColorAlwaysGammaSpace: 1
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -882,72 +855,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -40, y: -40}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &1297637741
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1297637743}
-  - component: {fileID: 1297637742}
-  m_Layer: 0
-  m_Name: Whisper
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1297637742
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1297637741}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9370225a2ca94276b870d5f87b0db55, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  logLevel: 1
-  modelPath: ggml-small.en.bin
-  isModelPathInStreamingAssets: 1
-  initOnAwake: 1
-  useGpu: 1
-  flashAttention: 0
-  language: en
-  translateToEnglish: 0
-  strategy: 0
-  noContext: 1
-  singleSegment: 0
-  enableTokens: 0
-  initialPrompt: 'Skill Commands: Kon, Domain Expansion Infinite Void, Fireball Jutsu,
-    Bang, Repulsor Beam.'
-  stepSec: 3
-  keepSec: 0.2
-  lengthSec: 10
-  updatePrompt: 1
-  dropOldBuffer: 0
-  useVad: 1
-  tokensTimestamps: 0
-  audioCtx: 0
---- !u!4 &1297637743
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1297637741}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1319731857
 GameObject:
   m_ObjectHideFlags: 0
@@ -995,7 +902,7 @@ MonoBehaviour:
   microphoneButton: {fileID: 254853024}
   outputText: {fileID: 1278855256}
   similarityInfoText: {fileID: 1432292979}
-  targetCommand: Kon
+  targetCommand: Bam
 --- !u!1 &1428944346
 GameObject:
   m_ObjectHideFlags: 0
@@ -1424,14 +1331,174 @@ MonoBehaviour:
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
   m_ScrollDeltaPerTick: 6
+--- !u!1 &1896764555 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5998152059442813635, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
+  m_PrefabInstance: {fileID: 8079896117517991858}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1896764558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896764555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2817236232809fb4eaf41f6fa500a003, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Whisper.WhisperManager
+  logLevel: 1
+  modelPath: ggml-small.en.bin
+  isModelPathInStreamingAssets: 1
+  initOnAwake: 1
+  useGpu: 1
+  flashAttention: 0
+  language: en
+  translateToEnglish: 0
+  strategy: 0
+  noContext: 1
+  singleSegment: 1
+  enableTokens: 0
+  initialPrompt: 'Skill Commands: "Ryoiki Tenkai Muryokusho"'
+  stepSec: 3
+  keepSec: 0.2
+  lengthSec: 10
+  updatePrompt: 0
+  dropOldBuffer: 0
+  useVad: 1
+  tokensTimestamps: 0
+  audioCtx: 0
+--- !u!1001 &5275937463613512903
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1096077664597899981, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
+      propertyPath: m_Name
+      value: MicrophoneRecord
+      objectReference: {fileID: 0}
+    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5976379819289775797, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 3781743577757301103, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1096077664597899981, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5138122}
+  m_SourcePrefab: {fileID: 100100000, guid: b2dec981d09df974991aba4e478b4a01, type: 3}
+--- !u!1001 &8079896117517991858
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5185260740758520392, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5998152059442813635, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
+      propertyPath: m_Name
+      value: Whisper
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 8507243954462333581, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5998152059442813635, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1896764558}
+  m_SourcePrefab: {fileID: 100100000, guid: 405bb10d1fe78764a861fbb607bb52cd, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1662480850}
   - {fileID: 187845698}
-  - {fileID: 1297637743}
+  - {fileID: 8079896117517991858}
   - {fileID: 1234647957}
   - {fileID: 1834631034}
-  - {fileID: 299703663}
+  - {fileID: 5275937463613512903}
   - {fileID: 1319731858}
