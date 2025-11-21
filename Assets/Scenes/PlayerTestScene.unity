@@ -2842,7 +2842,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6924207495545542848, guid: 043944c305dcbeb42936b06456c1c05e, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8713895743861340064, guid: 043944c305dcbeb42936b06456c1c05e, type: 3}
       propertyPath: m_Convex
@@ -4329,8 +4329,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 334764981372165316, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: vadStop
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 334764981372165316, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
       propertyPath: vadStopTime
-      value: 0.2
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 7268904971573669472, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
       propertyPath: modelPath
