@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - Collide
+  - Global Resource
+  - MicrophoneDropdown
+  - Boss
   layers:
   - Default
   - TransparentFX
@@ -32,10 +35,10 @@ TagManager:
   - 
   - 
   - 
+  - GroundTest
   - 
-  - 
-  - 
-  - 
+  - HandLandmark
+  - Player
   - Enemy
   - 
   m_SortingLayers:

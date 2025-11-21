@@ -9,7 +9,7 @@ public class MainMenuController : MonoBehaviour
     private AudioSource _mainMenuMusicSource;
 
     [SerializeField] private Image fadeImage;
-    [SerializeField] private GameObject optionPanel;
+    [SerializeField] private GameObject optionsPanel;
 
     private void Awake()
     {
@@ -22,7 +22,7 @@ public class MainMenuController : MonoBehaviour
         fadeImage.color = new Color(0f, 0f, 0f, 0f);
         fadeImage.enabled = false;
         
-        optionPanel.SetActive(false);
+        optionsPanel.SetActive(false);
     }
 
     public void StartGame()
@@ -36,9 +36,9 @@ public class MainMenuController : MonoBehaviour
 
     }
 
-    public void OpenOption()
+    public void OpenOptions()
     {
-        optionPanel.SetActive(true);
+        optionsPanel.SetActive(true);
     }
 
     public void ExitGame()

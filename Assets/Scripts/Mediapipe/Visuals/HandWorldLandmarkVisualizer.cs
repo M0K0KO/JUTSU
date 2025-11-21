@@ -103,6 +103,11 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
             landmark.transform.SetParent(gameObject.transform);
             landmarkVisuals[i] = landmark;
 
+            if (i == 8)
+            {
+                player.jutsu.RegisterAkaSpawnPoint(landmark.transform);
+            }
+
             var connection = Instantiate(connectionVisualPrefab, transform);
             connection.transform.SetParent(gameObject.transform);
             connectionVisuals[i] = connection;
