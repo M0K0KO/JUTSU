@@ -4330,11 +4330,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 334764981372165316, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
       propertyPath: vadStopTime
-      value: 1
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 7268904971573669472, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
       propertyPath: modelPath
       value: ggml-small.en.bin
+      objectReference: {fileID: 0}
+    - target: {fileID: 7268904971573669472, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: initialPrompt
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8303174728611474242, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
       propertyPath: whipserManager
@@ -5925,10 +5929,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9660ae5337ff6ca42868a61cca257fc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerJutsuManager
-  sequenceMaxDuration: 20
+  sequenceMaxDuration: 7
   slowedTimeScale: 0.4
   jutsuList:
   - {fileID: 11400000, guid: 0f66913499e6d7d4caa59bbd443b8827, type: 2}
+  - {fileID: 11400000, guid: ff12757a7b8c1014bbf523e6b61fd3a7, type: 2}
+  - {fileID: 11400000, guid: 6add0281304253a42aac631c347b9d2a, type: 2}
+  - {fileID: 11400000, guid: 126622a8ee2001d41b83fa69bcc4f0a2, type: 2}
   bloomQuadMaterial: {fileID: 2100000, guid: 624d59276972f394688be0cf3b6176de, type: 2}
   dissolveMaterial: {fileID: 2100000, guid: 296cd90ff46bfe6439f7655156654a68, type: 2}
   intersectionSphereTransform: {fileID: 1876509574}

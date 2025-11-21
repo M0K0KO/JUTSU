@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Mediapipe.Unity.HandWorldLandmarkDetection;
@@ -9,6 +10,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using Whisper;
 using Whisper.Utils;
+using Debug = UnityEngine.Debug;
 
 public class PlayerJutsuManager : MonoBehaviour
 {
@@ -25,24 +27,24 @@ public class PlayerJutsuManager : MonoBehaviour
     private List<Jutsu> jutsuList;
 
     [Header("Muryokusho")]
-    [SerializeField] private Material bloomQuadMaterial;
+    [SerializeField]
+    private Material bloomQuadMaterial;
+
     [SerializeField] private Material dissolveMaterial;
     [SerializeField] private Transform intersectionSphereTransform;
     [SerializeField] private MuryokushoSequenceData muryokushoSequenceData;
 
-    [Header("Aka")]
-    [SerializeField] private GameObject AkaObject;
+    [Header("Aka")] [SerializeField] private GameObject AkaObject;
     [SerializeField] private AkaSequenceData akaSequenceData;
     private Transform akaSpawnHandLandmark;
 
-    [Header("Kon")]
-    [SerializeField] private GameObject konWolfInstance;
+    [Header("Kon")] [SerializeField] private GameObject konWolfInstance;
     [SerializeField] private Animator konWolfAnimator;
     [SerializeField] private Material konWolfMaterial;
     [SerializeField] private KonSequenceData konSequenceData;
-    
 
-public bool isUsingJutsu { get; private set; } = false;
+
+    public bool isUsingJutsu { get; private set; } = false;
 
     private Dictionary<GestureType, Jutsu> jutsuDict = new Dictionary<GestureType, Jutsu>();
 
@@ -73,17 +75,9 @@ public bool isUsingJutsu { get; private set; } = false;
             if (!isUsingJutsu)
                 StartCoroutine(JutsuMode());
         }
-
-
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            //Muryokusho();
-            //Aka();
-            Kon();
-        }
     }
 
-    public IEnumerator JutsuMode()
+    /*public IEnumerator JutsuMode()
     {
         isUsingJutsu = true;
         EventManager.TriggerOnJustuModeEnter();
@@ -96,6 +90,7 @@ public bool isUsingJutsu { get; private set; } = false;
 
         bool isTriggered = false;
         bool jutsuGestureTrigger = false;
+        bool stopRequested = false;
 
         Action jutsu = null;
         string expectedVoiceCommand = "";
@@ -103,14 +98,30 @@ public bool isUsingJutsu { get; private set; } = false;
 
         Task<string> voiceTask = null;
         CancellationTokenSource cts = new CancellationTokenSource();
+        var mic = VoiceRecognitionManager.instance.microphoneRecord;
+
+        Stopwatch sequenceSw = new Stopwatch();
 
         Debug.Log("Jutsu Mode: Started. Waiting for gesture...");
 
         try
         {
-            while (elapsedTime < sequenceMaxDuration)
+            while (elapsedTime < sequenceMaxDuration || (voiceTask != null && !voiceTask.IsCompleted))
             {
                 elapsedTime += Time.unscaledDeltaTime;
+
+                if (elapsedTime >= sequenceMaxDuration && !stopRequested && voiceTask != null && !voiceTask.IsCompleted)
+                {
+                    Debug.Log("[Jutsu] Time out! Forcing stop microphone to check result...");
+                    if (mic.IsRecording) mic.StopRecord();
+                    stopRequested = true;
+                }
+
+                if (elapsedTime >= sequenceMaxDuration + 3.0f)
+                {
+                    Debug.Log("[Jutsu] Hard Timeout. Aborting.");
+                    break;
+                }
 
                 if (!jutsuGestureTrigger)
                 {
@@ -120,20 +131,18 @@ public bool isUsingJutsu { get; private set; } = false;
                         jutsu = GetJutsu(detectedGesture);
                         expectedVoiceCommand = GetJutsuVoiceCommand(detectedGesture);
 
-                        for (int i = 0; i < gestureQueueCapacity; i++)
-                        {
-                            gestureQueue.Enqueue(detectedGesture);
-                        }
+                        for (int i = 0; i < gestureQueueCapacity; i++) gestureQueue.Enqueue(detectedGesture);
 
                         jutsuGestureTrigger = true;
                         Debug.Log(
                             $"[Phase 1] Gesture '{detectedGesture}' detected. Listening for '{expectedVoiceCommand}'...");
+                        
+                        sequenceSw.Start();
                         voiceTask = RecognizeVoiceAsync(cts.Token);
                     }
                 }
                 else
                 {
-
                     if (voiceTask != null && voiceTask.IsCompleted)
                     {
                         if (voiceTask.Status == TaskStatus.RanToCompletion)
@@ -141,31 +150,50 @@ public bool isUsingJutsu { get; private set; } = false;
                             string voiceResult = voiceTask.Result;
                             Debug.Log($"[Phase 2] Voice task completed. Heard: '{voiceResult}'");
 
-                            if (StringSimilarity.IsSimilar(voiceResult, expectedVoiceCommand)) isTriggered = true;
-                            else Debug.Log("Wrong voice command.");
+                            if (voiceResult.Length != 0 && StringSimilarity.IsSimilar(voiceResult, expectedVoiceCommand))
+                            {
+                                isTriggered = true;
+                                break; 
+                            }
+                            else
+                            {
+                                voiceTask = RecognizeVoiceAsync(cts.Token);
+                                continue;
+                            }
                         }
-                        else if (voiceTask.Status == TaskStatus.Canceled)
+                        else if (voiceTask.Status == TaskStatus.Canceled || voiceTask.Status == TaskStatus.Faulted)
                         {
-                            Debug.Log("[Phase 2] Voice task was canceled.");
+                            Debug.Log("[Phase 2] Voice task canceled or faulted. Retrying...");
+                            voiceTask = RecognizeVoiceAsync(cts.Token); 
+                            continue;
                         }
-                        else if (voiceTask.Status == TaskStatus.Faulted)
-                        {
-                            Debug.LogWarning($"[Phase 2] Voice task faulted: {voiceTask.Exception}");
-                        }
-
-                        break;
                     }
 
-                    gestureQueue.CapacitySafeEnqueue(HandWorldLandmarkVisualizer.instance.currentGesture, gestureQueueCapacity);
-                    
-                    if (gestureQueue.GetCount(detectedGesture) == 0)
+                    gestureQueue.CapacitySafeEnqueue(HandWorldLandmarkVisualizer.instance.currentGesture,
+                        gestureQueueCapacity);
+
+                    if (gestureQueue.GetCount(detectedGesture) == 0 && !stopRequested)
                     {
-                        Debug.Log("[Canceled] Gesture was not held. Cancelling Jutsu.");
-                        cts.Cancel();
-                        break;
+                        Debug.Log("[Canceled] Gesture lost during casting.");
+
+                        if (mic.IsRecording) mic.StopRecord();
+                        stopRequested = true;
                     }
                 }
+
                 yield return null;
+            }
+            
+            if (!isTriggered && voiceTask != null && voiceTask.Status == TaskStatus.RanToCompletion)
+            {
+                string voiceResult = voiceTask.Result;
+                Debug.Log($"[Post-Loop Check] Voice task finished. Heard: '{voiceResult}'");
+
+                if (StringSimilarity.IsSimilar(voiceResult, expectedVoiceCommand))
+                {
+                    isTriggered = true;
+                    Debug.Log("[Post-Loop Check] Success! Triggering Jutsu.");
+                }
             }
         }
         finally
@@ -197,7 +225,7 @@ public bool isUsingJutsu { get; private set; } = false;
             }
 
             gestureQueue.Clear();
-            
+
             isUsingJutsu = false;
             EventManager.TriggerOnJustuModeExit();
         }
@@ -207,91 +235,52 @@ public bool isUsingJutsu { get; private set; } = false;
     {
         var mic = VoiceRecognitionManager.instance.microphoneRecord;
         var whisper = VoiceRecognitionManager.instance.whipserManager;
-        
+
         TaskCompletionSource<string> tcs = new TaskCompletionSource<string>();
         OnRecordStopDelegate onStop = null;
         bool isCompleted = false;
 
         try
         {
-            Debug.Log("[Voice] Starting voice recognition...");
-            
             onStop = async (chunk) =>
             {
-                if (isCompleted) return; 
-                
+                if (tcs.Task.IsCompleted) return;
+
                 try
                 {
-                    Debug.Log($"[Voice] Recording stopped. Audio length: {chunk.Length}s, Voice detected: {chunk.IsVoiceDetected}");
-                    Debug.Log($"[Voice] Audio data size: {chunk.Data.Length} samples, Frequency: {chunk.Frequency}Hz");
-                    
-                    Debug.Log("[Voice] Processing audio with Whisper...");
                     var result = await whisper.GetTextAsync(chunk.Data, chunk.Frequency, chunk.Channels);
-                    
-                    if (result != null && !string.IsNullOrEmpty(result.Result))
-                    {
-                        var transcription = result.Result.Trim();
-                        Debug.Log($"[Voice] ✓ Transcription complete: '{transcription}'");
-                        tcs.TrySetResult(transcription);
-                    }
-                    else
-                    {
-                        Debug.Log("[Voice] ✗ Transcription returned empty");
-                        tcs.TrySetResult(string.Empty);
-                    }
-                    
-                    isCompleted = true;
+
+                    string transcription = result != null ? result.Result.Trim() : string.Empty;
+                    tcs.TrySetResult(transcription);
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"[Voice] Error in OnRecordStop handler: {e}");
                     tcs.TrySetException(e);
-                    isCompleted = true;
                 }
             };
 
-           mic.OnRecordStop += onStop;
-           
-            
-            if (!mic.IsRecording)
+            mic.OnRecordStop += onStop;
+
+            if (!mic.IsRecording) mic.StartRecord();
+
+            using (ct.Register(() =>
+                   {
+                       if (mic != null && mic.IsRecording)
+                       {
+                           Debug.Log("[Voice] Token cancelled, stopping mic to finalize transcription...");
+                           mic.StopRecord();
+                       }
+                       else
+                       {
+                           tcs.TrySetCanceled();
+                       }
+                   }))
             {
-                mic.StartRecord();
-                Debug.Log("[Voice] 🎤 Microphone recording started (waiting for speech...)");
-            }
-            else
-            {
-                Debug.LogWarning("[Voice] Microphone is already recording!");
-            }
-            
-            using (ct.Register(() => 
-            {
-                if (isCompleted) return;
-                
-                Debug.Log("[Voice] Voice recognition cancelled by token");
-                if (mic != null && mic.IsRecording)
-                {
-                    mic.StopRecord(); 
-                }
-                else
-                {
-                    tcs.TrySetCanceled(ct);
-                    isCompleted = true;
-                }
-            }))
-            {
-                var result = await tcs.Task;
-                
-                if (onStop != null)
-                {
-                    mic.OnRecordStop -= onStop;
-                }
-                
-                return result;
+                return await tcs.Task;
             }
         }
-        catch (OperationCanceledException)
+        catch (TaskCanceledException)
         {
-            Debug.Log("[Voice] Voice recognition was canceled");
             return string.Empty;
         }
         catch (Exception e)
@@ -307,21 +296,277 @@ public bool isUsingJutsu { get; private set; } = false;
                 {
                     mic.OnRecordStop -= onStop;
                 }
-                catch { }
+                catch
+                {
+                }
             }
+
             {
                 mic.StopRecord();
                 Debug.Log("[Voice] Microphone recording stopped (cleanup)");
             }
         }
+    }*/
+
+    public IEnumerator JutsuMode()
+    {
+        isUsingJutsu = true;
+        EventManager.TriggerOnJustuModeEnter();
+
+        player.stateMachine.CheckNearbyEnemies(out GameObject target, false);
+        PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Jutsu, target.transform);
+
+        float elapsedTime = 0f;
+        Time.timeScale = slowedTimeScale;
+
+        bool isTriggered = false;
+        bool jutsuGestureTrigger = false;
+        bool stopRequested = false;
+
+        Action jutsu = null;
+        string expectedVoiceCommand = "";
+        GestureType detectedGesture = GestureType.None;
+
+        Task<string> voiceTask = null;
+        CancellationTokenSource cts = new CancellationTokenSource();
+        var mic = VoiceRecognitionManager.instance.microphoneRecord;
+        
+        // 전체 흐름 측정용 스톱워치
+        Stopwatch sequenceSw = new Stopwatch();
+
+        Debug.Log("Jutsu Mode: Started. Waiting for gesture...");
+
+        try
+        {
+            while (elapsedTime < sequenceMaxDuration || (voiceTask != null && !voiceTask.IsCompleted))
+            {
+                elapsedTime += Time.unscaledDeltaTime;
+
+                if (elapsedTime >= sequenceMaxDuration && !stopRequested && voiceTask != null && !voiceTask.IsCompleted)
+                {
+                    Debug.Log("[Jutsu] Time out! Forcing stop microphone to check result...");
+                    if (mic.IsRecording) mic.StopRecord();
+                    stopRequested = true;
+                }
+
+                if (elapsedTime >= sequenceMaxDuration + 3.0f)
+                {
+                    Debug.Log("[Jutsu] Hard Timeout. Aborting.");
+                    break;
+                }
+
+                if (!jutsuGestureTrigger)
+                {
+                    detectedGesture = HandWorldLandmarkVisualizer.instance.currentGesture;
+                    if (detectedGesture != GestureType.None && jutsuDict.ContainsKey(detectedGesture))
+                    {
+                        jutsu = GetJutsu(detectedGesture);
+                        expectedVoiceCommand = GetJutsuVoiceCommand(detectedGesture);
+
+                        for (int i = 0; i < gestureQueueCapacity; i++) gestureQueue.Enqueue(detectedGesture);
+
+                        jutsuGestureTrigger = true;
+                        Debug.Log($"[Phase 1] Gesture '{detectedGesture}' detected. Listening for '{expectedVoiceCommand}'...");
+                        
+                        // 녹음 시작 시점 기록
+                        sequenceSw.Start(); 
+                        voiceTask = RecognizeVoiceAsync(cts.Token, sequenceSw);
+                    }
+                }
+                else
+                {
+                    if (voiceTask != null && voiceTask.IsCompleted)
+                    {
+                        if (voiceTask.Status == TaskStatus.RanToCompletion)
+                        {
+                            // [TimeLog] 메인 스레드에서 결과를 받은 시점
+                            Debug.Log($"[TimeLog] 4. MainThread Received TaskResult: {sequenceSw.ElapsedMilliseconds}ms from start.");
+                            
+                            string voiceResult = voiceTask.Result;
+                            Debug.Log($"[Phase 2] Voice task completed. Heard: '{voiceResult}'");
+
+                            Stopwatch simSw = Stopwatch.StartNew();
+                            bool isSimilar = voiceResult.Length != 0 && StringSimilarity.IsSimilar(voiceResult, expectedVoiceCommand);
+                            simSw.Stop();
+                            
+                            // [TimeLog] 문자열 유사도 검사 시간 (보통 0~1ms 여야 함)
+                            Debug.Log($"[TimeLog] 5. Similarity Check Time: {simSw.ElapsedMilliseconds}ms. Result: {isSimilar}");
+
+                            if (isSimilar)
+                            {
+                                isTriggered = true;
+                                break; 
+                            }
+                            else
+                            {
+                                Debug.LogWarning($"[Retry] Wrong command. Restarting listener...");
+                                sequenceSw.Restart(); // 재시작 시 타이머 초기화
+                                voiceTask = RecognizeVoiceAsync(cts.Token, sequenceSw);
+                                continue;
+                            }
+                        }
+                        else if (voiceTask.Status == TaskStatus.Canceled || voiceTask.Status == TaskStatus.Faulted)
+                        {
+                            Debug.Log("[Phase 2] Voice task canceled or faulted. Retrying...");
+                            sequenceSw.Restart();
+                            voiceTask = RecognizeVoiceAsync(cts.Token, sequenceSw); 
+                            continue;
+                        }
+                    }
+
+                    gestureQueue.CapacitySafeEnqueue(HandWorldLandmarkVisualizer.instance.currentGesture, gestureQueueCapacity);
+
+                    if (gestureQueue.GetCount(detectedGesture) == 0 && !stopRequested)
+                    {
+                        Debug.Log("[Canceled] Gesture lost during casting.");
+
+                        if (mic.IsRecording) mic.StopRecord();
+                        stopRequested = true;
+                    }
+                }
+
+                yield return null;
+            }
+            
+            // 루프 탈출 후 체크
+            if (!isTriggered && voiceTask != null && voiceTask.Status == TaskStatus.RanToCompletion)
+            {
+                string voiceResult = voiceTask.Result;
+                if (StringSimilarity.IsSimilar(voiceResult, expectedVoiceCommand))
+                {
+                    isTriggered = true;
+                    Debug.Log("[Post-Loop Check] Success! Triggering Jutsu.");
+                }
+            }
+        }
+        finally
+        {
+            Debug.Log("Jutsu sequence ending. Cleaning up...");
+            cts.Cancel();
+            cts.Dispose();
+
+            Time.timeScale = 1f;
+            if (HandWorldLandmarkVisualizer.instance != null)
+            {
+                HandWorldLandmarkVisualizer.instance.DeactivateVisuals();
+            }
+
+            if (isTriggered && jutsu != null)
+            {
+                // [TimeLog] 실제 액션 발동 시점
+                Debug.Log($"[TimeLog] 6. Action Invoked. Total Time from gesture: {sequenceSw.ElapsedMilliseconds}ms");
+                EventManager.TriggerOnJutsuActivation(detectedGesture);
+                jutsu();
+            }
+            else
+            {
+                Debug.Log("Jutsu Sequence Ended (Timeout or Failed)");
+            }
+
+            if (PlayerCameraStateHandler.instance != null && target != null)
+            {
+                PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Strafe, target.transform);
+            }
+
+            gestureQueue.Clear();
+            isUsingJutsu = false;
+            EventManager.TriggerOnJustuModeExit();
+        }
     }
 
+    // Stopwatch 파라미터 추가
+    private async Task<string> RecognizeVoiceAsync(CancellationToken ct, Stopwatch sw)
+    {
+        var mic = VoiceRecognitionManager.instance.microphoneRecord;
+        var whisper = VoiceRecognitionManager.instance.whipserManager;
+
+        TaskCompletionSource<string> tcs = new TaskCompletionSource<string>();
+        OnRecordStopDelegate onStop = null;
+
+        try
+        {
+            onStop = async (chunk) =>
+            {
+                // [TimeLog] VAD가 침묵을 감지하고 녹음을 끊은 시점
+                long vadTime = sw.ElapsedMilliseconds;
+                Debug.Log($"[TimeLog] 1. VAD Detected Stop (Recording Duration): {vadTime}ms");
+
+                if (tcs.Task.IsCompleted) return;
+
+                try
+                {
+                    // [TimeLog] Whisper 추론 시작
+                    Debug.Log($"[TimeLog] 2. Whisper Inference Started at {sw.ElapsedMilliseconds}ms");
+                    
+                    Stopwatch inferenceSw = Stopwatch.StartNew();
+                    var result = await whisper.GetTextAsync(chunk.Data, chunk.Frequency, chunk.Channels);
+                    inferenceSw.Stop();
+
+                    // [TimeLog] Whisper 추론 완료
+                    Debug.Log($"[TimeLog] 3. Whisper Inference Finished. Took: {inferenceSw.ElapsedMilliseconds}ms");
+
+                    string transcription = result != null ? result.Result.Trim() : string.Empty;
+                    tcs.TrySetResult(transcription);
+                }
+                catch (Exception e)
+                {
+                    tcs.TrySetException(e);
+                }
+            };
+
+            mic.OnRecordStop += onStop;
+
+            if (!mic.IsRecording) 
+            {
+                mic.StartRecord();
+                Debug.Log("[Voice] Mic Started.");
+            }
+
+            using (ct.Register(() =>
+                   {
+                       if (mic != null && mic.IsRecording)
+                       {
+                           Debug.Log("[Voice] Token cancelled, stopping mic...");
+                           mic.StopRecord();
+                       }
+                       else
+                       {
+                           tcs.TrySetCanceled();
+                       }
+                   }))
+            {
+                return await tcs.Task;
+            }
+        }
+        catch (TaskCanceledException)
+        {
+            return string.Empty;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[Voice] Error: {e.Message}");
+            return string.Empty;
+        }
+        finally
+        {
+            if (onStop != null && mic != null) try { mic.OnRecordStop -= onStop; } catch {}
+            mic.StopRecord();
+        }
+    }
+    
     private Action GetJutsu(GestureType gestureType)
     {
         switch (gestureType)
         {
             case GestureType.Kon:
                 return Kon;
+            case GestureType.Aka:
+                return Aka;
+            case GestureType.Muryokusho:
+                return Muryokusho;
+            case GestureType.Punch:
+                Debug.Log("Punch is not implemented");
+                return null;
             default:
                 return null;
         }
@@ -331,6 +576,7 @@ public bool isUsingJutsu { get; private set; } = false;
 
     private void Kon()
     {
+        Debug.Log("KON has been called");
         StartCoroutine(KonSequence());
     }
 
@@ -339,42 +585,43 @@ public bool isUsingJutsu { get; private set; } = false;
         var targetTransform = player.stateMachine.currentTargetHitTarget.transform.root;
         Vector3 playerPos = player.transform.position;
         Vector3 bossPos = targetTransform.position;
-        
+
         Vector3 dirToBoss = bossPos - playerPos;
         dirToBoss.y = 0;
         dirToBoss.Normalize();
 
         Vector3 rightDir = Vector3.Cross(Vector3.up, dirToBoss);
 
-        Vector3 spawnPos = bossPos + (rightDir * konSequenceData.spawnOffset.x) + Vector3.up * konSequenceData.spawnOffset.y;
+        Vector3 spawnPos = bossPos + (rightDir * konSequenceData.spawnOffset.x) +
+                           Vector3.up * konSequenceData.spawnOffset.y;
         Vector3 lookDir = bossPos - spawnPos;
         lookDir.y = 0;
 
         Quaternion lookRotation = Quaternion.LookRotation(lookDir);
         Quaternion finalRot = Quaternion.Euler(-55f, lookRotation.eulerAngles.y, 0f);
-        
+
         konWolfInstance.transform.position = spawnPos;
         konWolfInstance.transform.rotation = finalRot;
-        
-        
+
+
         player.impulseManager.KonRumbleImpulse();
         yield return new WaitForSeconds(konSequenceData.rumbleDuration);
-        
+
 
         float animationSpeed = konSequenceData.animationPlaybackSpeedCurve.Evaluate(0);
         konWolfAnimator.SetFloat("AttackSpeed", animationSpeed);
         konWolfAnimator.Play("Attack8");
 
         yield return null;
-        
+
         AnimatorStateInfo stateInfo = konWolfAnimator.GetCurrentAnimatorStateInfo(0);
-        
+
         while (stateInfo.IsTag("Attack"))
         {
             animationSpeed = konSequenceData.animationPlaybackSpeedCurve.Evaluate(stateInfo.normalizedTime);
             Debug.Log($"{animationSpeed}");
             konWolfAnimator.SetFloat("AttackSpeed", animationSpeed);
-            
+
             stateInfo = konWolfAnimator.GetCurrentAnimatorStateInfo(0);
 
             yield return null;
@@ -382,17 +629,18 @@ public bool isUsingJutsu { get; private set; } = false;
 
         yield return null;
     }
-    
-    
+
+
     private void Muryokusho()
     {
+        Debug.Log("MURYOKUSHO has been called");
         StartCoroutine(MuryokushoSequence());
     }
 
     private IEnumerator MuryokushoSequence()
     {
         bool isSkyboxChanged = false;
-        
+
         float elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.quadBloomDuration)
         {
@@ -415,32 +663,35 @@ public bool isUsingJutsu { get; private set; } = false;
         while (elapsedTime < muryokushoSequenceData.intersectionDuration)
         {
             elapsedTime += Time.unscaledDeltaTime;
-            
-            float curveValue = 
-                muryokushoSequenceData.intersectionSphereScaleCurve.Evaluate(elapsedTime / muryokushoSequenceData.intersectionDuration);
-            float scaleValue = muryokushoSequenceData.minIntersectionSphereScale + muryokushoSequenceData.intersectionSphereScaleRange * curveValue;
-            
+
+            float curveValue =
+                muryokushoSequenceData.intersectionSphereScaleCurve.Evaluate(elapsedTime /
+                                                                             muryokushoSequenceData
+                                                                                 .intersectionDuration);
+            float scaleValue = muryokushoSequenceData.minIntersectionSphereScale +
+                               muryokushoSequenceData.intersectionSphereScaleRange * curveValue;
+
             intersectionSphereTransform.localScale = new Vector3(scaleValue, scaleValue, scaleValue);
-            
+
             yield return null;
         }
-        
+
 
         elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.dissolveDuration)
         {
             elapsedTime += Time.unscaledDeltaTime;
-            
+
             float curveValue = muryokushoSequenceData.cutoffCurve.Evaluate(
                 elapsedTime / muryokushoSequenceData.dissolveDuration);
             dissolveMaterial.SetFloat("_Cutoff_Height",
                 muryokushoSequenceData.maxCutoffHeight - curveValue * muryokushoSequenceData.cutOffHeightRange);
-            
+
             yield return null;
         }
-        
+
         //if (isSkyboxChanged) RenderSettings.skybox = muryokushoSequenceData.originalSkyboxMaterial;
-        
+
         bloomQuadMaterial.SetFloat("_Alpha", 0f);
         dissolveMaterial.SetFloat("_Cutoff_Height", muryokushoSequenceData.minCutoffHeight);
         intersectionSphereTransform.localScale = Vector3.zero;
@@ -449,30 +700,32 @@ public bool isUsingJutsu { get; private set; } = false;
 
     private void Aka()
     {
+        Debug.Log("AKA has been called");
         StartCoroutine(AkaSequence());
     }
 
     private IEnumerator AkaSequence()
     {
         Vector3 spawnPos = akaSpawnHandLandmark.position + Vector3.up * 0.3f;
-        
+
         GameObject aka = Instantiate(AkaObject, spawnPos, Quaternion.identity);
         AkaManager akaManager = aka.GetComponent<AkaManager>();
 
-        
+
         float elapsedTime = 0f;
         while (elapsedTime < akaSequenceData.waitDuration)
         {
             elapsedTime += Time.unscaledDeltaTime;
-            aka.transform.position = Vector3.Lerp(aka.transform.position, akaSpawnHandLandmark.position + Vector3.up * 0.3f,
+            aka.transform.position = Vector3.Lerp(aka.transform.position,
+                akaSpawnHandLandmark.position + Vector3.up * 0.3f,
                 akaSequenceData.akaLerpSpeed * Time.unscaledDeltaTime);
             yield return null;
         }
-        
+
         aka.GetComponent<CinemachineImpulseSource>().GenerateImpulse();
-        
+
         Vector3 initialDirection = player.stateMachine.currentTargetHitTarget.position - aka.transform.position;
-        
+
         while (true)
         {
             Vector3 direction = player.stateMachine.currentTargetHitTarget.position - aka.transform.position;
@@ -485,12 +738,12 @@ public bool isUsingJutsu { get; private set; } = false;
                 EventManager.TriggerOnAkaHit(initialDirection, akaSequenceData.pushDuration);
                 break;
             }
-            
+
             yield return null;
         }
 
         yield return null;
     }
 
-    public void RegisterAkaSpawnPoint(Transform fingertip) => akaSpawnHandLandmark = fingertip; 
+    public void RegisterAkaSpawnPoint(Transform fingertip) => akaSpawnHandLandmark = fingertip;
 }

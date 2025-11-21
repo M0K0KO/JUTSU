@@ -902,7 +902,7 @@ MonoBehaviour:
   microphoneButton: {fileID: 254853024}
   outputText: {fileID: 1278855256}
   similarityInfoText: {fileID: 1432292979}
-  targetCommand: Bam
+  targetCommand: Ryoiki Tenkai Muryokusho
 --- !u!1 &1428944346
 GameObject:
   m_ObjectHideFlags: 0
@@ -1360,7 +1360,7 @@ MonoBehaviour:
   noContext: 1
   singleSegment: 1
   enableTokens: 0
-  initialPrompt: 'Skill Commands: "Ryoiki Tenkai Muryokusho"'
+  initialPrompt: 
   stepSec: 3
   keepSec: 0.2
   lengthSec: 10

@@ -25,7 +25,7 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
     {
         string modelPath = Path.Combine(
             Application.streamingAssetsPath, 
-            "gesture_recognizer_v1.bytes");
+            "gesture_recognizer_v2.bytes");
 
         BaseOptions baseOptions = new BaseOptions(
             BaseOptions.Delegate.CPU,
@@ -130,7 +130,13 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
         switch (bestGesture)
         {
             case "kon":
-                return GestureType.Kon;       
+                return GestureType.Kon;     
+            case "aka":
+                return GestureType.Aka;
+            case "muryokusho":
+                return GestureType.Muryokusho;
+            case "punch":
+                return GestureType.Punch;
             default:
                 return GestureType.None;
         }

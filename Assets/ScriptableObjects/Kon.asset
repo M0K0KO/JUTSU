@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6746f74f7dc312c4791f6c5df4df2cb3, type: 3}
   m_Name: Kon
   m_EditorClassIdentifier: Assembly-CSharp::Jutsu
-  gestureType: 2
+  gestureType: 0
   targetCommand: Kon
