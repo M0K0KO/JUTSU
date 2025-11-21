@@ -44521,6 +44521,13 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0.2
+    functionName: IncreaseComboCounter
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.2
     functionName: PlayMuzzleFlash
     data: 
     objectReferenceParameter: {fileID: 0}
@@ -44542,7 +44549,7 @@ AnimationClip:
     intParameter: 0
     messageOptions: 0
   - time: 0.46666667
-    functionName: PlayMuzzleFlash
+    functionName: IncreaseComboCounter
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
@@ -44550,6 +44557,13 @@ AnimationClip:
     messageOptions: 0
   - time: 0.46666667
     functionName: AttackImpulse
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.46666667
+    functionName: PlayMuzzleFlash
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
