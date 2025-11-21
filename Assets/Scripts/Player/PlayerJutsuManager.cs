@@ -202,9 +202,9 @@ public class PlayerJutsuManager : MonoBehaviour
             cts.Cancel();
             cts.Dispose();
 
-            Time.timeScale = 1f;
-            if (HandWorldLandmarkVisualizer.instance != null)
+            if (HandWorldLandmarkVisualizer.instance != null && detectedGesture != GestureType.Aka)
             {
+                Time.timeScale = 1f;
                 HandWorldLandmarkVisualizer.instance.DeactivateVisuals();
             }
 
@@ -217,11 +217,6 @@ public class PlayerJutsuManager : MonoBehaviour
             else
             {
                 Debug.Log("Jutsu Sequence Ended (Timeout or Failed)");
-            }
-
-            if (PlayerCameraStateHandler.instance != null && target != null)
-            {
-                PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Strafe, target.transform);
             }
 
             gestureQueue.Clear();
@@ -378,6 +373,12 @@ public class PlayerJutsuManager : MonoBehaviour
 
             stateInfo = konWolfAnimator.GetCurrentAnimatorStateInfo(0);
 
+            if (stateInfo.normalizedTime > 0.5f)
+            {
+                PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Strafe,
+                    player.stateMachine.currentTargetHitTarget.transform);
+            }
+
             yield return null;
         }
 
@@ -388,6 +389,8 @@ public class PlayerJutsuManager : MonoBehaviour
     private void Muryokusho()
     {
         Debug.Log("MURYOKUSHO has been called");
+        PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Strafe,
+            player.stateMachine.currentTargetHitTarget.transform);
         StartCoroutine(MuryokushoSequence());
     }
 
@@ -444,11 +447,49 @@ public class PlayerJutsuManager : MonoBehaviour
             yield return null;
         }
 
-        //if (isSkyboxChanged) RenderSettings.skybox = muryokushoSequenceData.originalSkyboxMaterial;
-
         bloomQuadMaterial.SetFloat("_Alpha", 0f);
         dissolveMaterial.SetFloat("_Cutoff_Height", muryokushoSequenceData.minCutoffHeight);
         intersectionSphereTransform.localScale = Vector3.zero;
+
+        
+        
+
+        yield return new WaitForSeconds(muryokushoSequenceData.muryokushoDuration);
+        
+        
+        
+        
+        elapsedTime = 0f;
+        while (elapsedTime < muryokushoSequenceData.quadBloomDuration)
+        {
+            elapsedTime += Time.unscaledDeltaTime;
+            float alphaValue =
+                muryokushoSequenceData.quadBloomCurve.Evaluate(elapsedTime / muryokushoSequenceData.quadBloomDuration);
+            bloomQuadMaterial.SetFloat("_Alpha", alphaValue);
+
+            if (elapsedTime > 0.2f)
+            {
+                RenderSettings.skybox = muryokushoSequenceData.originalSkyboxMaterial;
+                dissolveMaterial.SetFloat("_Cutoff_Height", muryokushoSequenceData.maxCutoffHeight);
+            }
+
+            yield return null;
+        }
+        
+        elapsedTime = 0f;
+        while (elapsedTime < muryokushoSequenceData.dissolveDuration)
+        {
+            elapsedTime += Time.unscaledDeltaTime;
+
+            float curveValue = muryokushoSequenceData.cutoffCurve.Evaluate(
+                elapsedTime / muryokushoSequenceData.dissolveDuration);
+            dissolveMaterial.SetFloat("_Cutoff_Height",
+                muryokushoSequenceData.maxCutoffHeight - curveValue * muryokushoSequenceData.cutOffHeightRange);
+
+            yield return null;
+        }
+        
+        
     }
 
 
@@ -478,7 +519,11 @@ public class PlayerJutsuManager : MonoBehaviour
 
         aka.GetComponent<CinemachineImpulseSource>().GenerateImpulse();
 
+        Time.timeScale = 1f;
         Vector3 initialDirection = player.stateMachine.currentTargetHitTarget.position - aka.transform.position;
+        HandWorldLandmarkVisualizer.instance.DeactivateVisuals();
+        PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Strafe,
+            player.stateMachine.currentTargetHitTarget.transform);
 
         while (true)
         {
@@ -489,7 +534,7 @@ public class PlayerJutsuManager : MonoBehaviour
 
             if (akaManager.isHit)
             {
-                EventManager.TriggerOnAkaHit(initialDirection, akaSequenceData.pushDuration);
+                EventManager.TriggerOnAkaHit(initialDirection, akaSequenceData.pushDuration, akaSequenceData.akaSpeed);
                 break;
             }
 
