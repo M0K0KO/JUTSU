@@ -1,28 +1,18 @@
-using System.Collections;
 using UnityEngine;
 
-public class Lunge : StateMachineBehaviour
+public class ResetAttackTrigger : StateMachineBehaviour
 {
-    private PlayerManager player;
-
-    [SerializeField] private AnimationCurve lungeCurve;
-    [SerializeField] private bool isFront = false;
-    
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
-    //override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-    //
-    //}
+    override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        animator.ResetTrigger("attack");
+    }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
-    override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    {
-        if (!player) player = animator.GetComponent<PlayerManager>();
-        
-        float multiplier = isFront ? 1f : -1f;
-        
-        player.cc.Move( multiplier * player.transform.forward * lungeCurve.Evaluate(stateInfo.normalizedTime));
-    }
+    //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    //{
+    //    
+    //}
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     //override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)

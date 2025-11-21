@@ -5,7 +5,7 @@ public class AttackState : BaseState
     public AttackState(PlayerStateMachine stateMachine) : base(stateMachine) { }
 
     private bool nextCombo = false;
-    
+
     public override void OnEnterState()
     {
         stateMachine.player.mover.EnableMove();
@@ -13,7 +13,7 @@ public class AttackState : BaseState
         stateMachine.player.mover.EnableRotation();
         PivotTowardsTargetDirection();
         stateMachine.player.mover.DisableRotation();
-        
+
         stateMachine.player.animController.TriggerAnimParam("attack");
     }
     
@@ -21,6 +21,7 @@ public class AttackState : BaseState
     {
         if (nextCombo)
         {
+            nextCombo = false;
             stateMachine.player.animController.TriggerAnimParam("attack");
         }
     }
@@ -33,6 +34,7 @@ public class AttackState : BaseState
     {
         stateMachine.player.animController.ResetTriggerAnimParam("attack");
         nextCombo = false;
+        stateMachine.comboCounter = 0;
     }
 
     private void PivotTowardsTargetDirection()
@@ -53,7 +55,7 @@ public class AttackState : BaseState
     public void BufferAttackInput()
     {
         AnimatorStateInfo stateInfo = stateMachine.player.animator.GetCurrentAnimatorStateInfo(1);
-        if (!stateInfo.IsName("Empty") && stateInfo.normalizedTime >= 0.35f)
+        if (!stateInfo.IsName("Empty") && stateInfo.normalizedTime >= 0.25f)
         {
             nextCombo = true;
         }

@@ -11,6 +11,7 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
     public AttackState attackState { get; private set; }
     public HitState hitState { get; private set; }
 
+    
     public BaseState currentState;
 
 
@@ -30,6 +31,8 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
     public Queue<bool> hitAnimationQueue = new Queue<bool>(hitAnimationQueueInitialCapacity); 
 
     public bool isStrafing { get; private set; } = false;
+
+    public int comboCounter = 0;
 
     private void Awake()
     {
@@ -51,6 +54,15 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
         {
             TakeDamage();
         }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            player.animator.Play("Player_Attack_03");
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            player.animator.Play("Player_Attack_04");
+        }
+        
 
         CheckRollInput();
         CheckAttackInput();
@@ -181,7 +193,25 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
         currentTargetHitTarget = null;
         return false;
     }
-
+    
+    /*
+    public void TakeDamage(Vector3 damageOrigin, bool shouldPlayHitReaction = false, GestureType gestureType = GestureType.None)
+    {
+        if (currentState == rollState) return;
+        
+        Vector3 damageOriginDir = damageOrigin - transform.position;
+        player.mover.Rotate(damageOriginDir, false);
+        
+        if (currentState != hitState)
+        {
+            ChangeState(hitState);
+        }
+        else
+        {
+            hitAnimationQueue.CapacitySafeEnqueue(true, hitAnimationQueueInitialCapacity);
+        }
+    }
+    */
     public void TakeDamage(bool shouldPlayHitReaction = false, GestureType gestureType = GestureType.None)
     {
         if (currentState == rollState) return;
@@ -193,6 +223,24 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
         else
         {
             hitAnimationQueue.CapacitySafeEnqueue(true, hitAnimationQueueInitialCapacity);
+        }
+    }
+
+    public void IncreaseComboCounter() => comboCounter++;
+    
+    public void Attack(Vector3 origin, Vector3 destination)
+    {
+        bool shouldPlayHitReaction = (comboCounter == 7);
+        
+        if (shouldPlayHitReaction) Debug.Log("SHOULD PLAY HIT REACTION!!");
+        
+        Ray ray = new Ray(origin, destination - origin);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            if (hit.transform.TryGetComponent(out IDamageable damageable))
+            {
+                //damageable.TakeDamage(origin, shouldPlayHitReaction, GestureType.None);
+            }
         }
     }
 }
