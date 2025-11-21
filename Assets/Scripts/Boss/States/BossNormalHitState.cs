@@ -48,7 +48,7 @@ public class BossNormalHitState : BossBaseState
             Vector3 toPlayer = _player.transform.position - _bossTransform.position;
             if (toPlayer != Vector3.zero)
             {
-                Quaternion lookRotation = Quaternion.LookRotation(_player.transform.position - _bossTransform.position);
+                Quaternion lookRotation = Quaternion.LookRotation(toPlayer);
                 _targetRotation = Quaternion.Euler(0f, lookRotation.eulerAngles.y, 0f);
                 return;
             }

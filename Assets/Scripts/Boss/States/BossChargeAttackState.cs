@@ -13,6 +13,8 @@ public class BossChargeAttackState : BossBaseState
     private float _rotationTimer;
     private float _rotationDuration = 0.85f;
 
+    private int _animHash;
+
     public BossChargeAttackState(BossStateMachine stateMachine) : base(stateMachine)
     {
         _animator = stateMachine.BossAnimator;
@@ -27,8 +29,10 @@ public class BossChargeAttackState : BossBaseState
         _agent.ResetPath();
         _rotationTimer =_rotationDuration;
         _shouldRotate = true;
-        int triggerHash = GetAttackTriggerHash(_attackIndex);
-        _animator.SetTrigger(triggerHash);
+        _animHash = GetAttackAnimHash(_attackIndex);
+        _animator.SetTrigger(_animHash);
+        
+        _animator.CrossFadeInFixedTime(_animHash, 0.15f);
         _attackIndex = (_attackIndex + 1) % _attackCount;
     }
 
@@ -59,17 +63,19 @@ public class BossChargeAttackState : BossBaseState
         }
     }
 
-    private int GetAttackTriggerHash(int index)
+    private int GetAttackAnimHash(int index)
     {
         switch (index)
         {
             case 0:
-                return Animator.StringToHash("chargeAttack1");
+                return Animator.StringToHash("ChargeAttack1");
             case 1:
-                return Animator.StringToHash("chargeAttack2");
+                return Animator.StringToHash("ChargeAttack2");
             default:
                 // fallback hash
-                return Animator.StringToHash("chargeAttack1");
+                return Animator.StringToHash("ChargeAttack1");
         }
     }
+    
+    
 }

@@ -1,3 +1,5 @@
+using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -15,6 +17,8 @@ public class BossAkaHitState : BossBaseState
     private Quaternion _targetRotation;
     private float _enterTime;
     private float _rotationDuration = 0.2f;
+
+    private bool _playingEndAnimation = false;
     
     public BossAkaHitState(BossStateMachine stateMachine) : base(stateMachine)
     {
@@ -27,9 +31,11 @@ public class BossAkaHitState : BossBaseState
 
     public override void OnEnter()
     {
+        _playingEndAnimation = false;
         _enterTime = Time.time;
         _agent.ResetPath();
         _animator.SetBool("shouldMove", false);
+        _animator.CrossFadeInFixedTime("AkaHitLoop", 0.15f);
         
         FindTargetRotation();
         
@@ -38,8 +44,7 @@ public class BossAkaHitState : BossBaseState
         _initialDirection.Normalize();
         
         _duration = StateMachine.AkaDuration;
-        
-        _rigidbody.linearVelocity = _initialDirection * 20f;
+        _rigidbody.linearVelocity = 20f * _initialDirection;
     }
 
     public override void OnUpdate()
@@ -52,11 +57,13 @@ public class BossAkaHitState : BossBaseState
 
         if (Time.time - _enterTime > _duration)
         {
-            _rigidbody.linearVelocity = Vector3.zero;
+            if (!_playingEndAnimation)
+            {
+                _playingEndAnimation = true;
+                _rigidbody.linearVelocity = Vector3.zero;
+                _animator.CrossFadeInFixedTime("AkaHitNormalEnd", 0.15f);
+            }
         }
-
-        
-
     }
 
     private void FindTargetRotation()
@@ -73,5 +80,19 @@ public class BossAkaHitState : BossBaseState
         }
 
         _targetRotation = _bossTransform.rotation;
+    }
+
+    public override void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Wall") && !_playingEndAnimation)
+        {
+            Vector3 normal2D = collision.contacts[0].normal;
+            normal2D.y = 0f;
+            normal2D.Normalize();
+            _bossTransform.DOMove(_bossTransform.position + normal2D * 1.5f, 0.15f).SetEase(Ease.InOutSine);
+            _playingEndAnimation = true;
+            _rigidbody.linearVelocity = Vector3.zero;
+            _animator.CrossFadeInFixedTime("AkaHitWallStart", 0.2f);
+        }
     }
 }

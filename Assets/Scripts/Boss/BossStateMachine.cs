@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class BossStateMachine : MonoBehaviour, IDamageable
+public class BossStateMachine : MonoBehaviour
 {
     [HideInInspector] public Animator BossAnimator { get; private set; }
     [HideInInspector] public NavMeshAgent BossAgent { get; private set; }
@@ -106,7 +106,7 @@ public class BossStateMachine : MonoBehaviour, IDamageable
                 _shockwaveAttackTimer = _shockwaveAttackCooldown;
             }
         }
-        
+        Debug.Log($"{CurrentState.GetType().Name}");
         CurrentState.OnUpdate();
     }
 
@@ -117,16 +117,12 @@ public class BossStateMachine : MonoBehaviour, IDamageable
 
     private void OnCollisionEnter(Collision other)
     {
+        Debug.Log(other.gameObject.name);
         CurrentState.OnCollisionEnter(other);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         CurrentState.OnTriggerEnter(other);   
-    }
-
-    public void TakeDamage(bool shouldPlayHitReaction = false, GestureType gestureType = GestureType.None)
-    {
-        
     }
 }

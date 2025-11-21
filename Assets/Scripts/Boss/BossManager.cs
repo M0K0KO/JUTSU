@@ -11,7 +11,7 @@ public class BossManager : MonoBehaviour, IDamageable
     [SerializeField] private BossHand rightHand;
     [SerializeField] private GameObject shockwaveSphere;
     
-    private CinemachineImpulseSource _impulseSource;
+    [SerializeField] private CinemachineImpulseSource shockWaveImpulseSource;
 
     private bool _shockwaveHitPlayer = false;
     private float _shockwaveHitWidth = 0.5f;
@@ -19,7 +19,7 @@ public class BossManager : MonoBehaviour, IDamageable
     private void Awake()
     {
         StateMachine = GetComponent<BossStateMachine>();
-        _impulseSource = GetComponent<CinemachineImpulseSource>();
+        
         
         leftHand.OnBossHandPlayerTriggerEnter += OnLeftHandPlayerTriggerEnter;
         rightHand.OnBossHandPlayerTriggerEnter += OnRightHandPlayerTriggerEnter;
@@ -53,7 +53,7 @@ public class BossManager : MonoBehaviour, IDamageable
         if (Input.GetKeyDown(KeyCode.U))
         {
             StateMachine.AkaInitialDirection = transform.position - StateMachine.PlayerGameObject.transform.position;
-            StateMachine.AkaDuration = 5f;
+            StateMachine.AkaDuration = 1.5f;
             StateMachine.ChangeState(StateMachine.AkaHitState);
         }
 #endif
@@ -78,6 +78,8 @@ public class BossManager : MonoBehaviour, IDamageable
 
     public void StartShockwave()
     {
+        if (StateMachine.CurrentState != StateMachine.ShockwaveAttackState) return;
+        
         Renderer sphereRenderer = shockwaveSphere.GetComponent<Renderer>();
 
         _shockwaveHitPlayer = false;
@@ -114,7 +116,7 @@ public class BossManager : MonoBehaviour, IDamageable
                 // Debug.Log("Shockwave Hit!");
                 if (StateMachine.PlayerGameObject.TryGetComponent<IDamageable>(out IDamageable damageable))
                 {
-                    damageable.TakeDamage(true, GestureType.None);
+                    damageable.TakeDamage(true, GestureType.None, shockwavePosition);
                 }
             }
         }
@@ -124,7 +126,7 @@ public class BossManager : MonoBehaviour, IDamageable
     {
         if (other.TryGetComponent(out IDamageable damageable))
         {
-            damageable.TakeDamage(true, GestureType.None);
+            damageable.TakeDamage(true, GestureType.None, other.ClosestPoint(leftHand.transform.position));
             leftHand.HandCollider.enabled = false;
         }
     }
@@ -133,17 +135,21 @@ public class BossManager : MonoBehaviour, IDamageable
     {
         if (other.TryGetComponent(out IDamageable damageable))
         {
-            damageable.TakeDamage(true, GestureType.None);
+            damageable.TakeDamage(true, GestureType.None, other.ClosestPoint(rightHand.transform.position));
             rightHand.HandCollider.enabled = false;
         }
     }
 
-    public void TakeDamage(bool shouldPlayHitReaction = false, GestureType gestureType = GestureType.None)
+    public void TakeDamage(bool shouldPlayHitReaction, GestureType gestureType, Vector3 hitPoint)
     {
         switch (gestureType)
         {
             case GestureType.None:
             {
+                if (StateMachine.CurrentState != StateMachine.ChaseState &&
+                    StateMachine.CurrentState != StateMachine.IdleState)
+                    return;
+                
                 if (shouldPlayHitReaction)
                 {
                     StateMachine.ChangeState(StateMachine.NormalHitState);
@@ -154,13 +160,15 @@ public class BossManager : MonoBehaviour, IDamageable
         }
     }
 
-    public void PlayImpulse()
+    public void PlayShockwaveImpulse()
     {
-        _impulseSource.GenerateImpulse();
+        if (StateMachine.CurrentState != StateMachine.ShockwaveAttackState) return;
+        shockWaveImpulseSource.GenerateImpulse();
     }
 
     public void EnableLeftHandTrigger()
     {
+        if (StateMachine.CurrentState != StateMachine.ChargeAttackState) return;
         leftHand.HandCollider.enabled = true;
     }
 
@@ -171,6 +179,7 @@ public class BossManager : MonoBehaviour, IDamageable
 
     public void EnableRightHandTrigger()
     {
+        if (StateMachine.CurrentState != StateMachine.ChargeAttackState) return;
         rightHand.HandCollider.enabled = true;
     }
 

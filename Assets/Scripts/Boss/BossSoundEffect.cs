@@ -49,12 +49,16 @@ public class BossSoundEffect : MonoBehaviour
 
     public void PlayShockwaveSound()
     {
-        shockwaveAudioSource.pitch = UnityEngine.Random.Range(0.8f, 1f);
+        if (_stateMachine.CurrentState != _stateMachine.ShockwaveAttackState) return;
         shockwaveAudioSource.PlayOneShot(shockwaveAudioClip);
     }
 
     public void PlayAttackSound()
     {
+        if (_stateMachine.CurrentState != _stateMachine.ChargeAttackState &&
+            _stateMachine.CurrentState != _stateMachine.ShockwaveAttackState)
+            return;
+        
         int shuffleIndex;
         do
         {
