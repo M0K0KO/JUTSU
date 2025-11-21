@@ -23,48 +23,57 @@ public class BossManager : MonoBehaviour, IDamageable
         
         leftHand.OnBossHandPlayerTriggerEnter += OnLeftHandPlayerTriggerEnter;
         rightHand.OnBossHandPlayerTriggerEnter += OnRightHandPlayerTriggerEnter;
+
+        EventManager.OnJutsuActivation += OnJutsuActivation;
+        EventManager.OnAkaHit += OnAkaHit;
     }
 
     private void OnDestroy()
     {
         leftHand.OnBossHandPlayerTriggerEnter -= OnLeftHandPlayerTriggerEnter;
         rightHand.OnBossHandPlayerTriggerEnter -= OnRightHandPlayerTriggerEnter;
+
+        EventManager.OnJutsuActivation -= OnJutsuActivation;
+        EventManager.OnAkaHit -= OnAkaHit;
     }
 
     private void Update()
     {
         
 #if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        // if (Input.GetKeyDown(KeyCode.Mouse0))
+        // {
+        //     if (StateMachine.CurrentState != StateMachine.ChargeAttackState &&
+        //         StateMachine.CurrentState != StateMachine.ShockwaveAttackState)
+        //     {
+        //         StateMachine.ChangeState(StateMachine.NormalHitState);
+        //     }
+        // }
+
+        if (Input.GetKeyDown(KeyCode.U))
         {
-            if (StateMachine.CurrentState != StateMachine.ChargeAttackState &&
-                StateMachine.CurrentState != StateMachine.ShockwaveAttackState)
-            {
-                StateMachine.ChangeState(StateMachine.NormalHitState);
-            }
+            StateMachine.AkaInitialDirection = transform.position - StateMachine.PlayerGameObject.transform.position;
+            StateMachine.AkaDuration = 5f;
+            StateMachine.ChangeState(StateMachine.AkaHitState);
         }
 #endif
+        
+        CheckShockwaveHit();
+    }
 
-        if (shockwaveSphere.activeInHierarchy && !_shockwaveHitPlayer)
+    private void OnJutsuActivation(GestureType gestureType)
+    {
+        switch (gestureType)
         {
-            float currentRadius = shockwaveSphere.transform.localScale.x / 2f;
-            Vector3 shockwavePosition = shockwaveSphere.transform.position;
-            Vector3 toPlayer = StateMachine.PlayerGameObject.transform.position - shockwavePosition;
-            toPlayer.y = 0f;
-            float distance = toPlayer.magnitude;
-
-            if (Mathf.Abs(currentRadius - distance) <= _shockwaveHitWidth)
-            {
-                _shockwaveHitPlayer = true;
-                Debug.Log("Shockwave Hit!");
-                if (StateMachine.PlayerGameObject.TryGetComponent<IDamageable>(out IDamageable damageable))
-                {
-                    damageable.TakeDamage(true, GestureType.None);
-                }
-            }
+            //TODO: If gesture type is domain expansion infinite void, change animator speed
         }
-        
-        
+    }
+
+    private void OnAkaHit(Vector3 initialDirection, float duration)
+    {
+        StateMachine.AkaInitialDirection = initialDirection;
+        StateMachine.AkaDuration = duration;
+        StateMachine.ChangeState(StateMachine.AkaHitState);
     }
 
     public void StartShockwave()
@@ -87,6 +96,28 @@ public class BossManager : MonoBehaviour, IDamageable
         {
             shockwaveSphere.SetActive(false);
         }));
+    }
+
+    private void CheckShockwaveHit()
+    {
+        if (shockwaveSphere.activeInHierarchy && !_shockwaveHitPlayer)
+        {
+            float currentRadius = shockwaveSphere.transform.localScale.x / 2f;
+            Vector3 shockwavePosition = shockwaveSphere.transform.position;
+            Vector3 toPlayer = StateMachine.PlayerGameObject.transform.position - shockwavePosition;
+            toPlayer.y = 0f;
+            float distance = toPlayer.magnitude;
+
+            if (Mathf.Abs(currentRadius - distance) <= _shockwaveHitWidth)
+            {
+                _shockwaveHitPlayer = true;
+                // Debug.Log("Shockwave Hit!");
+                if (StateMachine.PlayerGameObject.TryGetComponent<IDamageable>(out IDamageable damageable))
+                {
+                    damageable.TakeDamage(true, GestureType.None);
+                }
+            }
+        }
     }
 
     private void OnLeftHandPlayerTriggerEnter(Collider other)
