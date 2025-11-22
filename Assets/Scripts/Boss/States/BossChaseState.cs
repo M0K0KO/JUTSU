@@ -37,7 +37,7 @@ public class BossChaseState :BossBaseState
 
         Vector3 playerPosition = player.transform.position;
         float currentAnimLocomotionValue = StateMachine.BossAnimator.GetFloat(_locomotionId);
-        float newAnimLocomotionValue = UnrealInterp.FInterpTo(currentAnimLocomotionValue, 1f, Time.deltaTime, 2f);
+        float newAnimLocomotionValue = UnrealInterp.FInterpTo(currentAnimLocomotionValue, 1f, Time.deltaTime, 2f * _animator.speed);
         StateMachine.BossAnimator.SetFloat(_locomotionId, newAnimLocomotionValue);
 
         _agent.SetDestination(playerPosition);
@@ -59,7 +59,6 @@ public class BossChaseState :BossBaseState
 
     public override void OnExit()
     {
-        DOTween.To(() => _animator.GetFloat(_locomotionId), x => _animator.SetFloat(_locomotionId, x), 
-            0f, 0.2f);
+        StateMachine.ResetLocomotionValue(0.2f);
     }
 }

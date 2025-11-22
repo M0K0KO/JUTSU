@@ -10,8 +10,13 @@ public class BossManager : MonoBehaviour, IDamageable
     [SerializeField] private BossHand leftHand;
     [SerializeField] private BossHand rightHand;
     [SerializeField] private GameObject shockwaveSphere;
-    
-    [SerializeField] private CinemachineImpulseSource shockWaveImpulseSource;
+    [Header("Impulse Sources")]
+    public CinemachineImpulseSource shockWaveImpulseSource;
+    public CinemachineImpulseSource akaPushImpulseSource;
+    public CinemachineImpulseSource akaWallEndImpulseSource;
+    public CinemachineImpulseSource akaNormalEndImpulseSource;
+    public CinemachineImpulseSource konHitImpulseSource;
+    public CinemachineImpulseSource muryokushoEndImpulseSource;
 
     private bool _shockwaveHitPlayer = false;
     private float _shockwaveHitWidth = 0.5f;
@@ -26,6 +31,8 @@ public class BossManager : MonoBehaviour, IDamageable
 
         EventManager.OnJutsuActivation += OnJutsuActivation;
         EventManager.OnAkaHit += OnAkaHit;
+        EventManager.OnMuryokushoStart += OnMuryokushoStart;
+        EventManager.OnMuryokushoEnd += OnMuryokushoEnd;
     }
 
     private void OnDestroy()
@@ -35,6 +42,8 @@ public class BossManager : MonoBehaviour, IDamageable
 
         EventManager.OnJutsuActivation -= OnJutsuActivation;
         EventManager.OnAkaHit -= OnAkaHit;
+        EventManager.OnMuryokushoStart -= OnMuryokushoStart;
+        EventManager.OnMuryokushoEnd -= OnMuryokushoEnd;
     }
 
     private void Update()
@@ -61,18 +70,29 @@ public class BossManager : MonoBehaviour, IDamageable
         CheckShockwaveHit();
     }
 
+    private void OnMuryokushoStart()
+    {
+        StateMachine.IsUnderDomainExpansion = true;
+        StateMachine.BossAnimator.speed = 0.01f;
+        
+    }
+
+    private void OnMuryokushoEnd()
+    {
+        StateMachine.IsUnderDomainExpansion = false;
+        StateMachine.BossAnimator.speed = 1f;
+    }
+    
     private void OnJutsuActivation(GestureType gestureType)
     {
-        switch (gestureType)
-        {
-            //TODO: If gesture type is domain expansion infinite void, change animator speed
-        }
+        
     }
 
     private void OnAkaHit(Vector3 initialDirection, float duration, float projectileSpeed)
     {
         StateMachine.AkaInitialDirection = initialDirection;
         StateMachine.AkaDuration = duration;
+        StateMachine.AkaSpeed = projectileSpeed;
         StateMachine.ChangeState(StateMachine.AkaHitState);
     }
 
@@ -154,6 +174,11 @@ public class BossManager : MonoBehaviour, IDamageable
                 {
                     StateMachine.ChangeState(StateMachine.NormalHitState);
                 }
+                break;
+            }
+            case GestureType.Kon:
+            {
+                StateMachine.ChangeState(StateMachine.KonHitState);
                 break;
             }
             
