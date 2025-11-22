@@ -37,13 +37,13 @@ public class GlobalVolumeManager : MonoBehaviour
 
     private void OnEnable()
     {
-        EventManager.OnJustuModeEnter += () => SetVignette(true);
+        EventManager.OnJutsuModeEnter += () => SetVignette(true);
         EventManager.OnJustuModeExit += () => SetVignette(false);
     }
 
     private void OnDisable()
     {
-        EventManager.OnJustuModeEnter -= () => SetVignette(true);
+        EventManager.OnJutsuModeEnter -= () => SetVignette(true);
         EventManager.OnJustuModeExit -= () => SetVignette(false);
     }
 

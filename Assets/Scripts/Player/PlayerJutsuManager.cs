@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Mediapipe.Unity.HandWorldLandmarkDetection;
@@ -44,6 +45,7 @@ public class PlayerJutsuManager : MonoBehaviour
     [SerializeField] private KonSequenceData konSequenceData;
 
 
+    public bool isInMuryokusho = false;
     public bool isUsingJutsu { get; private set; } = false;
 
     private Dictionary<GestureType, Jutsu> jutsuDict = new Dictionary<GestureType, Jutsu>();
@@ -80,7 +82,10 @@ public class PlayerJutsuManager : MonoBehaviour
     public IEnumerator JutsuMode()
     {
         isUsingJutsu = true;
-        EventManager.TriggerOnJustuModeEnter();
+        EventManager.TriggerOnJutsuModeEnter();
+        
+        gestureQueue.Clear();
+        ResetInitialPrompt();
 
         player.stateMachine.CheckNearbyEnemies(out GameObject target, false);
         PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Jutsu, target.transform);
@@ -140,6 +145,7 @@ public class PlayerJutsuManager : MonoBehaviour
                         Debug.Log(
                             $"[Phase 1] Gesture '{detectedGesture}' detected. Listening for '{expectedVoiceCommand}'...");
 
+                        UpdateInitialPrompt(expectedVoiceCommand);
                         voiceTask = RecognizeVoiceAsync(cts.Token);
                     }
                 }
@@ -226,6 +232,7 @@ public class PlayerJutsuManager : MonoBehaviour
                 Debug.Log("Jutsu Sequence Ended (Timeout or Failed)");
             }
 
+            ResetInitialPrompt();
             gestureQueue.Clear();
 
             isUsingJutsu = false;
@@ -236,7 +243,7 @@ public class PlayerJutsuManager : MonoBehaviour
     private async Task<string> RecognizeVoiceAsync(CancellationToken ct)
     {
         var mic = VoiceRecognitionManager.instance.microphoneRecord;
-        var whisper = VoiceRecognitionManager.instance.whipserManager;
+        var whisper = VoiceRecognitionManager.instance.whisperManager;
 
         TaskCompletionSource<string> tcs = new TaskCompletionSource<string>();
         OnRecordStopDelegate onStop = null;
@@ -406,8 +413,9 @@ public class PlayerJutsuManager : MonoBehaviour
     private IEnumerator MuryokushoSequence()
     {
         EventManager.TriggerOnMuryokushoStart();
-
         bool isSkyboxChanged = false;
+
+        isInMuryokusho = true;
 
         float elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.quadBloomDuration)
@@ -497,6 +505,7 @@ public class PlayerJutsuManager : MonoBehaviour
         }
 
         EventManager.TriggerOnMuryokushoEnd();
+        isInMuryokusho = false;
     }
 
 
@@ -553,4 +562,13 @@ public class PlayerJutsuManager : MonoBehaviour
     }
 
     public void RegisterAkaSpawnPoint(Transform fingertip) => akaSpawnHandLandmark = fingertip;
+
+
+
+    private void UpdateInitialPrompt(string expectedCommand)
+    {
+        VoiceRecognitionManager.instance.whisperManager.initialPrompt = $"skill command : \"{expectedCommand}\"";
+    }
+
+    private void ResetInitialPrompt() => VoiceRecognitionManager.instance.whisperManager.initialPrompt = "";
 }

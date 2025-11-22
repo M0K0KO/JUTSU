@@ -9,10 +9,10 @@ public static class EventManager
         OnCameraStateChange?.Invoke(state, target);
     }
 
-    public static Action OnJustuModeEnter;
-    public static void TriggerOnJustuModeEnter()
+    public static Action OnJutsuModeEnter;
+    public static void TriggerOnJutsuModeEnter()
     {
-        OnJustuModeEnter?.Invoke();
+        OnJutsuModeEnter?.Invoke();
     }
 
     public static Action<GestureType> OnJutsuActivation;

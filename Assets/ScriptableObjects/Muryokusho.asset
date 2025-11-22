@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Muryokusho
   m_EditorClassIdentifier: Assembly-CSharp::Jutsu
   gestureType: 2
-  targetCommand: muryokusho
+  targetCommand: ryoiki tenkai muryokusho

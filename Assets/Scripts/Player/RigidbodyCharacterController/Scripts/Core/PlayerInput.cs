@@ -3,6 +3,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerInput : MonoBehaviour
 {
+    private PlayerManager player;
+    
     public Vector2 MoveInput { get; private set; }
     public bool RunInput { get; private set; }
     public Vector2 LookInput { get; private set; }
@@ -25,6 +27,8 @@ public class PlayerInput : MonoBehaviour
     #region Built-In Functions
     private void Awake()
     {
+        player = GetComponent<PlayerManager>();
+        
         _playerInputActions = new PlayerInputActions();
 
         _move = _playerInputActions.Move.Move;
@@ -119,6 +123,7 @@ public class PlayerInput : MonoBehaviour
 
     private void OnJutsu(InputAction.CallbackContext context)
     {
+        if (player.jutsu.isInMuryokusho) return;
         JutsuInput = true;
     }
     #endregion

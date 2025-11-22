@@ -8,7 +8,7 @@ public class VoiceRecognitionManager : MonoBehaviour
     public static VoiceRecognitionManager instance;
 
     public MicrophoneRecord microphoneRecord;
-    public WhisperManager whipserManager;
+    public WhisperManager whisperManager;
 
     private void Awake()
     {

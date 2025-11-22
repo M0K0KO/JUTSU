@@ -22,7 +22,7 @@ public class MusicController : MonoBehaviour
         audioMixer.SetFloat("CutoffSFX", 22000f);
         audioMixer.SetFloat("ResonanceSFX", 1f);
 
-        EventManager.OnJustuModeEnter += OnJutsuModeEnter;
+        EventManager.OnJutsuModeEnter += OnJutsuModeEnter;
         EventManager.OnJustuModeExit += OnJutsuModeExit;
 
 
@@ -30,7 +30,7 @@ public class MusicController : MonoBehaviour
 
     private void OnDestroy()
     {
-        EventManager.OnJustuModeEnter -= OnJutsuModeEnter;
+        EventManager.OnJutsuModeEnter -= OnJutsuModeEnter;
         EventManager.OnJustuModeExit -= OnJutsuModeExit;
     }
 

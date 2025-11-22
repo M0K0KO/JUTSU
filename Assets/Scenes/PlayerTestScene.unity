@@ -4712,6 +4712,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 3522575328527517265}
     - target: {fileID: 8303174728611474242, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
+      propertyPath: whisperManager
+      value: 
+      objectReference: {fileID: 3522575328527517265}
+    - target: {fileID: 8303174728611474242, guid: cfb1ea6b8337b6f46905cbcdd5d37123, type: 3}
       propertyPath: microphoneRecord
       value: 
       objectReference: {fileID: 3522575328527517264}
@@ -6377,6 +6381,7 @@ MonoBehaviour:
   konWolfAnimator: {fileID: 858698619}
   konWolfMaterial: {fileID: 2100000, guid: 0bfe98c95b040e64c8cbd1037c37fe96, type: 2}
   konSequenceData: {fileID: 11400000, guid: e2ea5824ac909304cbad6b839cc27898, type: 2}
+  isInMuryokusho: 0
 --- !u!114 &8359154950952063662
 MonoBehaviour:
   m_ObjectHideFlags: 0
