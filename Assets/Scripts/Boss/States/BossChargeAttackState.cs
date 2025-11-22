@@ -10,7 +10,7 @@ public class BossChargeAttackState : BossBaseState
     private GameObject _player;
     private bool _shouldRotate = true;
     private float _rotationTimer;
-    private float _rotationDuration = 0.85f;
+    private float _rotationDuration = 0.3f;
 
     private int _attackTypeId = Animator.StringToHash("AttackType");
     private int _attackTriggerId = Animator.StringToHash("Attack");
@@ -50,11 +50,15 @@ public class BossChargeAttackState : BossBaseState
                 {
                     targetRotation = Quaternion.LookRotation(toPlayer);
                 }
-
-                float scaledInterpSpeed = 4f * _animator.speed;
-                _bossTransform.rotation = UnrealInterp.QInterpTo(currentRotation, targetRotation, Time.deltaTime, scaledInterpSpeed);
                 
-                _rotationTimer -= Time.deltaTime;
+                float angleDiff = Quaternion.Angle(_bossTransform.rotation, targetRotation);
+                float angleStep = angleDiff / _rotationTimer * Time.deltaTime * _animator.speed;
+                _bossTransform.rotation = Quaternion.RotateTowards(_bossTransform.rotation, targetRotation, angleStep);
+
+                // float scaledInterpSpeed = 4f * _animator.speed;
+                // _bossTransform.rotation = UnrealInterp.QInterpTo(currentRotation, targetRotation, Time.deltaTime, scaledInterpSpeed);
+                
+                _rotationTimer -= Time.deltaTime * _animator.speed;
             }
             else
             {

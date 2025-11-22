@@ -48,7 +48,7 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
     {
         transform.position = new Vector3(transform.position.x, 0f, transform.position.z);
         
-        Debug.Log(currentState);
+        
         
         currentState.OnUpdateState();
 
@@ -87,11 +87,11 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
 
     private void CheckRollInput()
     {
+        if (currentState == hitState) return;
+        
         if (player.playerInput.RollInput)
         {
             player.playerInput.ClearRollInput();
-            
-            if (currentState == hitState) return;
 
             if (currentState != rollState)
             {
@@ -102,12 +102,11 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
 
     private void CheckAttackInput()
     {
+        if (currentState == hitState) return;
         
         if (player.playerInput.AttackInput)
         {
             player.playerInput.ClearAttackInput();
-            
-            if (currentState == hitState) return;
 
             if (currentState != rollState && currentState != attackState)
             {
@@ -203,8 +202,6 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
         if (currentState == rollState) return;
         
         Vector3 damageOriginDir = damageOrigin - transform.position;
-        damageOriginDir.y = 0;
-        damageOriginDir.Normalize();
         player.mover.Rotate(damageOriginDir, false);
         
         if (currentState != hitState)
@@ -222,14 +219,14 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
     
     public void Attack(Vector3 origin, Vector3 destination)
     {
-        bool shouldPlayHitReaction = (comboCounter == 8);
+        bool shouldPlayHitReaction = (comboCounter == 7);
         
         if (shouldPlayHitReaction) Debug.Log("SHOULD PLAY HIT REACTION!!");
         
         Ray ray = new Ray(origin, destination - origin);
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            if (hit.transform.root.TryGetComponent(out IDamageable damageable))
+            if (hit.transform.TryGetComponent(out IDamageable damageable))
             {
                 damageable.TakeDamage(shouldPlayHitReaction, GestureType.None, origin);
             }

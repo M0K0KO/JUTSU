@@ -18,15 +18,27 @@ public class BossManager : MonoBehaviour, IDamageable
     public CinemachineImpulseSource konHitImpulseSource;
     public CinemachineImpulseSource muryokushoEndImpulseSource;
 
+    public CinemachineBasicMultiChannelPerlin baseCamPerlin;
+    public CinemachineBasicMultiChannelPerlin strafeCamPerlin;
+    public CinemachineBasicMultiChannelPerlin skillCamPerlin;
+
     private bool _shockwaveHitPlayer = false;
     private float _shockwaveHitWidth = 0.5f;
-    
+
+    public bool IsKonJutsuActive { get; private set; } = false;
+
+    public int AkaHitCount { get; set; } = 0;
+    public int KonHitCount { get; set; } = 0;
+    public int MuryokushoHitCount { get; set; } = 0;
+
+
     [HideInInspector] public AkaManager BossHitAkaManager { get; set; }
 
     private void Awake()
     {
         StateMachine = GetComponent<BossStateMachine>();
         
+        SetPerlinNoiseAmplitude(0f);
         
         leftHand.OnBossHandPlayerTriggerEnter += OnLeftHandPlayerTriggerEnter;
         rightHand.OnBossHandPlayerTriggerEnter += OnRightHandPlayerTriggerEnter;
@@ -72,6 +84,13 @@ public class BossManager : MonoBehaviour, IDamageable
         CheckShockwaveHit();
     }
 
+    public void SetPerlinNoiseAmplitude(float amplitude)
+    {
+        baseCamPerlin.AmplitudeGain = amplitude;
+        strafeCamPerlin.AmplitudeGain = amplitude;
+        skillCamPerlin.AmplitudeGain = amplitude;
+    }
+
     private void OnMuryokushoStart()
     {
         StateMachine.IsUnderDomainExpansion = true;
@@ -90,14 +109,37 @@ public class BossManager : MonoBehaviour, IDamageable
     
     private void OnJutsuActivation(GestureType gestureType)
     {
-        
+        switch (gestureType)
+        {
+            case GestureType.Aka:
+            {
+                AkaHitCount++;
+                IsKonJutsuActive = true;
+                break;
+            }
+            case GestureType.Kon:
+            {
+                KonHitCount++;
+                break;
+            }
+            case GestureType.Muryokusho:
+            {
+                MuryokushoHitCount++;
+                break;
+            }
+        }
+    }
+
+    public bool ShouldTransitionToQuickTimeEvent()
+    {
+        return (AkaHitCount > 0 && KonHitCount > 0 && MuryokushoHitCount > 0);
     }
 
     private void OnAkaHit(Vector3 initialDirection, float duration, float projectileSpeed)
     {
         StateMachine.AkaInitialDirection = initialDirection;
         StateMachine.AkaDuration = duration;
-        StateMachine.AkaSpeed = projectileSpeed;
+        StateMachine.AkaSpeed = projectileSpeed * 3f;
         StateMachine.ChangeState(StateMachine.AkaHitState);
     }
 
@@ -117,7 +159,7 @@ public class BossManager : MonoBehaviour, IDamageable
         shockwaveSphere.SetActive(true);
         
         Sequence shockwaveSequence = DOTween.Sequence();
-        shockwaveSequence.Append(shockwaveSphere.transform.DOScale(60f, 2f).SetEase(Ease.OutSine));
+        shockwaveSequence.Append(shockwaveSphere.transform.DOScale(140f, 2f).SetEase(Ease.OutSine));
         shockwaveSequence.Insert(1.6f, sphereRenderer.material.DOFloat(0f, "_Opacity", 0.4f).SetEase(Ease.OutExpo));
         shockwaveSequence.OnComplete((() =>
         {
@@ -149,33 +191,39 @@ public class BossManager : MonoBehaviour, IDamageable
 
     private void OnLeftHandPlayerTriggerEnter(Collider other)
     {
+        Debug.Log("LeftHandPlayerTriggerEnter");
         if (other.TryGetComponent(out IDamageable damageable))
         {
-            damageable.TakeDamage(true, GestureType.None, other.ClosestPoint(leftHand.transform.position));
+            damageable.TakeDamage(true, GestureType.None, transform.position);
             leftHand.HandCollider.enabled = false;
         }
     }
 
     private void OnRightHandPlayerTriggerEnter(Collider other)
     {
+        Debug.Log("RightHandPlayerTriggerEnter");
         if (other.TryGetComponent(out IDamageable damageable))
         {
-            damageable.TakeDamage(true, GestureType.None, other.ClosestPoint(rightHand.transform.position));
+            damageable.TakeDamage(true, GestureType.None, transform.position);
             rightHand.HandCollider.enabled = false;
         }
     }
 
     public void TakeDamage(bool shouldPlayHitReaction, GestureType gestureType, Vector3 hitPoint)
     {
-        if (StateMachine.IsUnderDomainExpansion) return;
-        
+        // if (StateMachine.IsUnderDomainExpansion) return;
+        Debug.Log($"TakeDamage! hit react: {shouldPlayHitReaction}, gesture: {gestureType}");
         switch (gestureType)
         {
             case GestureType.None:
             {
                 if (StateMachine.CurrentState != StateMachine.ChaseState &&
                     StateMachine.CurrentState != StateMachine.IdleState)
+                {
+                    Debug.Log($"Current State: {StateMachine.CurrentState.GetType().Name}");
                     return;
+                }
+                    
                 
                 if (shouldPlayHitReaction)
                 {
@@ -185,6 +233,7 @@ public class BossManager : MonoBehaviour, IDamageable
             }
             case GestureType.Kon:
             {
+                IsKonJutsuActive = false;
                 StateMachine.ChangeState(StateMachine.KonHitState);
                 break;
             }

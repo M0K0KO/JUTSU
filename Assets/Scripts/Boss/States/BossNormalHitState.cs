@@ -26,6 +26,7 @@ public class BossNormalHitState : BossBaseState
 
     public override void OnEnter()
     {
+        Debug.Log("Boss Normal Hit State Enter");
         _enterTime = Time.time;
 
         FindTargetRotation();
