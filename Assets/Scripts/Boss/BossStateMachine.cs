@@ -2,6 +2,26 @@ using System;
 using UnityEngine;
 using UnityEngine.AI;
 
+public enum BossAttack
+{
+    ChargeAttack1 = 0,
+    ChargeAttack2 = 1,
+    ShockwaveAttack = 2
+}
+
+public enum BossHit
+{
+    NormalHit = 0,
+    AkaHit = 1,
+    KonHit = 2
+}
+
+public enum BossAkaHitEnd
+{
+    Duration = 0,
+    Wall = 1
+}
+
 public class BossStateMachine : MonoBehaviour
 {
     [HideInInspector] public Animator BossAnimator { get; private set; }
@@ -19,6 +39,7 @@ public class BossStateMachine : MonoBehaviour
     public BossShockwaveAttackState ShockwaveAttackState { get; private set; }
     public BossNormalHitState NormalHitState { get; private set; }
     public BossAkaHitState AkaHitState { get; private set; }
+    public BossKonHit KonHitState { get; private set; }
 
     public BossBaseState CurrentState { get; private set; }
 
@@ -50,6 +71,7 @@ public class BossStateMachine : MonoBehaviour
         ShockwaveAttackState = new BossShockwaveAttackState(this);
         NormalHitState = new BossNormalHitState(this);
         AkaHitState = new BossAkaHitState(this);
+        KonHitState = new BossKonHit(this);
         
         
         CurrentState = IdleState;
@@ -106,7 +128,6 @@ public class BossStateMachine : MonoBehaviour
                 _shockwaveAttackTimer = _shockwaveAttackCooldown;
             }
         }
-        Debug.Log($"{CurrentState.GetType().Name}");
         CurrentState.OnUpdate();
     }
 

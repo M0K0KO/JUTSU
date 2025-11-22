@@ -19,6 +19,12 @@ public class BossAkaHitState : BossBaseState
     private float _rotationDuration = 0.2f;
 
     private bool _playingEndAnimation = false;
+
+    private int _attackTriggerId = Animator.StringToHash("Attack");
+    private int _hitTypeId = Animator.StringToHash("HitType");
+    private int _hitTriggerId = Animator.StringToHash("Hit");
+    private int _akaHitEndTriggerId = Animator.StringToHash("AkaHitEnd");
+    private int _akaHitEndTypeId = Animator.StringToHash("AkaHitEndType");
     
     public BossAkaHitState(BossStateMachine stateMachine) : base(stateMachine)
     {
@@ -34,8 +40,10 @@ public class BossAkaHitState : BossBaseState
         _playingEndAnimation = false;
         _enterTime = Time.time;
         _agent.ResetPath();
-        _animator.SetBool("shouldMove", false);
-        _animator.CrossFadeInFixedTime("AkaHitLoop", 0.15f);
+        
+        _animator.ResetTrigger(_attackTriggerId);
+        _animator.SetInteger(_hitTypeId, (int)BossHit.AkaHit);
+        _animator.SetTrigger(_hitTriggerId);
         
         FindTargetRotation();
         
@@ -61,7 +69,8 @@ public class BossAkaHitState : BossBaseState
             {
                 _playingEndAnimation = true;
                 _rigidbody.linearVelocity = Vector3.zero;
-                _animator.CrossFadeInFixedTime("AkaHitNormalEnd", 0.15f);
+                _animator.SetInteger(_akaHitEndTypeId, (int)BossAkaHitEnd.Duration);
+                _animator.SetTrigger(_akaHitEndTriggerId);
             }
         }
     }
@@ -92,7 +101,8 @@ public class BossAkaHitState : BossBaseState
             _bossTransform.DOMove(_bossTransform.position + normal2D * 1.5f, 0.15f).SetEase(Ease.InOutSine);
             _playingEndAnimation = true;
             _rigidbody.linearVelocity = Vector3.zero;
-            _animator.CrossFadeInFixedTime("AkaHitWallStart", 0.2f);
+            _animator.SetInteger(_akaHitEndTypeId, (int)BossAkaHitEnd.Wall);
+            _animator.SetTrigger(_akaHitEndTriggerId);
         }
     }
 }

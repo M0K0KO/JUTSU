@@ -10,6 +10,10 @@ public class BossNormalHitState : BossBaseState
     private Quaternion _targetRotation;
     private float _enterTime;
     private float _rotationDuration = 0.2f;
+
+    private int _attackTriggerId = Animator.StringToHash("Attack");
+    private int _hitTypeId = Animator.StringToHash("HitType");
+    private int _hitTriggerId = Animator.StringToHash("Hit");
     
     public BossNormalHitState(BossStateMachine stateMachine) : base(stateMachine)
     {
@@ -27,8 +31,9 @@ public class BossNormalHitState : BossBaseState
         FindTargetRotation();
         
         _agent.ResetPath();
-        _animator.SetBool("shouldMove", false);
-        _animator.SetTrigger("normalHit");
+        _animator.ResetTrigger(_attackTriggerId);
+        _animator.SetInteger(_hitTypeId, (int)BossHit.NormalHit);
+        _animator.SetTrigger(_hitTriggerId);
         
         
     }

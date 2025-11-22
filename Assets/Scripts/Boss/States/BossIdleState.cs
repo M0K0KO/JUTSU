@@ -13,7 +13,6 @@ public class BossIdleState : BossBaseState
 
     public override void OnEnter()
     {
-        StateMachine.BossAnimator.SetBool("shouldMove", false);
         StateMachine.BossAgent.ResetPath();
         _stateEnterTime = Time.time;
     }
