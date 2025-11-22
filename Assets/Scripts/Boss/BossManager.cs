@@ -20,6 +20,8 @@ public class BossManager : MonoBehaviour, IDamageable
 
     private bool _shockwaveHitPlayer = false;
     private float _shockwaveHitWidth = 0.5f;
+    
+    [HideInInspector] public AkaManager BossHitAkaManager { get; set; }
 
     private void Awake()
     {
