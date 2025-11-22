@@ -1,15 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Mediapipe.Unity.HandWorldLandmarkDetection;
 using Unity.Cinemachine;
-using Unity.VisualScripting;
 using UnityEngine;
-using Whisper;
+using UnityEngine.Rendering.Universal;
 using Whisper.Utils;
 using Debug = UnityEngine.Debug;
 
@@ -17,32 +13,39 @@ public class PlayerJutsuManager : MonoBehaviour
 {
     private PlayerManager player;
 
+    [SerializeField] private ScriptableRendererData rendererData;
+    private const string EnemyFeatureName = "Enemy";
+    private const string PlayerFeatureName = "Player";
+    private ScriptableRendererFeature enemyFeature;
+    private ScriptableRendererFeature playerFeature;
+    
+
     [Header("Sequence Settings")]
-    [SerializeField]
-    private float sequenceMaxDuration;
+    [SerializeField] private float sequenceMaxDuration;
 
     [SerializeField, Range(0.1f, 0.9f)] private float slowedTimeScale;
 
     [Header("Jutsu List")]
-    [SerializeField]
-    private List<Jutsu> jutsuList;
+    [SerializeField] private List<Jutsu> jutsuList;
 
     [Header("Muryokusho")]
-    [SerializeField]
-    private Material bloomQuadMaterial;
+    [SerializeField] private Material bloomQuadMaterial;
 
     [SerializeField] private Material dissolveMaterial;
     [SerializeField] private Transform intersectionSphereTransform;
     [SerializeField] private MuryokushoSequenceData muryokushoSequenceData;
 
-    [Header("Aka")] [SerializeField] private GameObject AkaObject;
+    [Header("Aka")] 
+    [SerializeField] private GameObject AkaObject;
     [SerializeField] private AkaSequenceData akaSequenceData;
     private Transform akaSpawnHandLandmark;
 
-    [Header("Kon")] [SerializeField] private GameObject konWolfInstance;
+    [Header("Kon")] 
+    [SerializeField] private GameObject konWolfInstance;
     [SerializeField] private Animator konWolfAnimator;
     [SerializeField] private Material konWolfMaterial;
     [SerializeField] private KonSequenceData konSequenceData;
+    private BaseAudioSourceHolder konWolfAudioSourceHolder;
 
 
     public bool isInMuryokusho = false;
@@ -57,6 +60,11 @@ public class PlayerJutsuManager : MonoBehaviour
     {
         player = GetComponent<PlayerManager>();
         //VoiceRecognitionManager.instance.microphoneRecord.OnRecordStop += OnRecordStop;
+        
+        konWolfAudioSourceHolder = konWolfInstance.GetComponentInChildren<BaseAudioSourceHolder>();
+        
+        playerFeature = rendererData.rendererFeatures.Find(f => f.name == PlayerFeatureName);
+        enemyFeature = rendererData.rendererFeatures.Find(f => f.name == EnemyFeatureName);
     }
 
     private void Start()
@@ -368,6 +376,11 @@ public class PlayerJutsuManager : MonoBehaviour
         konWolfInstance.transform.rotation = finalRot;
 
 
+        konWolfAudioSourceHolder.sfxDict["Rumble"].PlayAudioClip();
+        yield return new WaitForSeconds(0.2f);         
+        konWolfAudioSourceHolder.sfxDict["Emerge"].PlayAudioClip();
+
+        
         player.impulseManager.KonRumbleImpulse();
         yield return new WaitForSeconds(konSequenceData.rumbleDuration);
 
@@ -380,6 +393,9 @@ public class PlayerJutsuManager : MonoBehaviour
 
         AnimatorStateInfo stateInfo = konWolfAnimator.GetCurrentAnimatorStateInfo(0);
 
+        bool impact = false;
+        bool cameraUpdated = false;
+
         while (stateInfo.IsTag("Attack"))
         {
             animationSpeed = konSequenceData.animationPlaybackSpeedCurve.Evaluate(stateInfo.normalizedTime);
@@ -388,8 +404,17 @@ public class PlayerJutsuManager : MonoBehaviour
 
             stateInfo = konWolfAnimator.GetCurrentAnimatorStateInfo(0);
 
-            if (stateInfo.normalizedTime > 0.5f)
+            if (stateInfo.normalizedTime > 0.2f && !impact)
             {
+                impact = true;
+                konWolfAudioSourceHolder.sfxDict["Impact"].PlayAudioClip();
+            }
+            
+            
+            if (stateInfo.normalizedTime > 0.5f && !cameraUpdated)
+            {
+                
+                cameraUpdated = true;
                 PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Strafe,
                     player.stateMachine.currentTargetHitTarget.transform);
             }
@@ -414,8 +439,9 @@ public class PlayerJutsuManager : MonoBehaviour
     {
         EventManager.TriggerOnMuryokushoStart();
         bool isSkyboxChanged = false;
-
         isInMuryokusho = true;
+
+        SetFeatureActive(true);
 
         float elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.quadBloomDuration)
@@ -434,6 +460,8 @@ public class PlayerJutsuManager : MonoBehaviour
 
             yield return null;
         }
+        
+        SetFeatureActive(false);
 
         elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.intersectionDuration)
@@ -474,6 +502,8 @@ public class PlayerJutsuManager : MonoBehaviour
         yield return new WaitForSeconds(muryokushoSequenceData.muryokushoDuration);
 
 
+        SetFeatureActive(true);
+        
         elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.quadBloomDuration)
         {
@@ -490,6 +520,10 @@ public class PlayerJutsuManager : MonoBehaviour
 
             yield return null;
         }
+        
+        SetFeatureActive(false);
+        
+        EventManager.TriggerOnMuryokushoEnd();
 
         elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.dissolveDuration)
@@ -504,7 +538,6 @@ public class PlayerJutsuManager : MonoBehaviour
             yield return null;
         }
 
-        EventManager.TriggerOnMuryokushoEnd();
         isInMuryokusho = false;
     }
 
@@ -571,4 +604,12 @@ public class PlayerJutsuManager : MonoBehaviour
     }
 
     private void ResetInitialPrompt() => VoiceRecognitionManager.instance.whisperManager.initialPrompt = "";
+
+
+    private void SetFeatureActive(bool isActive)
+    {
+        playerFeature.SetActive(isActive);
+        enemyFeature.SetActive(isActive);
+        rendererData.SetDirty();
+    }
 }

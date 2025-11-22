@@ -230,4 +230,21 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
             }
         }
     }
+
+    public void PlayShootSFX()
+    {
+        player.audioSourceHolder.sfxDict["Shoot"].PlayAudioClip();
+    }
+    
+
+    public void PlayRunSFX()
+    {
+        if (currentState == runState)
+            player.audioSourceHolder.sfxDict["Run"].PlayAudioClip();
+    }
+
+    public void PlayRollSFX()
+    {
+        player.audioSourceHolder.sfxDict["Roll"].PlayAudioClip();
+    }
 }
