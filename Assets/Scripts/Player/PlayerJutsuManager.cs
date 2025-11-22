@@ -405,7 +405,6 @@ public class PlayerJutsuManager : MonoBehaviour
         while (stateInfo.IsTag("Attack"))
         {
             animationSpeed = konSequenceData.animationPlaybackSpeedCurve.Evaluate(stateInfo.normalizedTime);
-            Debug.Log($"{animationSpeed}");
             konWolfAnimator.SetFloat("AttackSpeed", animationSpeed);
 
             stateInfo = konWolfAnimator.GetCurrentAnimatorStateInfo(0);
