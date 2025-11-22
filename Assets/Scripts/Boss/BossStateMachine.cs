@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -31,7 +32,9 @@ public class BossStateMachine : MonoBehaviour
     
     [HideInInspector] public GameObject PlayerGameObject { get; private set; }
     
-    public bool IsUnderDomainExpansion { get; private set; }
+    [HideInInspector] public BossManager Manager { get; private set; }
+    
+    public bool IsUnderDomainExpansion { get; set; }
     
     public BossIdleState IdleState { get; private set; }
     public BossChaseState ChaseState { get; private set; }
@@ -49,9 +52,16 @@ public class BossStateMachine : MonoBehaviour
     
     public Vector3 AkaInitialDirection { get; set; }
     public float AkaDuration { get; set; }
+    public float AkaSpeed { get; set; }
+
+    private Vector3 _acculmulatedDeltaPos = Vector3.zero;
+    
+    private int _locomotionId = Animator.StringToHash("Locomotion");
 
     private void InitStateMachine()
     {
+        Manager = GetComponent<BossManager>();
+        
         BossAnimator = GetComponent<Animator>();
         BossAnimator.applyRootMotion = true;
         
@@ -60,6 +70,7 @@ public class BossStateMachine : MonoBehaviour
         BossAgent.updateRotation = false;
         
         BossRigidbody = GetComponent<Rigidbody>();
+        BossRigidbody.isKinematic = true;
         
         BossTransform = transform;
         
@@ -92,35 +103,34 @@ public class BossStateMachine : MonoBehaviour
 
     private void OnAnimatorMove()
     {
-        Vector3 newPos = transform.position + BossAnimator.deltaPosition;
-        newPos.y = BossAgent.nextPosition.y;
-        transform.position = newPos;
-        BossAgent.nextPosition = newPos;
+        
+        _acculmulatedDeltaPos += BossAnimator.deltaPosition;
+        _acculmulatedDeltaPos.y = 0f;
         
         CurrentState.OnAnimatorMove();
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.I))
-        {
-            if (!IsUnderDomainExpansion)
-            {
-                IsUnderDomainExpansion = true;
-                BossAnimator.speed = 0.001f;
-            }
-            else
-            {
-                IsUnderDomainExpansion = false;
-                BossAnimator.speed = 1f;
-            }
-        }
+        // if (Input.GetKeyDown(KeyCode.I))
+        // {
+        //     if (!IsUnderDomainExpansion)
+        //     {
+        //         IsUnderDomainExpansion = true;
+        //         BossAnimator.speed = 0.001f;
+        //     }
+        //     else
+        //     {
+        //         IsUnderDomainExpansion = false;
+        //         BossAnimator.speed = 1f;
+        //     }
+        // }
         
         if (!CanShockwaveAttack)
         {
             if (_shockwaveAttackTimer > 0f)
             {
-                _shockwaveAttackTimer -= Time.deltaTime;
+                _shockwaveAttackTimer -= Time.deltaTime * BossAnimator.speed;
             }
             else
             {
@@ -128,11 +138,25 @@ public class BossStateMachine : MonoBehaviour
                 _shockwaveAttackTimer = _shockwaveAttackCooldown;
             }
         }
-        CurrentState.OnUpdate();
+
+        if (!IsUnderDomainExpansion)
+        {
+            CurrentState.OnUpdate();
+        }
     }
 
     private void FixedUpdate()
     {
+        if (_acculmulatedDeltaPos != Vector3.zero)
+        {
+            Vector3 targetPos = BossRigidbody.position + _acculmulatedDeltaPos;
+            BossRigidbody.MovePosition(targetPos);
+            
+            BossAgent.nextPosition = targetPos;
+            _acculmulatedDeltaPos = Vector3.zero;
+        }
+        
+        
         CurrentState.OnFixedUpdate();
     }
 
@@ -145,5 +169,24 @@ public class BossStateMachine : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         CurrentState.OnTriggerEnter(other);   
+    }
+
+    public void ResetLocomotionValue(float duration)
+    {
+        StartCoroutine(LocomotionValueResetCoroutine(duration));
+    }
+
+    IEnumerator LocomotionValueResetCoroutine(float duration)
+    {
+        float startValue = BossAnimator.GetFloat(_locomotionId);
+        float elapsedTime = 0f;
+        while (elapsedTime < duration)
+        {
+            float newValue = Mathf.Clamp01(startValue * (1 - Mathf.Clamp01(elapsedTime / duration))); 
+            BossAnimator.SetFloat(_locomotionId, newValue);
+            elapsedTime += Time.deltaTime * BossAnimator.speed;
+            yield return null;
+        }
+        BossAnimator.SetFloat(_locomotionId, 0f);
     }
 }
