@@ -81,8 +81,11 @@ public class BossManager : MonoBehaviour, IDamageable
 
     private void OnMuryokushoEnd()
     {
+        Debug.Log("MuryokushoEnd");
         StateMachine.IsUnderDomainExpansion = false;
         StateMachine.BossAnimator.speed = 1f;
+        muryokushoEndImpulseSource.GenerateImpulse();
+        StateMachine.ChangeState(StateMachine.MuryokushoEndState);
     }
     
     private void OnJutsuActivation(GestureType gestureType)
@@ -164,6 +167,8 @@ public class BossManager : MonoBehaviour, IDamageable
 
     public void TakeDamage(bool shouldPlayHitReaction, GestureType gestureType, Vector3 hitPoint)
     {
+        if (StateMachine.IsUnderDomainExpansion) return;
+        
         switch (gestureType)
         {
             case GestureType.None:

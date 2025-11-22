@@ -226,7 +226,7 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
         {
             if (hit.transform.TryGetComponent(out IDamageable damageable))
             {
-                //damageable.TakeDamage(origin, shouldPlayHitReaction, GestureType.None);
+                damageable.TakeDamage(shouldPlayHitReaction, GestureType.None, origin);
             }
         }
     }

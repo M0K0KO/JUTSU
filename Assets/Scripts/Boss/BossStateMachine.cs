@@ -14,7 +14,8 @@ public enum BossHit
 {
     NormalHit = 0,
     AkaHit = 1,
-    KonHit = 2
+    KonHit = 2,
+    MuryokushoHit = 3
 }
 
 public enum BossAkaHitEnd
@@ -43,6 +44,7 @@ public class BossStateMachine : MonoBehaviour
     public BossNormalHitState NormalHitState { get; private set; }
     public BossAkaHitState AkaHitState { get; private set; }
     public BossKonHit KonHitState { get; private set; }
+    public BossMuryokushoEndState MuryokushoEndState { get; private set; }
 
     public BossBaseState CurrentState { get; private set; }
 
@@ -83,6 +85,7 @@ public class BossStateMachine : MonoBehaviour
         NormalHitState = new BossNormalHitState(this);
         AkaHitState = new BossAkaHitState(this);
         KonHitState = new BossKonHit(this);
+        MuryokushoEndState = new BossMuryokushoEndState(this);
         
         
         CurrentState = IdleState;
