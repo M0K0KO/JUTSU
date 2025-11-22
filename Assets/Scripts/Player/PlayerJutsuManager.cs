@@ -92,6 +92,8 @@ public class PlayerJutsuManager : MonoBehaviour
         isUsingJutsu = true;
         EventManager.TriggerOnJutsuModeEnter();
         
+        HandWorldLandmarkVisualizer.instance.ResetIntensity();
+        
         gestureQueue.Clear();
         ResetInitialPrompt();
 
@@ -153,6 +155,8 @@ public class PlayerJutsuManager : MonoBehaviour
                         Debug.Log(
                             $"[Phase 1] Gesture '{detectedGesture}' detected. Listening for '{expectedVoiceCommand}'...");
 
+                        StartCoroutine(HandWorldLandmarkVisualizer.instance.Glow());
+                        
                         UpdateInitialPrompt(expectedVoiceCommand);
                         voiceTask = RecognizeVoiceAsync(cts.Token);
                     }
@@ -223,6 +227,7 @@ public class PlayerJutsuManager : MonoBehaviour
             {
                 Time.timeScale = 1f;
                 HandWorldLandmarkVisualizer.instance.DeactivateVisuals();
+                HandWorldLandmarkVisualizer.instance.ResetIntensity();
             }
 
             if (isTriggered && jutsu != null)
@@ -242,6 +247,7 @@ public class PlayerJutsuManager : MonoBehaviour
 
             ResetInitialPrompt();
             gestureQueue.Clear();
+            
 
             isUsingJutsu = false;
             EventManager.TriggerOnJustuModeExit();
