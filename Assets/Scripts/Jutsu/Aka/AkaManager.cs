@@ -27,6 +27,11 @@ public class AkaManager : MonoBehaviour
         if (other.CompareTag("Boss")) 
         {
             isHit = true;
+            if (other.TryGetComponent(out BossManager bossManager))
+            {
+                bossManager.BossHitAkaManager = this;
+                transform.SetParent(other.transform, true);
+            }
         }
     }
 

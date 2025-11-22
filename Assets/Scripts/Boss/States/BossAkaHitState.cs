@@ -10,9 +10,11 @@ public class BossAkaHitState : BossBaseState
     private Transform _bossTransform;
     private GameObject _player;
     private Rigidbody _rigidbody;
+    private BossManager _bossManager;
     
     private Vector3 _initialDirection;
     private float _duration;
+    private float _speed;
 
     private Quaternion _targetRotation;
     private float _enterTime;
@@ -33,6 +35,7 @@ public class BossAkaHitState : BossBaseState
         _bossTransform = stateMachine.BossTransform;
         _player = stateMachine.PlayerGameObject;
         _rigidbody = stateMachine.BossRigidbody;
+        _bossManager = stateMachine.Manager;
     }
 
     public override void OnEnter()
@@ -51,8 +54,13 @@ public class BossAkaHitState : BossBaseState
         _initialDirection.y = 0f;
         _initialDirection.Normalize();
         
+        _speed = StateMachine.AkaSpeed;
+        
         _duration = StateMachine.AkaDuration;
-        _rigidbody.linearVelocity = 20f * _initialDirection;
+
+        _rigidbody.isKinematic = false;
+        _rigidbody.linearVelocity = _speed * _initialDirection;
+        
     }
 
     public override void OnUpdate()
@@ -67,8 +75,11 @@ public class BossAkaHitState : BossBaseState
         {
             if (!_playingEndAnimation)
             {
+                _bossManager.BossHitAkaManager.Explode();
+                StateMachine.Manager.akaNormalEndImpulseSource.GenerateImpulse();
                 _playingEndAnimation = true;
                 _rigidbody.linearVelocity = Vector3.zero;
+                _rigidbody.isKinematic = true;
                 _animator.SetInteger(_akaHitEndTypeId, (int)BossAkaHitEnd.Duration);
                 _animator.SetTrigger(_akaHitEndTriggerId);
             }
@@ -95,12 +106,15 @@ public class BossAkaHitState : BossBaseState
     {
         if (collision.gameObject.CompareTag("Wall") && !_playingEndAnimation)
         {
+            _bossManager.BossHitAkaManager.Explode();
+            StateMachine.Manager.akaWallEndImpulseSource.GenerateImpulse();
             Vector3 normal2D = collision.contacts[0].normal;
             normal2D.y = 0f;
             normal2D.Normalize();
             _bossTransform.DOMove(_bossTransform.position + normal2D * 1.5f, 0.15f).SetEase(Ease.InOutSine);
             _playingEndAnimation = true;
             _rigidbody.linearVelocity = Vector3.zero;
+            _rigidbody.isKinematic = true;
             _animator.SetInteger(_akaHitEndTypeId, (int)BossAkaHitEnd.Wall);
             _animator.SetTrigger(_akaHitEndTriggerId);
         }

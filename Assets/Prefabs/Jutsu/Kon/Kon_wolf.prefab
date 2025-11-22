@@ -2292,6 +2292,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6806911502014557873}
   - component: {fileID: 1748525481352302310}
+  - component: {fileID: 8168598673036495909}
   m_Layer: 29
   m_Name: Kon_wolf
   m_TagString: Untagged
@@ -2339,6 +2340,29 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!136 &8168598673036495909
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8319432556308522729}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.87
+  m_Height: 2.25
+  m_Direction: 2
+  m_Center: {x: 0, y: 1.2, z: 0.29}
 --- !u!1 &8404118559695189806
 GameObject:
   m_ObjectHideFlags: 0
