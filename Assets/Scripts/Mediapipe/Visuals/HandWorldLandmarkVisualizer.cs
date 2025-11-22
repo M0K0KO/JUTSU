@@ -5,6 +5,7 @@ using System.IO;
 using Mediapipe;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
 using Mediapipe.Tasks.Vision.HandLandmarker;
+using Unity.VisualScripting;
 using mptcc = Mediapipe.Tasks.Components.Containers;
 using UnityEngine;
 
@@ -58,6 +59,12 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
     private Vector3[] landmarkTargetPositions = new Vector3[_LandmarkCount];
 
     [SerializeField] private float landmarkScale = 20f;
+    
+    [SerializeField] private Material landmarkMaterial;
+    [SerializeField] private Material connectionMaterial;
+    [SerializeField] private float originalIntensity = 1f;
+    [SerializeField] private float maxIntensity = 10f;
+    [SerializeField] private float glowDuration = 1.5f;
     
     [Header("SmoothTime Options")]
     [SerializeField] private float visualsPositionSmoothTime = 0.2f;
@@ -272,5 +279,30 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
             connectionVisualControllers[i].SetPoints(landmarkVisuals[_connections[i].Item1].transform.position,
                 landmarkVisuals[_connections[i].Item2].transform.position);
         }
+    }
+
+    public IEnumerator Glow()
+    {
+        float elapsedTime = 0f;
+
+        while (elapsedTime < glowDuration)
+        {
+            elapsedTime += Time.unscaledDeltaTime;
+            
+            float value = Mathf.Lerp(originalIntensity, maxIntensity,elapsedTime / glowDuration);
+            
+            landmarkMaterial.SetFloat("_Intensity", value);
+            connectionMaterial.SetFloat("_Intensity", value);
+
+            yield return null;
+        }
+
+        yield return null;
+    }
+
+    public void ResetIntensity()
+    {
+        landmarkMaterial.SetFloat("_Intensity", originalIntensity);
+        connectionMaterial.SetFloat("_Intensity", originalIntensity);
     }
 }   
