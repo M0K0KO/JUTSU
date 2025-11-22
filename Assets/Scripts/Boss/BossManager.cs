@@ -69,7 +69,7 @@ public class BossManager : MonoBehaviour, IDamageable
         }
     }
 
-    private void OnAkaHit(Vector3 initialDirection, float duration)
+    private void OnAkaHit(Vector3 initialDirection, float duration, float projectileSpeed)
     {
         StateMachine.AkaInitialDirection = initialDirection;
         StateMachine.AkaDuration = duration;
