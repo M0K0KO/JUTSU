@@ -3,8 +3,7 @@ using UnityEngine.AI;
 
 public class BossChargeAttackState : BossBaseState
 {
-    private int _attackIndex = 1;
-    private int _attackCount = 2;
+    
     private Animator _animator;
     private NavMeshAgent _agent;
     private Transform _bossTransform;
@@ -12,6 +11,11 @@ public class BossChargeAttackState : BossBaseState
     private bool _shouldRotate = true;
     private float _rotationTimer;
     private float _rotationDuration = 0.85f;
+
+    private int _attackTypeId = Animator.StringToHash("AttackType");
+    private int _attackTriggerId = Animator.StringToHash("Attack");
+    private BossAttack[] _chargeAttacks = { BossAttack.ChargeAttack1, BossAttack.ChargeAttack2 };
+    private int _chargeAttackIndex = 0;
 
     public BossChargeAttackState(BossStateMachine stateMachine) : base(stateMachine)
     {
@@ -23,13 +27,13 @@ public class BossChargeAttackState : BossBaseState
 
     public override void OnEnter()
     {
-        _animator.SetBool("shouldMove", false);
         _agent.ResetPath();
         _rotationTimer =_rotationDuration;
         _shouldRotate = true;
-        int triggerHash = GetAttackTriggerHash(_attackIndex);
-        _animator.SetTrigger(triggerHash);
-        _attackIndex = (_attackIndex + 1) % _attackCount;
+        
+        _animator.SetInteger(_attackTypeId, (int)_chargeAttacks[_chargeAttackIndex]);
+        _chargeAttackIndex = (_chargeAttackIndex + 1) % _chargeAttacks.Length;
+        _animator.SetTrigger(_attackTriggerId);
     }
 
     public override void OnUpdate()
@@ -58,18 +62,7 @@ public class BossChargeAttackState : BossBaseState
             }
         }
     }
-
-    private int GetAttackTriggerHash(int index)
-    {
-        switch (index)
-        {
-            case 0:
-                return Animator.StringToHash("chargeAttack1");
-            case 1:
-                return Animator.StringToHash("chargeAttack2");
-            default:
-                // fallback hash
-                return Animator.StringToHash("chargeAttack1");
-        }
-    }
+    
+    
+    
 }

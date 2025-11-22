@@ -5,8 +5,9 @@ public class BossShockwaveAttackState : BossBaseState
 {
     private Animator _animator;
     private NavMeshAgent _agent;
-    
-    private int _attackHash = Animator.StringToHash("shockwaveAttack");
+
+    private int _attackTypeId = Animator.StringToHash("AttackType");
+    private int _attackTriggerId = Animator.StringToHash("Attack");
     
     public BossShockwaveAttackState(BossStateMachine stateMachine) : base(stateMachine)
     {
@@ -17,8 +18,8 @@ public class BossShockwaveAttackState : BossBaseState
     public override void OnEnter()
     {
         StateMachine.CanShockwaveAttack = false;
-        _animator.SetBool("shouldMove", false);
-        _animator.SetTrigger(_attackHash);
+        _animator.SetInteger(_attackTypeId, (int)BossAttack.ShockwaveAttack);
+        _animator.SetTrigger(_attackTriggerId);
         _agent.ResetPath();
         
     }

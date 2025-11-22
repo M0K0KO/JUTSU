@@ -1,7 +1,20 @@
+using System;
 using UnityEngine;
 
 public class IdleOnStateExitBehaviour : StateMachineBehaviour
 {
+    public enum BossStateType
+    {
+        NormalHit,
+        AkaHit,
+        KonHit,
+        ChargeAttack,
+        ShockwaveAttack
+    }
+    
+    [SerializeField] private BossStateType bossStateType;
+    
+    
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     //override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     //{
@@ -18,7 +31,33 @@ public class IdleOnStateExitBehaviour : StateMachineBehaviour
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         BossStateMachine stateMachine = animator.GetComponent<BossStateMachine>();
-        stateMachine.ChangeState(stateMachine.IdleState);
+
+        BossBaseState stateToCheck = null;
+        switch (bossStateType)
+        {
+            case BossStateType.NormalHit:
+                stateToCheck = stateMachine.NormalHitState;
+                break;
+            case BossStateType.AkaHit:
+                stateToCheck = stateMachine.AkaHitState;
+                break;
+            case BossStateType.KonHit:
+                stateToCheck = stateMachine.KonHitState;
+                break;
+            case BossStateType.ChargeAttack:
+                stateToCheck = stateMachine.ChargeAttackState;
+                break;
+            case BossStateType.ShockwaveAttack:
+                stateToCheck = stateMachine.ShockwaveAttackState;
+                break;
+        }
+
+        if (stateToCheck != null && stateToCheck == stateMachine.CurrentState)
+        {
+            stateMachine.ChangeState(stateMachine.IdleState);
+        }
+        
+        
     }
 
     // OnStateMove is called right after Animator.OnAnimatorMove()
@@ -32,4 +71,6 @@ public class IdleOnStateExitBehaviour : StateMachineBehaviour
     //{
     //    // Implement code that sets up animation IK (inverse kinematics)
     //}
+    
+    
 }

@@ -2,10 +2,31 @@ using System;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class BossStateMachine : MonoBehaviour, IDamageable
+public enum BossAttack
+{
+    ChargeAttack1 = 0,
+    ChargeAttack2 = 1,
+    ShockwaveAttack = 2
+}
+
+public enum BossHit
+{
+    NormalHit = 0,
+    AkaHit = 1,
+    KonHit = 2
+}
+
+public enum BossAkaHitEnd
+{
+    Duration = 0,
+    Wall = 1
+}
+
+public class BossStateMachine : MonoBehaviour
 {
     [HideInInspector] public Animator BossAnimator { get; private set; }
     [HideInInspector] public NavMeshAgent BossAgent { get; private set; }
+    [HideInInspector] public Rigidbody BossRigidbody { get; private set; }
     [HideInInspector] public Transform BossTransform { get; private set; }
     
     [HideInInspector] public GameObject PlayerGameObject { get; private set; }
@@ -17,12 +38,17 @@ public class BossStateMachine : MonoBehaviour, IDamageable
     public BossChargeAttackState ChargeAttackState { get; private set; }
     public BossShockwaveAttackState ShockwaveAttackState { get; private set; }
     public BossNormalHitState NormalHitState { get; private set; }
+    public BossAkaHitState AkaHitState { get; private set; }
+    public BossKonHit KonHitState { get; private set; }
 
     public BossBaseState CurrentState { get; private set; }
 
     private float _shockwaveAttackCooldown = 10f;
     private float _shockwaveAttackTimer = 10f;
     public bool CanShockwaveAttack { get; set; }
+    
+    public Vector3 AkaInitialDirection { get; set; }
+    public float AkaDuration { get; set; }
 
     private void InitStateMachine()
     {
@@ -33,6 +59,8 @@ public class BossStateMachine : MonoBehaviour, IDamageable
         BossAgent.updatePosition = false;
         BossAgent.updateRotation = false;
         
+        BossRigidbody = GetComponent<Rigidbody>();
+        
         BossTransform = transform;
         
         PlayerGameObject = GameObject.FindGameObjectWithTag("Player");
@@ -42,6 +70,8 @@ public class BossStateMachine : MonoBehaviour, IDamageable
         ChargeAttackState = new BossChargeAttackState(this);
         ShockwaveAttackState = new BossShockwaveAttackState(this);
         NormalHitState = new BossNormalHitState(this);
+        AkaHitState = new BossAkaHitState(this);
+        KonHitState = new BossKonHit(this);
         
         
         CurrentState = IdleState;
@@ -98,7 +128,6 @@ public class BossStateMachine : MonoBehaviour, IDamageable
                 _shockwaveAttackTimer = _shockwaveAttackCooldown;
             }
         }
-        
         CurrentState.OnUpdate();
     }
 
@@ -109,16 +138,12 @@ public class BossStateMachine : MonoBehaviour, IDamageable
 
     private void OnCollisionEnter(Collision other)
     {
+        Debug.Log(other.gameObject.name);
         CurrentState.OnCollisionEnter(other);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         CurrentState.OnTriggerEnter(other);   
-    }
-
-    public void TakeDamage(bool shouldPlayHitReaction = false, GestureType gestureType = GestureType.None)
-    {
-        
     }
 }

@@ -2,5 +2,7 @@ using UnityEngine;
 
 public interface IDamageable
 {
-    public void TakeDamage(bool shouldPlayHitReaction = false, GestureType gestureType = GestureType.None);
+    public void TakeDamage(bool shouldPlayHitReaction = false, GestureType gestureType = GestureType.None, 
+        Vector3 damageOrigin = default);
+    
 }

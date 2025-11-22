@@ -11,7 +11,7 @@ public class BossManager : MonoBehaviour, IDamageable
     [SerializeField] private BossHand rightHand;
     [SerializeField] private GameObject shockwaveSphere;
     
-    private CinemachineImpulseSource _impulseSource;
+    [SerializeField] private CinemachineImpulseSource shockWaveImpulseSource;
 
     private bool _shockwaveHitPlayer = false;
     private float _shockwaveHitWidth = 0.5f;
@@ -19,56 +19,67 @@ public class BossManager : MonoBehaviour, IDamageable
     private void Awake()
     {
         StateMachine = GetComponent<BossStateMachine>();
-        _impulseSource = GetComponent<CinemachineImpulseSource>();
+        
         
         leftHand.OnBossHandPlayerTriggerEnter += OnLeftHandPlayerTriggerEnter;
         rightHand.OnBossHandPlayerTriggerEnter += OnRightHandPlayerTriggerEnter;
+
+        EventManager.OnJutsuActivation += OnJutsuActivation;
+        EventManager.OnAkaHit += OnAkaHit;
     }
 
     private void OnDestroy()
     {
         leftHand.OnBossHandPlayerTriggerEnter -= OnLeftHandPlayerTriggerEnter;
         rightHand.OnBossHandPlayerTriggerEnter -= OnRightHandPlayerTriggerEnter;
+
+        EventManager.OnJutsuActivation -= OnJutsuActivation;
+        EventManager.OnAkaHit -= OnAkaHit;
     }
 
     private void Update()
     {
         
 #if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        // if (Input.GetKeyDown(KeyCode.Mouse0))
+        // {
+        //     if (StateMachine.CurrentState != StateMachine.ChargeAttackState &&
+        //         StateMachine.CurrentState != StateMachine.ShockwaveAttackState)
+        //     {
+        //         StateMachine.ChangeState(StateMachine.NormalHitState);
+        //     }
+        // }
+
+        if (Input.GetKeyDown(KeyCode.U))
         {
-            if (StateMachine.CurrentState != StateMachine.ChargeAttackState &&
-                StateMachine.CurrentState != StateMachine.ShockwaveAttackState)
-            {
-                StateMachine.ChangeState(StateMachine.NormalHitState);
-            }
+            StateMachine.AkaInitialDirection = transform.position - StateMachine.PlayerGameObject.transform.position;
+            StateMachine.AkaDuration = 1.5f;
+            StateMachine.ChangeState(StateMachine.AkaHitState);
         }
 #endif
+        
+        CheckShockwaveHit();
+    }
 
-        if (shockwaveSphere.activeInHierarchy && !_shockwaveHitPlayer)
+    private void OnJutsuActivation(GestureType gestureType)
+    {
+        switch (gestureType)
         {
-            float currentRadius = shockwaveSphere.transform.localScale.x / 2f;
-            Vector3 shockwavePosition = shockwaveSphere.transform.position;
-            Vector3 toPlayer = StateMachine.PlayerGameObject.transform.position - shockwavePosition;
-            toPlayer.y = 0f;
-            float distance = toPlayer.magnitude;
-
-            if (Mathf.Abs(currentRadius - distance) <= _shockwaveHitWidth)
-            {
-                _shockwaveHitPlayer = true;
-                Debug.Log("Shockwave Hit!");
-                if (StateMachine.PlayerGameObject.TryGetComponent<IDamageable>(out IDamageable damageable))
-                {
-                    damageable.TakeDamage(true, GestureType.None);
-                }
-            }
+            //TODO: If gesture type is domain expansion infinite void, change animator speed
         }
-        
-        
+    }
+
+    private void OnAkaHit(Vector3 initialDirection, float duration)
+    {
+        StateMachine.AkaInitialDirection = initialDirection;
+        StateMachine.AkaDuration = duration;
+        StateMachine.ChangeState(StateMachine.AkaHitState);
     }
 
     public void StartShockwave()
     {
+        if (StateMachine.CurrentState != StateMachine.ShockwaveAttackState) return;
+        
         Renderer sphereRenderer = shockwaveSphere.GetComponent<Renderer>();
 
         _shockwaveHitPlayer = false;
@@ -89,11 +100,33 @@ public class BossManager : MonoBehaviour, IDamageable
         }));
     }
 
+    private void CheckShockwaveHit()
+    {
+        if (shockwaveSphere.activeInHierarchy && !_shockwaveHitPlayer)
+        {
+            float currentRadius = shockwaveSphere.transform.localScale.x / 2f;
+            Vector3 shockwavePosition = shockwaveSphere.transform.position;
+            Vector3 toPlayer = StateMachine.PlayerGameObject.transform.position - shockwavePosition;
+            toPlayer.y = 0f;
+            float distance = toPlayer.magnitude;
+
+            if (Mathf.Abs(currentRadius - distance) <= _shockwaveHitWidth)
+            {
+                _shockwaveHitPlayer = true;
+                // Debug.Log("Shockwave Hit!");
+                if (StateMachine.PlayerGameObject.TryGetComponent<IDamageable>(out IDamageable damageable))
+                {
+                    damageable.TakeDamage(true, GestureType.None, shockwavePosition);
+                }
+            }
+        }
+    }
+
     private void OnLeftHandPlayerTriggerEnter(Collider other)
     {
         if (other.TryGetComponent(out IDamageable damageable))
         {
-            damageable.TakeDamage(true, GestureType.None);
+            damageable.TakeDamage(true, GestureType.None, other.ClosestPoint(leftHand.transform.position));
             leftHand.HandCollider.enabled = false;
         }
     }
@@ -102,17 +135,21 @@ public class BossManager : MonoBehaviour, IDamageable
     {
         if (other.TryGetComponent(out IDamageable damageable))
         {
-            damageable.TakeDamage(true, GestureType.None);
+            damageable.TakeDamage(true, GestureType.None, other.ClosestPoint(rightHand.transform.position));
             rightHand.HandCollider.enabled = false;
         }
     }
 
-    public void TakeDamage(bool shouldPlayHitReaction = false, GestureType gestureType = GestureType.None)
+    public void TakeDamage(bool shouldPlayHitReaction, GestureType gestureType, Vector3 hitPoint)
     {
         switch (gestureType)
         {
             case GestureType.None:
             {
+                if (StateMachine.CurrentState != StateMachine.ChaseState &&
+                    StateMachine.CurrentState != StateMachine.IdleState)
+                    return;
+                
                 if (shouldPlayHitReaction)
                 {
                     StateMachine.ChangeState(StateMachine.NormalHitState);
@@ -123,13 +160,15 @@ public class BossManager : MonoBehaviour, IDamageable
         }
     }
 
-    public void PlayImpulse()
+    public void PlayShockwaveImpulse()
     {
-        _impulseSource.GenerateImpulse();
+        if (StateMachine.CurrentState != StateMachine.ShockwaveAttackState) return;
+        shockWaveImpulseSource.GenerateImpulse();
     }
 
     public void EnableLeftHandTrigger()
     {
+        if (StateMachine.CurrentState != StateMachine.ChargeAttackState) return;
         leftHand.HandCollider.enabled = true;
     }
 
@@ -140,6 +179,7 @@ public class BossManager : MonoBehaviour, IDamageable
 
     public void EnableRightHandTrigger()
     {
+        if (StateMachine.CurrentState != StateMachine.ChargeAttackState) return;
         rightHand.HandCollider.enabled = true;
     }
 

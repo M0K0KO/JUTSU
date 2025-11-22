@@ -22,39 +22,37 @@ public class MusicController : MonoBehaviour
         audioMixer.SetFloat("CutoffSFX", 22000f);
         audioMixer.SetFloat("ResonanceSFX", 1f);
 
-        EventManager.OnCameraStateChange += OnCameraStateChange;
+        EventManager.OnJustuModeEnter += OnJutsuModeEnter;
+        EventManager.OnJustuModeExit += OnJutsuModeExit;
 
 
     }
 
     private void OnDestroy()
     {
-        EventManager.OnCameraStateChange -= OnCameraStateChange;
+        EventManager.OnJustuModeEnter -= OnJutsuModeEnter;
+        EventManager.OnJustuModeExit -= OnJutsuModeExit;
     }
 
-    private void OnCameraStateChange(PlayerCameraState state, Transform target)
+    private void OnJutsuModeEnter()
     {
-        switch (state)
-        {
-            case PlayerCameraState.Jutsu:
-            {
-                ModifyLowpassFilter(1000f, 4f, 0.25f);
-                break;
-            }
-            default:
-            {
-                ModifyLowpassFilter(22000f, 1f, 0.25f);
-                break;
-            }
-        }
+        ModifyLowpassFilter(1200f, 1f);
+        _musicAudioSource.volume = 0.9f;
     }
 
-    private void ModifyLowpassFilter(float cutoffFrequency, float resonance, float transitionDuration)
+    private void OnJutsuModeExit()
     {
-        audioMixer.DOSetFloat("CutoffBGM", cutoffFrequency, transitionDuration);
-        audioMixer.DOSetFloat("CutoffSFX", cutoffFrequency, transitionDuration);
-        audioMixer.DOSetFloat("ResonanceBGM", resonance, transitionDuration);
-        audioMixer.DOSetFloat("ResonanceSFX", resonance, transitionDuration);
+        ModifyLowpassFilter(22000f, 1f);
+        _musicAudioSource.pitch = 1f;
+        _musicAudioSource.volume = 1f;
+    }
+
+    private void ModifyLowpassFilter(float cutoffFrequency, float resonance)
+    {
+        audioMixer.SetFloat("CutoffBGM", cutoffFrequency);
+        audioMixer.SetFloat("CutoffSFX", cutoffFrequency);
+        audioMixer.SetFloat("ResonanceBGM", resonance);
+        audioMixer.SetFloat("ResonanceSFX", resonance);
     }
     
     

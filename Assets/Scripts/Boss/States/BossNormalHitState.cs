@@ -10,6 +10,10 @@ public class BossNormalHitState : BossBaseState
     private Quaternion _targetRotation;
     private float _enterTime;
     private float _rotationDuration = 0.2f;
+
+    private int _attackTriggerId = Animator.StringToHash("Attack");
+    private int _hitTypeId = Animator.StringToHash("HitType");
+    private int _hitTriggerId = Animator.StringToHash("Hit");
     
     public BossNormalHitState(BossStateMachine stateMachine) : base(stateMachine)
     {
@@ -27,8 +31,9 @@ public class BossNormalHitState : BossBaseState
         FindTargetRotation();
         
         _agent.ResetPath();
-        _animator.SetBool("shouldMove", false);
-        _animator.SetTrigger("normalHit");
+        _animator.ResetTrigger(_attackTriggerId);
+        _animator.SetInteger(_hitTypeId, (int)BossHit.NormalHit);
+        _animator.SetTrigger(_hitTriggerId);
         
         
     }
@@ -48,7 +53,7 @@ public class BossNormalHitState : BossBaseState
             Vector3 toPlayer = _player.transform.position - _bossTransform.position;
             if (toPlayer != Vector3.zero)
             {
-                Quaternion lookRotation = Quaternion.LookRotation(_player.transform.position - _bossTransform.position);
+                Quaternion lookRotation = Quaternion.LookRotation(toPlayer);
                 _targetRotation = Quaternion.Euler(0f, lookRotation.eulerAngles.y, 0f);
                 return;
             }

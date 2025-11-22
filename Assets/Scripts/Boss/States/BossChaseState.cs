@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
@@ -7,6 +8,8 @@ public class BossChaseState :BossBaseState
     private float _attackDistance = 4.5f;
     private NavMeshAgent _agent;
     private Animator _animator;
+
+    private int _locomotionId = Animator.StringToHash("Locomotion");
     
     public BossChaseState(BossStateMachine stateMachine) : base(stateMachine)
     {
@@ -16,7 +19,7 @@ public class BossChaseState :BossBaseState
 
     public override void OnEnter()
     {
-        StateMachine.BossAnimator.SetBool("shouldMove", true);
+
     }
 
     public override void OnUpdate()
@@ -33,9 +36,9 @@ public class BossChaseState :BossBaseState
         if (!player) return;
 
         Vector3 playerPosition = player.transform.position;
-        float currentAnimLocomotionValue = StateMachine.BossAnimator.GetFloat("locomotion");
+        float currentAnimLocomotionValue = StateMachine.BossAnimator.GetFloat(_locomotionId);
         float newAnimLocomotionValue = UnrealInterp.FInterpTo(currentAnimLocomotionValue, 1f, Time.deltaTime, 2f);
-        StateMachine.BossAnimator.SetFloat("locomotion", newAnimLocomotionValue);
+        StateMachine.BossAnimator.SetFloat(_locomotionId, newAnimLocomotionValue);
 
         _agent.SetDestination(playerPosition);
 
@@ -54,10 +57,9 @@ public class BossChaseState :BossBaseState
         
     }
 
-    public override void OnExit(){}
-
-    public override void OnAnimatorMove()
+    public override void OnExit()
     {
-        
+        DOTween.To(() => _animator.GetFloat(_locomotionId), x => _animator.SetFloat(_locomotionId, x), 
+            0f, 0.2f);
     }
 }
