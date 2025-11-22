@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1548551730789059357}
   - component: {fileID: 7562291032481643401}
   - component: {fileID: 7946856320612056591}
-  m_Layer: 31
+  m_Layer: 17
   m_Name: MuzzleFlashVFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4799,7 +4799,7 @@ GameObject:
   - component: {fileID: 7004818527638421817}
   - component: {fileID: 1084591364874409434}
   - component: {fileID: 4955919574944598128}
-  m_Layer: 31
+  m_Layer: 17
   m_Name: Point Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4926,7 +4926,7 @@ GameObject:
   - component: {fileID: 6614712959969023141}
   - component: {fileID: 7291886703604770000}
   - component: {fileID: 2036754454326143795}
-  m_Layer: 31
+  m_Layer: 17
   m_Name: Sparks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9850,7 +9850,7 @@ GameObject:
   - component: {fileID: 7911644743856043011}
   - component: {fileID: 5385342694572989110}
   - component: {fileID: 7839398791564755484}
-  m_Layer: 31
+  m_Layer: 17
   m_Name: Flame
   m_TagString: Untagged
   m_Icon: {fileID: 0}

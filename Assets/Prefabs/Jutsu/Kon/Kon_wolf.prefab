@@ -874,6 +874,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1850567258417677600}
+  - component: {fileID: 5889532013458546614}
+  - component: {fileID: 5074005767144364293}
   m_Layer: 29
   m_Name: Head_M
   m_TagString: Untagged
@@ -906,6 +908,41 @@ Transform:
   - {fileID: 60923602792267591}
   m_Father: {fileID: 6346776923812035170}
   m_LocalEulerAnglesHint: {x: 1.0201638, y: -5.7303095, z: 106.401924}
+--- !u!136 &5889532013458546614
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3792033875064985897}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.71
+  m_Height: 2.45
+  m_Direction: 1
+  m_Center: {x: 0.15, y: -0.54, z: 0}
+--- !u!114 &5074005767144364293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3792033875064985897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1a4f10a02e08ff49ad0339ef3cb68f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KonWolfTrigger
 --- !u!1 &3924874839108698799
 GameObject:
   m_ObjectHideFlags: 0
@@ -1806,7 +1843,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6806911502014557873}
   - component: {fileID: 1748525481352302310}
-  - component: {fileID: 8168598673036495909}
+  - component: {fileID: 4438129684986313361}
   m_Layer: 29
   m_Name: Kon_wolf
   m_TagString: Untagged
@@ -1853,29 +1890,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!136 &8168598673036495909
-CapsuleCollider:
+--- !u!114 &4438129684986313361
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8319432556308522729}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.87
-  m_Height: 2.25
-  m_Direction: 2
-  m_Center: {x: 0, y: 1.2, z: 0.29}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ebebcb4ab3f3cd45bfc130d615e3b72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KonWolfManager
 --- !u!1 &8404118559695189806
 GameObject:
   m_ObjectHideFlags: 0
