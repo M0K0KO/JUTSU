@@ -17,13 +17,16 @@ public class HitState : BaseState
     {
         if (stateMachine.hitAnimationQueue.TryDequeue(out bool _))
         {
-            stateMachine.player.animator.Play("Hit");
+            stateMachine.player.animator.Play("Hit", 2, 0f);
         }
 
         AnimatorStateInfo stateInfo = stateMachine.player.animator.GetCurrentAnimatorStateInfo(2);
-        if (stateInfo.IsName("Empty"))
+        if (stateInfo.IsName("Hit"))
         {
-            stateMachine.ChangeState(stateMachine.idleState);
+            if (stateInfo.normalizedTime >= 0.95f) 
+            {
+                stateMachine.ChangeState(stateMachine.idleState);
+            }
         }
     }
     
