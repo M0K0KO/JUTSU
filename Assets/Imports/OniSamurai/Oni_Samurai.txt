@@ -1,0 +1,7 @@
+This asset uses unity humanoid rig with its animations imported as separate files.
+
+To control the animations, use Animator Controller object. Sample of controller can be found in Demo folder.
+
+If performance is your main concern, rescale the textures
+
+You can contact me via : willpowaproject@outlook.com
