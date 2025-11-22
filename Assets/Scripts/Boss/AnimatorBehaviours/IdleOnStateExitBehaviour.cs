@@ -9,7 +9,8 @@ public class IdleOnStateExitBehaviour : StateMachineBehaviour
         AkaHit,
         KonHit,
         ChargeAttack,
-        ShockwaveAttack
+        ShockwaveAttack,
+        MuryokushoEnd
     }
     
     [SerializeField] private BossStateType bossStateType;
@@ -49,6 +50,9 @@ public class IdleOnStateExitBehaviour : StateMachineBehaviour
                 break;
             case BossStateType.ShockwaveAttack:
                 stateToCheck = stateMachine.ShockwaveAttackState;
+                break;
+            case BossStateType.MuryokushoEnd:
+                stateToCheck = stateMachine.MuryokushoEndState;
                 break;
         }
 

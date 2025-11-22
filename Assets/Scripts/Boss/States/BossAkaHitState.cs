@@ -10,6 +10,7 @@ public class BossAkaHitState : BossBaseState
     private Transform _bossTransform;
     private GameObject _player;
     private Rigidbody _rigidbody;
+    private BossManager _bossManager;
     
     private Vector3 _initialDirection;
     private float _duration;
@@ -34,6 +35,7 @@ public class BossAkaHitState : BossBaseState
         _bossTransform = stateMachine.BossTransform;
         _player = stateMachine.PlayerGameObject;
         _rigidbody = stateMachine.BossRigidbody;
+        _bossManager = stateMachine.Manager;
     }
 
     public override void OnEnter()
@@ -73,6 +75,7 @@ public class BossAkaHitState : BossBaseState
         {
             if (!_playingEndAnimation)
             {
+                _bossManager.BossHitAkaManager.Explode();
                 StateMachine.Manager.akaNormalEndImpulseSource.GenerateImpulse();
                 _playingEndAnimation = true;
                 _rigidbody.linearVelocity = Vector3.zero;
@@ -103,6 +106,7 @@ public class BossAkaHitState : BossBaseState
     {
         if (collision.gameObject.CompareTag("Wall") && !_playingEndAnimation)
         {
+            _bossManager.BossHitAkaManager.Explode();
             StateMachine.Manager.akaWallEndImpulseSource.GenerateImpulse();
             Vector3 normal2D = collision.contacts[0].normal;
             normal2D.y = 0f;
