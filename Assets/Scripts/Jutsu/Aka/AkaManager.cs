@@ -10,13 +10,6 @@ public class AkaManager : MonoBehaviour
     
     [SerializeField] private GameObject[] explosionVFXs;
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            Explode();
-        }
-    }
 
     private void OnTriggerEnter(Collider other)
     {
