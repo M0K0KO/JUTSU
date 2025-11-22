@@ -1,21 +1,24 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Mediapipe.Unity.HandWorldLandmarkDetection;
 using Unity.Cinemachine;
-using Unity.VisualScripting;
 using UnityEngine;
-using Whisper;
+using UnityEngine.Rendering.Universal;
 using Whisper.Utils;
 using Debug = UnityEngine.Debug;
 
 public class PlayerJutsuManager : MonoBehaviour
 {
     private PlayerManager player;
+
+    [SerializeField] private ScriptableRendererData rendererData;
+    private const string EnemyFeatureName = "Enemy";
+    private const string PlayerFeatureName = "Player";
+    private ScriptableRendererFeature enemyFeature;
+    private ScriptableRendererFeature playerFeature;
+    
 
     [Header("Sequence Settings")]
     [SerializeField] private float sequenceMaxDuration;
@@ -59,6 +62,9 @@ public class PlayerJutsuManager : MonoBehaviour
         //VoiceRecognitionManager.instance.microphoneRecord.OnRecordStop += OnRecordStop;
         
         konWolfAudioSourceHolder = konWolfInstance.GetComponentInChildren<BaseAudioSourceHolder>();
+        
+        playerFeature = rendererData.rendererFeatures.Find(f => f.name == PlayerFeatureName);
+        enemyFeature = rendererData.rendererFeatures.Find(f => f.name == EnemyFeatureName);
     }
 
     private void Start()
@@ -433,8 +439,9 @@ public class PlayerJutsuManager : MonoBehaviour
     {
         EventManager.TriggerOnMuryokushoStart();
         bool isSkyboxChanged = false;
-
         isInMuryokusho = true;
+
+        SetFeatureActive(true);
 
         float elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.quadBloomDuration)
@@ -453,6 +460,8 @@ public class PlayerJutsuManager : MonoBehaviour
 
             yield return null;
         }
+        
+        SetFeatureActive(false);
 
         elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.intersectionDuration)
@@ -493,6 +502,8 @@ public class PlayerJutsuManager : MonoBehaviour
         yield return new WaitForSeconds(muryokushoSequenceData.muryokushoDuration);
 
 
+        SetFeatureActive(true);
+        
         elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.quadBloomDuration)
         {
@@ -509,6 +520,8 @@ public class PlayerJutsuManager : MonoBehaviour
 
             yield return null;
         }
+        
+        SetFeatureActive(false);
         
         EventManager.TriggerOnMuryokushoEnd();
 
@@ -591,4 +604,12 @@ public class PlayerJutsuManager : MonoBehaviour
     }
 
     private void ResetInitialPrompt() => VoiceRecognitionManager.instance.whisperManager.initialPrompt = "";
+
+
+    private void SetFeatureActive(bool isActive)
+    {
+        playerFeature.SetActive(isActive);
+        enemyFeature.SetActive(isActive);
+        rendererData.SetDirty();
+    }
 }
