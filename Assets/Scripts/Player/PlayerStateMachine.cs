@@ -46,7 +46,7 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
 
     private void Update()
     {
-        Debug.Log(currentState);
+        // Debug.Log(currentState);
         
         currentState.OnUpdateState();
 
@@ -217,14 +217,14 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
     
     public void Attack(Vector3 origin, Vector3 destination)
     {
-        bool shouldPlayHitReaction = (comboCounter == 7);
+        bool shouldPlayHitReaction = (comboCounter == 8);
         
         if (shouldPlayHitReaction) Debug.Log("SHOULD PLAY HIT REACTION!!");
         
         Ray ray = new Ray(origin, destination - origin);
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            if (hit.transform.TryGetComponent(out IDamageable damageable))
+            if (hit.transform.root.TryGetComponent(out IDamageable damageable))
             {
                 damageable.TakeDamage(shouldPlayHitReaction, GestureType.None, origin);
             }

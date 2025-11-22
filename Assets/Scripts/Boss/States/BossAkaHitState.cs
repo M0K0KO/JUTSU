@@ -61,6 +61,8 @@ public class BossAkaHitState : BossBaseState
         _rigidbody.isKinematic = false;
         _rigidbody.linearVelocity = _speed * _initialDirection;
         
+        _bossManager.SetPerlinNoiseAmplitude(1.5f);
+        
     }
 
     public override void OnUpdate()
@@ -75,6 +77,7 @@ public class BossAkaHitState : BossBaseState
         {
             if (!_playingEndAnimation)
             {
+                _bossManager.SetPerlinNoiseAmplitude(0f);
                 _bossManager.BossHitAkaManager.Explode();
                 StateMachine.Manager.akaNormalEndImpulseSource.GenerateImpulse();
                 _playingEndAnimation = true;
@@ -106,6 +109,7 @@ public class BossAkaHitState : BossBaseState
     {
         if (collision.gameObject.CompareTag("Wall") && !_playingEndAnimation)
         {
+            _bossManager.SetPerlinNoiseAmplitude(0f);
             _bossManager.BossHitAkaManager.Explode();
             StateMachine.Manager.akaWallEndImpulseSource.GenerateImpulse();
             Vector3 normal2D = collision.contacts[0].normal;

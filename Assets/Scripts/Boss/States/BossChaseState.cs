@@ -8,6 +8,7 @@ public class BossChaseState :BossBaseState
     private float _attackDistance = 4.5f;
     private NavMeshAgent _agent;
     private Animator _animator;
+    private BossManager _bossManager;
 
     private int _locomotionId = Animator.StringToHash("Locomotion");
     
@@ -15,6 +16,7 @@ public class BossChaseState :BossBaseState
     {
         _agent = stateMachine.BossAgent;
         _animator = stateMachine.BossAnimator;
+        _bossManager = stateMachine.Manager;
     }
 
     public override void OnEnter()
@@ -35,9 +37,15 @@ public class BossChaseState :BossBaseState
         GameObject player = StateMachine.PlayerGameObject;
         if (!player) return;
 
+        float targetLocomotionValue = 1f;
+        if (_bossManager.IsKonJutsuActive)
+        {
+            targetLocomotionValue = 0.2f;
+        }
+
         Vector3 playerPosition = player.transform.position;
         float currentAnimLocomotionValue = StateMachine.BossAnimator.GetFloat(_locomotionId);
-        float newAnimLocomotionValue = UnrealInterp.FInterpTo(currentAnimLocomotionValue, 1f, Time.deltaTime, 2f * _animator.speed);
+        float newAnimLocomotionValue = UnrealInterp.FInterpTo(currentAnimLocomotionValue, targetLocomotionValue, Time.deltaTime, 2f * _animator.speed);
         StateMachine.BossAnimator.SetFloat(_locomotionId, newAnimLocomotionValue);
 
         _agent.SetDestination(playerPosition);

@@ -45,7 +45,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: -4088811080337986926, guid: 8db561b85f1bd2948b7e25752b217a87, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 1
@@ -142,5 +142,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97779309b27bf0c4caa495cbfbf89dbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MusicController
-  musicClip: {fileID: 0}
+  musicClip: {fileID: 8300000, guid: a54271e6d6b7f3e4fbb4b3ce572e6f19, type: 3}
   audioMixer: {fileID: 24100000, guid: 8db561b85f1bd2948b7e25752b217a87, type: 2}

@@ -60,6 +60,8 @@ public class BossStateMachine : MonoBehaviour
     
     private int _locomotionId = Animator.StringToHash("Locomotion");
 
+    public float ApproximateRootSpeed { get; private set; }
+
     private void InitStateMachine()
     {
         Manager = GetComponent<BossManager>();
@@ -152,6 +154,7 @@ public class BossStateMachine : MonoBehaviour
     {
         if (_acculmulatedDeltaPos != Vector3.zero)
         {
+            ApproximateRootSpeed = _acculmulatedDeltaPos.magnitude / Time.fixedDeltaTime;
             Vector3 targetPos = BossRigidbody.position + _acculmulatedDeltaPos;
             BossRigidbody.MovePosition(targetPos);
             
