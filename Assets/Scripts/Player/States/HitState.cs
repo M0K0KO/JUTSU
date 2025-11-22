@@ -21,9 +21,12 @@ public class HitState : BaseState
         }
 
         AnimatorStateInfo stateInfo = stateMachine.player.animator.GetCurrentAnimatorStateInfo(2);
-        if (stateInfo.IsName("Empty"))
+        if (stateInfo.IsName("Hit"))
         {
-            stateMachine.ChangeState(stateMachine.idleState);
+            if (stateInfo.normalizedTime >= 0.95f) 
+            {
+                stateMachine.ChangeState(stateMachine.idleState);
+            }
         }
     }
     

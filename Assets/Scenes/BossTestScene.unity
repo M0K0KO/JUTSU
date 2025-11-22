@@ -825,6 +825,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9660ae5337ff6ca42868a61cca257fc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerJutsuManager
+  rendererData: {fileID: 0}
   sequenceMaxDuration: 5
   slowedTimeScale: 0.4
   jutsuList:
