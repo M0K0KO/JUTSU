@@ -23,6 +23,7 @@ public class PlayerManager : MonoBehaviour
         animController = GetComponent<PlayerAnimationController>();
         jutsu = GetComponent<PlayerJutsuManager>();
         vfxManager = GetComponent<PlayerVFXManager>();
+        impulseManager = GetComponent<PlayerCameraImpulseManager>();
         
         animator = GetComponent<Animator>();
         cc = GetComponent<CharacterController>();

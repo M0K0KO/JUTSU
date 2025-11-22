@@ -33088,7 +33088,7 @@ AnimationClip:
     m_LoopBlend: 0
     m_LoopBlendOrientation: 1
     m_LoopBlendPositionY: 1
-    m_LoopBlendPositionXZ: 1
+    m_LoopBlendPositionXZ: 0
     m_KeepOriginalOrientation: 1
     m_KeepOriginalPositionY: 1
     m_KeepOriginalPositionXZ: 1
@@ -64933,7 +64933,14 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0.33333334
-    functionName: PlayMuzzleFlash
+    functionName: IncreaseComboCounter
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.33333334
+    functionName: SpawnBulletTrail
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
@@ -64947,7 +64954,7 @@ AnimationClip:
     intParameter: 0
     messageOptions: 0
   - time: 0.33333334
-    functionName: SpawnBulletTrail
+    functionName: PlayMuzzleFlash
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

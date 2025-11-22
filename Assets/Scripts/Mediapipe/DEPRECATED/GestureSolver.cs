@@ -18,14 +18,17 @@ public class GestureSolver : MonoBehaviour
             string indicatorText = "";
             switch (type)
             {
-                case GestureType.Open:
-                    indicatorText = "Open";
-                    break;
-                case GestureType.Close:
-                    indicatorText = "Close";
-                    break;
                 case GestureType.Kon:
                     indicatorText = "Kon";
+                    break;
+                case GestureType.Aka:
+                    indicatorText = "Aka";
+                    break;
+                case GestureType.Muryokusho:
+                    indicatorText = "Muryokusho";
+                    break;
+                case GestureType.Punch:
+                    indicatorText = "Punch";
                     break;
                 case GestureType.None:
                     indicatorText = "None";

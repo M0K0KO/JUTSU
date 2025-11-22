@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1548551730789059357}
   - component: {fileID: 7562291032481643401}
   - component: {fileID: 7946856320612056591}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: MuzzleFlashVFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -191,7 +191,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 1, g: 0.96649736, b: 0.6745283, a: 1}
+      maxColor: {r: 0.5853862, g: 0.3281814, b: 1, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -4799,13 +4799,13 @@ GameObject:
   - component: {fileID: 7004818527638421817}
   - component: {fileID: 1084591364874409434}
   - component: {fileID: 4955919574944598128}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: Point Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7004818527638421817
 Transform:
   m_ObjectHideFlags: 0
@@ -4831,9 +4831,9 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 2
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
-  m_Range: 2
+  m_Color: {r: 0.73389685, g: 0.64465404, b: 1, a: 1}
+  m_Intensity: 0.48
+  m_Range: 1
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -4877,7 +4877,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: NaN, y: 3e-45, z: 0, w: 7.317453e+17}
+  m_BoundingSphereOverride: {x: NaN, y: NaN, z: NaN, w: NaN}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
@@ -4926,7 +4926,7 @@ GameObject:
   - component: {fileID: 6614712959969023141}
   - component: {fileID: 7291886703604770000}
   - component: {fileID: 2036754454326143795}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: Sparks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9850,7 +9850,7 @@ GameObject:
   - component: {fileID: 7911644743856043011}
   - component: {fileID: 5385342694572989110}
   - component: {fileID: 7839398791564755484}
-  m_Layer: 0
+  m_Layer: 31
   m_Name: Flame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11106,8 +11106,8 @@ ParticleSystem:
       maxColor: {r: 1, g: 1, b: 1, a: 1}
       maxGradient:
         serializedVersion: 2
-        key0: {r: 1, g: 0.66513133, b: 0, a: 0}
-        key1: {r: 0.4890157, g: 0.48718405, b: 0.8679245, a: 1}
+        key0: {r: 0.4901961, g: 0.48627454, b: 0.86666673, a: 0}
+        key1: {r: 0.828827, g: 0.827044, b: 1, a: 1}
         key2: {r: 0.50775075, g: 0.47552508, b: 0.735849, a: 1}
         key3: {r: 0.03127098, g: 1, b: 0, a: 0}
         key4: {r: 1, g: 0, b: 0.73958254, a: 0}
@@ -11131,7 +11131,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
-        m_ColorSpace: -1
+        m_ColorSpace: 0
         m_NumColorKeys: 2
         m_NumAlphaKeys: 4
       minGradient:

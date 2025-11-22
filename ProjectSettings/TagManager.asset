@@ -41,7 +41,7 @@ TagManager:
   - HandLandmark
   - Player
   - Enemy
-  - 
+  - VFX
   m_SortingLayers:
   - name: Default
     uniqueID: 0

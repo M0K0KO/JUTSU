@@ -1,8 +1,10 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "MuryokushoSequenceData", menuName = "MuryokushoSequenceData", order = 1)]
+[CreateAssetMenu(fileName = "MuryokushoSequenceData", menuName = "SO/MuryokushoSequenceData", order = 1)]
 public class MuryokushoSequenceData : ScriptableObject
 {
+    public float muryokushoDuration = 10f;
+    
     [Header("Bloom Quad")]
     public float quadBloomDuration = 0.5f;
     public AnimationCurve quadBloomCurve;

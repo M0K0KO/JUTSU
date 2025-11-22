@@ -5,6 +5,7 @@ public class PlayerVFXManager : MonoBehaviour
     private PlayerManager player;
 
     [SerializeField] private Transform muzzleFlashPos;
+    [SerializeField] private LayerMask enemyLayer;
 
     private void Awake()
     {
@@ -42,6 +43,8 @@ public class PlayerVFXManager : MonoBehaviour
             }
         }
         destination += new Vector3(Random.Range(-0.2f, 0.2f), Random.Range(-0.2f, 0.2f),Random.Range(-0.2f, 0.2f));
+
+        player.stateMachine.Attack(origin, destination);
         
         BulletTrailObjectPool.instance.bulletTrailManagers[instanceID].SetPosition(origin, destination);
     }
