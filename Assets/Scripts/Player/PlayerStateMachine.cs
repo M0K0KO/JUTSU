@@ -52,7 +52,7 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
 
         if (Input.GetKeyDown(KeyCode.F))
         {
-            TakeDamage();
+            // TakeDamage();
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
@@ -194,8 +194,8 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
         return false;
     }
     
-    /*
-    public void TakeDamage(Vector3 damageOrigin, bool shouldPlayHitReaction = false, GestureType gestureType = GestureType.None)
+    
+    public void TakeDamage(bool shouldPlayHitReaction, GestureType gestureType, Vector3 damageOrigin)
     {
         if (currentState == rollState) return;
         
@@ -211,20 +211,7 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
             hitAnimationQueue.CapacitySafeEnqueue(true, hitAnimationQueueInitialCapacity);
         }
     }
-    */
-    public void TakeDamage(bool shouldPlayHitReaction = false, GestureType gestureType = GestureType.None)
-    {
-        if (currentState == rollState) return;
-        
-        if (currentState != hitState)
-        {
-            ChangeState(hitState);
-        }
-        else
-        {
-            hitAnimationQueue.CapacitySafeEnqueue(true, hitAnimationQueueInitialCapacity);
-        }
-    }
+    
 
     public void IncreaseComboCounter() => comboCounter++;
     
