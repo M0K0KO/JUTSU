@@ -39,10 +39,11 @@ Material:
     m_Ints: []
     m_Floats:
     - _Alpha: 0.6
+    - _Intensity: 10.5
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
-    - _EmissionColor: {r: 766.99615, g: 113.361, b: 113.361, a: 1}
+    - _EmissionColor: {r: 1084.6963, g: 160.31667, b: 160.31667, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &1489479893725399859

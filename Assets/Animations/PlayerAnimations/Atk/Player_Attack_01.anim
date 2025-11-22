@@ -44521,7 +44521,7 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0.2
-    functionName: IncreaseComboCounter
+    functionName: AttackImpulse
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
@@ -44535,13 +44535,41 @@ AnimationClip:
     intParameter: 0
     messageOptions: 0
   - time: 0.2
-    functionName: AttackImpulse
+    functionName: IncreaseComboCounter
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 0.2
+    functionName: PlayShootSFX
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.2
+    functionName: SpawnBulletTrail
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.46666667
+    functionName: PlayShootSFX
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.46666667
+    functionName: AttackImpulse
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.46666667
     functionName: SpawnBulletTrail
     data: 
     objectReferenceParameter: {fileID: 0}
@@ -44556,21 +44584,7 @@ AnimationClip:
     intParameter: 0
     messageOptions: 0
   - time: 0.46666667
-    functionName: AttackImpulse
-    data: 
-    objectReferenceParameter: {fileID: 0}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
-  - time: 0.46666667
     functionName: PlayMuzzleFlash
-    data: 
-    objectReferenceParameter: {fileID: 0}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
-  - time: 0.46666667
-    functionName: SpawnBulletTrail
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

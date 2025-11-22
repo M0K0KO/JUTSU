@@ -9,6 +9,7 @@ public class PlayerManager : MonoBehaviour
     public PlayerAnimationController animController { get; private set; }
     public PlayerJutsuManager jutsu { get; private set; }
     public PlayerVFXManager vfxManager { get; private set; }
+    public BaseAudioSourceHolder audioSourceHolder { get; private set; }
     public PlayerCameraImpulseManager impulseManager { get; private set; }
 
     public Animator animator { get; private set; }
@@ -23,6 +24,7 @@ public class PlayerManager : MonoBehaviour
         animController = GetComponent<PlayerAnimationController>();
         jutsu = GetComponent<PlayerJutsuManager>();
         vfxManager = GetComponent<PlayerVFXManager>();
+        audioSourceHolder = GetComponentInChildren<BaseAudioSourceHolder>();
         impulseManager = GetComponent<PlayerCameraImpulseManager>();
         
         animator = GetComponent<Animator>();

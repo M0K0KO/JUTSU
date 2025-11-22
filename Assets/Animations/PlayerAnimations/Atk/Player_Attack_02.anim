@@ -64933,6 +64933,13 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0.33333334
+    functionName: PlayShootSFX
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.33333334
     functionName: IncreaseComboCounter
     data: 
     objectReferenceParameter: {fileID: 0}
@@ -64940,14 +64947,14 @@ AnimationClip:
     intParameter: 0
     messageOptions: 0
   - time: 0.33333334
-    functionName: SpawnBulletTrail
+    functionName: AttackImpulse
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 0.33333334
-    functionName: AttackImpulse
+    functionName: SpawnBulletTrail
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
