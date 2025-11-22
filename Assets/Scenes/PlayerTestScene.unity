@@ -2656,7 +2656,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 1
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -3473,6 +3473,7 @@ GameObject:
   - component: {fileID: 1950098841}
   - component: {fileID: 1950098840}
   - component: {fileID: 1950098842}
+  - component: {fileID: 1950098843}
   m_Layer: 0
   m_Name: PlayerCamera_Strafe
   m_TagString: Untagged
@@ -3637,6 +3638,23 @@ MonoBehaviour:
     NearLimit: 5
     FarLimit: 30
     MaxQualityBoost: 0.2
+--- !u!114 &1950098843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1950098837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68bb026fafb42b14791938953eaace77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineBasicMultiChannelPerlin
+  NoiseProfile: {fileID: 0}
+  PivotOffset: {x: 0, y: 0, z: 0}
+  AmplitudeGain: 1
+  FrequencyGain: 1
+  m_NoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!4 &57572877293930739
 Transform:
   m_ObjectHideFlags: 0
@@ -6353,7 +6371,7 @@ MonoBehaviour:
   dissolveMaterial: {fileID: 2100000, guid: 296cd90ff46bfe6439f7655156654a68, type: 2}
   intersectionSphereTransform: {fileID: 1876509574}
   muryokushoSequenceData: {fileID: 11400000, guid: c6642009f11edcb40bc381dfb4466b33, type: 2}
-  AkaObject: {fileID: 6974980043953679038, guid: d83e61e0554d44646ac4879765cf95b5, type: 3}
+  AkaObject: {fileID: 227457151536437502, guid: 0872c3f12df654d4fa1ff31c18af42a5, type: 3}
   akaSequenceData: {fileID: 11400000, guid: 6127c7d690a94f24cac8d2004f8770fa, type: 2}
   konWolfInstance: {fileID: 858698618}
   konWolfAnimator: {fileID: 858698619}
