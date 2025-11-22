@@ -29,6 +29,7 @@ public class PlayerJutsuManager : MonoBehaviour
     [Header("Muryokusho")]
     [SerializeField]
     private Material bloomQuadMaterial;
+
     [SerializeField] private Material dissolveMaterial;
     [SerializeField] private Transform intersectionSphereTransform;
     [SerializeField] private MuryokushoSequenceData muryokushoSequenceData;
@@ -99,8 +100,6 @@ public class PlayerJutsuManager : MonoBehaviour
         CancellationTokenSource cts = new CancellationTokenSource();
         var mic = VoiceRecognitionManager.instance.microphoneRecord;
 
-        Stopwatch sequenceSw = new Stopwatch();
-
         Debug.Log("Jutsu Mode: Started. Waiting for gesture...");
 
         try
@@ -124,8 +123,13 @@ public class PlayerJutsuManager : MonoBehaviour
 
                 if (!jutsuGestureTrigger)
                 {
+                    gestureQueue.CapacitySafeEnqueue(HandWorldLandmarkVisualizer.instance.currentGesture,
+                        gestureQueueCapacity);
+                    
                     detectedGesture = HandWorldLandmarkVisualizer.instance.currentGesture;
-                    if (detectedGesture != GestureType.None && jutsuDict.ContainsKey(detectedGesture))
+                    if (detectedGesture != GestureType.None && 
+                        jutsuDict.ContainsKey(detectedGesture) && 
+                        gestureQueue.GetCount(detectedGesture) == gestureQueueCapacity)
                     {
                         jutsu = GetJutsu(detectedGesture);
                         expectedVoiceCommand = GetJutsuVoiceCommand(detectedGesture);
@@ -135,8 +139,7 @@ public class PlayerJutsuManager : MonoBehaviour
                         jutsuGestureTrigger = true;
                         Debug.Log(
                             $"[Phase 1] Gesture '{detectedGesture}' detected. Listening for '{expectedVoiceCommand}'...");
-                        
-                        sequenceSw.Start();
+
                         voiceTask = RecognizeVoiceAsync(cts.Token);
                     }
                 }
@@ -149,10 +152,11 @@ public class PlayerJutsuManager : MonoBehaviour
                             string voiceResult = voiceTask.Result;
                             Debug.Log($"[Phase 2] Voice task completed. Heard: '{voiceResult}'");
 
-                            if (voiceResult.Length != 0 && StringSimilarity.IsSimilar(voiceResult, expectedVoiceCommand))
+                            if (voiceResult.Length != 0 &&
+                                StringSimilarity.IsSimilar(voiceResult, expectedVoiceCommand))
                             {
                                 isTriggered = true;
-                                break; 
+                                break;
                             }
                             else
                             {
@@ -163,11 +167,11 @@ public class PlayerJutsuManager : MonoBehaviour
                         else if (voiceTask.Status == TaskStatus.Canceled || voiceTask.Status == TaskStatus.Faulted)
                         {
                             Debug.Log("[Phase 2] Voice task canceled or faulted. Retrying...");
-                            voiceTask = RecognizeVoiceAsync(cts.Token); 
+                            voiceTask = RecognizeVoiceAsync(cts.Token);
                             continue;
                         }
                     }
-
+                    
                     gestureQueue.CapacitySafeEnqueue(HandWorldLandmarkVisualizer.instance.currentGesture,
                         gestureQueueCapacity);
 
@@ -182,7 +186,7 @@ public class PlayerJutsuManager : MonoBehaviour
 
                 yield return null;
             }
-            
+
             if (!isTriggered && voiceTask != null && voiceTask.Status == TaskStatus.RanToCompletion)
             {
                 string voiceResult = voiceTask.Result;
@@ -201,7 +205,7 @@ public class PlayerJutsuManager : MonoBehaviour
             cts.Cancel();
             cts.Dispose();
 
-            if (HandWorldLandmarkVisualizer.instance != null && detectedGesture != GestureType.Aka)
+            if (detectedGesture != GestureType.Aka)
             {
                 Time.timeScale = 1f;
                 HandWorldLandmarkVisualizer.instance.DeactivateVisuals();
@@ -215,6 +219,10 @@ public class PlayerJutsuManager : MonoBehaviour
             }
             else
             {
+                PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Strafe,
+                    player.stateMachine.currentTargetHitTarget.transform);
+                Time.timeScale = 1f;
+                HandWorldLandmarkVisualizer.instance.DeactivateVisuals();
                 Debug.Log("Jutsu Sequence Ended (Timeout or Failed)");
             }
 
@@ -301,7 +309,7 @@ public class PlayerJutsuManager : MonoBehaviour
             }
         }
     }
-    
+
     private Action GetJutsu(GestureType gestureType)
     {
         switch (gestureType)
@@ -322,6 +330,7 @@ public class PlayerJutsuManager : MonoBehaviour
 
     private string GetJutsuVoiceCommand(GestureType gestureType) => jutsuDict[gestureType].targetCommand;
 
+    
     private void Kon()
     {
         Debug.Log("KON has been called");
@@ -385,6 +394,7 @@ public class PlayerJutsuManager : MonoBehaviour
     }
 
 
+    
     private void Muryokusho()
     {
         Debug.Log("MURYOKUSHO has been called");
@@ -396,7 +406,7 @@ public class PlayerJutsuManager : MonoBehaviour
     private IEnumerator MuryokushoSequence()
     {
         EventManager.TriggerOnMuryokushoStart();
-        
+
         bool isSkyboxChanged = false;
 
         float elapsedTime = 0f;
@@ -452,14 +462,10 @@ public class PlayerJutsuManager : MonoBehaviour
         dissolveMaterial.SetFloat("_Cutoff_Height", muryokushoSequenceData.minCutoffHeight);
         intersectionSphereTransform.localScale = Vector3.zero;
 
-        
-        
 
         yield return new WaitForSeconds(muryokushoSequenceData.muryokushoDuration);
-        
-        
-        
-        
+
+
         elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.quadBloomDuration)
         {
@@ -476,7 +482,7 @@ public class PlayerJutsuManager : MonoBehaviour
 
             yield return null;
         }
-        
+
         elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.dissolveDuration)
         {
@@ -489,11 +495,12 @@ public class PlayerJutsuManager : MonoBehaviour
 
             yield return null;
         }
-        
+
         EventManager.TriggerOnMuryokushoEnd();
     }
 
 
+    
     private void Aka()
     {
         Debug.Log("AKA has been called");
