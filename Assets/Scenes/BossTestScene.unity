@@ -2356,6 +2356,11 @@ MonoBehaviour:
   landmarkPrefab: {fileID: 7474478527993108329, guid: 78ad5c26a6db4954995d0dad794a9a72, type: 3}
   connectionVisualPrefab: {fileID: 5678733891094599766, guid: 3d04744353f474744867a5e543c3c3c1, type: 3}
   landmarkScale: 10
+  landmarkMaterial: {fileID: 0}
+  connectionMaterial: {fileID: 0}
+  originalIntensity: 1
+  maxIntensity: 10
+  glowDuration: 1.5
   visualsPositionSmoothTime: 20
   rootPositionSmoothTime: 20
   minUnityX: -2
