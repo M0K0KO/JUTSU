@@ -18,6 +18,7 @@ public class MoumeeMenuButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
     private void Awake()
     {
         _audioSource = GetComponent<AudioSource>();
+        _audioSource.ignoreListenerPause = true;
         
         _buttonBackground = GetComponent<Image>();
         _buttonBackground.fillAmount = 0;
@@ -29,16 +30,16 @@ public class MoumeeMenuButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
     public void OnPointerEnter(PointerEventData eventData)
     {
         _audioSource.PlayOneShot(hoverSound);
-        _buttonText.DOColor(Color.black, 0.1f).SetEase(Ease.OutCubic);
-        _buttonBackground.DOFillAmount(1f, 0.15f).SetEase(Ease.OutCubic);
+        _buttonText.DOColor(Color.black, 0.1f).SetEase(Ease.OutCubic).SetUpdate(true);
+        _buttonBackground.DOFillAmount(1f, 0.15f).SetEase(Ease.OutCubic).SetUpdate(true);
 
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         // _audioSource.PlayOneShot(hoverSound);
-        _buttonText.DOColor(Color.white, 0.1f).SetEase(Ease.InCubic);
-        _buttonBackground.DOFillAmount(0f, 0.15f).SetEase(Ease.InCubic);
+        _buttonText.DOColor(Color.white, 0.1f).SetEase(Ease.InCubic).SetUpdate(true);
+        _buttonBackground.DOFillAmount(0f, 0.15f).SetEase(Ease.InCubic).SetUpdate(true);
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -47,7 +48,7 @@ public class MoumeeMenuButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
         // _buttonBackground.fillAmount = 1f;
         Color clickedColor = Color.gray;
 
-        Sequence clickSeq = DOTween.Sequence();
+        Sequence clickSeq = DOTween.Sequence().SetUpdate(true);
         clickSeq.Append(_buttonBackground.rectTransform.DOScale(0.95f, 0.05f).SetEase(Ease.OutCubic))
             .Join(_buttonBackground.DOColor(clickedColor, 0.05f).SetEase(Ease.OutCubic))
             .AppendInterval(0.05f)

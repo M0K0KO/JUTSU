@@ -12,7 +12,6 @@ public class BossManager : MonoBehaviour, IDamageable
     [SerializeField] private GameObject shockwaveSphere;
     [Header("Impulse Sources")]
     public CinemachineImpulseSource shockWaveImpulseSource;
-    public CinemachineImpulseSource akaPushImpulseSource;
     public CinemachineImpulseSource akaWallEndImpulseSource;
     public CinemachineImpulseSource akaNormalEndImpulseSource;
     public CinemachineImpulseSource konHitImpulseSource;
@@ -114,12 +113,12 @@ public class BossManager : MonoBehaviour, IDamageable
             case GestureType.Aka:
             {
                 AkaHitCount++;
-                IsKonJutsuActive = true;
                 break;
             }
             case GestureType.Kon:
             {
                 KonHitCount++;
+                IsKonJutsuActive = true;
                 break;
             }
             case GestureType.Muryokusho:
@@ -139,7 +138,7 @@ public class BossManager : MonoBehaviour, IDamageable
     {
         StateMachine.AkaInitialDirection = initialDirection;
         StateMachine.AkaDuration = duration;
-        StateMachine.AkaSpeed = projectileSpeed * 3f;
+        StateMachine.AkaSpeed = projectileSpeed * 2f;
         StateMachine.ChangeState(StateMachine.AkaHitState);
     }
 

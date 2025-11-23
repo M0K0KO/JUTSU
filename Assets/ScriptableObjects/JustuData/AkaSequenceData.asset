@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AkaSequenceData
   waitDuration: 3
   pushDuration: 2
-  akaLerpSpeed: 3
-  akaSpeed: 20
+  akaLerpSpeed: 4
+  akaSpeed: 30

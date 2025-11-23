@@ -1,6 +1,8 @@
 using UnityEditor;
 using UnityEngine;
 
+#if UNITY_EDITOR
+
 namespace Voo.ShowRoom
 {
     [CustomEditor(typeof(ShowRoom))]
@@ -48,3 +50,5 @@ namespace Voo.ShowRoom
         }
     }
 }
+
+#endif

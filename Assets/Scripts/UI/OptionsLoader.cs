@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class OptionsLoader : MonoBehaviour
 {
-    private void Awake()
+    private void Start()
     {
         var optionController = FindFirstObjectByType<OptionsPanelController>(FindObjectsInactive.Include);
         if (optionController != null)
