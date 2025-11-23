@@ -13,11 +13,14 @@ public class MainMenuController : MonoBehaviour
 
     private void Awake()
     {
+        Time.timeScale = 1f;
+        AudioListener.pause = false;
+        
         _mainMenuMusicSource = GetComponent<AudioSource>();
         _mainMenuMusicSource.volume = 0f;
         _mainMenuMusicSource.loop = true;
         _mainMenuMusicSource.playOnAwake = true;
-        _mainMenuMusicSource.DOFade(1f, 1f);
+        _mainMenuMusicSource.DOFade(1f, 1f).SetUpdate(true);
 
         fadeImage.color = new Color(0f, 0f, 0f, 0f);
         fadeImage.enabled = false;
@@ -27,12 +30,12 @@ public class MainMenuController : MonoBehaviour
 
     public void StartGame()
     {
-        _mainMenuMusicSource.DOFade(0f, 0.3f).OnComplete((() => _mainMenuMusicSource.Stop()));
+        _mainMenuMusicSource.DOFade(0f, 0.3f).OnComplete((() => _mainMenuMusicSource.Stop())).SetUpdate(true);
         fadeImage.enabled = true;
         fadeImage.DOFade(1f, 0.5f).OnComplete((() =>
         {
-            SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
-        }));
+            SceneManager.LoadSceneAsync("Main Combat Scene", LoadSceneMode.Single);
+        })).SetUpdate(true);
 
     }
 
@@ -43,7 +46,7 @@ public class MainMenuController : MonoBehaviour
 
     public void ExitGame()
     {
-        _mainMenuMusicSource.DOFade(0f, 0.3f).OnComplete((() => _mainMenuMusicSource.Stop()));
+        _mainMenuMusicSource.DOFade(0f, 0.3f).OnComplete((() => _mainMenuMusicSource.Stop())).SetUpdate(true);
         fadeImage.enabled = true;
         fadeImage.DOFade(1f, 0.5f).OnComplete((() =>
         {
@@ -52,7 +55,7 @@ public class MainMenuController : MonoBehaviour
 #else
         Application.Quit();
 #endif
-        }));
+        })).SetUpdate(true);
 
     }
 }

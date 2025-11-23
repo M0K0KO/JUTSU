@@ -28,11 +28,11 @@ public class OptionsPanelController : MonoBehaviour
     private Resolution[] _resolutions;
     private int _currentResolutionIndex = 0;
 
+    public static float GetMouseSensitivity() => PlayerPrefs.GetFloat(MouseSensitivityKey, 1f);
+
     public void LoadSavedOptions()
     {
         Screen.fullScreenMode = (FullScreenMode)PlayerPrefs.GetInt(WindowModeKey, (int)Screen.fullScreenMode);
-        
-        // TODO: Handle Mouse Sensitivity
         
         float master = Mathf.Log10(Mathf.Max(PlayerPrefs.GetFloat(MasterVolumeKey, 0.5f), 0.0001f)) * 20f;
         float bgm = Mathf.Log10(Mathf.Max(PlayerPrefs.GetFloat(BgmVolumeKey, 0.5f), 0.0001f)) * 20f;
@@ -41,6 +41,10 @@ public class OptionsPanelController : MonoBehaviour
         audioMixer.SetFloat("Master", master);
         audioMixer.SetFloat("BGM", bgm);
         audioMixer.SetFloat("SFX", sfx);
+
+        masterVolumeSlider.SetValueWithoutNotify(master);
+        bgmVolumeSlider.SetValueWithoutNotify(bgm);
+        sfxVolumeSlider.SetValueWithoutNotify(sfx);
     }
     
     private void Awake()
@@ -54,7 +58,7 @@ public class OptionsPanelController : MonoBehaviour
         
         windowModeDropdown.value = PlayerPrefs.GetInt(WindowModeKey, (int)Screen.fullScreenMode);
         resolutionDropdown.value = _currentResolutionIndex;
-        mouseSensitivitySlider.value = PlayerPrefs.GetFloat(MouseSensitivityKey, 0.5f);
+        mouseSensitivitySlider.value = PlayerPrefs.GetFloat(MouseSensitivityKey, 1f);
         masterVolumeSlider.value = PlayerPrefs.GetFloat(MasterVolumeKey, 0.5f);
         bgmVolumeSlider.value = PlayerPrefs.GetFloat(BgmVolumeKey, 0.5f);
         sfxVolumeSlider.value = PlayerPrefs.GetFloat(SfxVolumeKey, 0.5f);
@@ -91,7 +95,7 @@ public class OptionsPanelController : MonoBehaviour
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
 
-        Sequence seq = DOTween.Sequence();
+        Sequence seq = DOTween.Sequence().SetUpdate(true);
         seq.Append(_canvasGroup.DOFade(1f, 0.2f).SetEase(Ease.OutCubic));
         seq.Join(transform.DOScale(1f, 0.2f).SetEase(Ease.OutCubic));
         seq.OnComplete(() =>
@@ -106,7 +110,7 @@ public class OptionsPanelController : MonoBehaviour
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
 
-        Sequence seq = DOTween.Sequence();
+        Sequence seq = DOTween.Sequence().SetUpdate(true);
         seq.Append(_canvasGroup.DOFade(0f, 0.2f).SetEase(Ease.OutCubic));
         seq.Join(transform.DOScale(0.9f, 0.2f).SetEase(Ease.OutCubic));
         seq.OnComplete(() => gameObject.SetActive(false));
@@ -122,14 +126,27 @@ public class OptionsPanelController : MonoBehaviour
         resolutionDropdown.ClearOptions();
 
         List<string> resolutionStrings = new List<string>();
+        
+        int currentResolutionIndex = 0;
 
-        foreach (Resolution resolution in _resolutions)
+        for (int i = 0; i < _resolutions.Length; i++)
         {
-            string resolutionString = $"{resolution.width} x {resolution.height} ({resolution.refreshRateRatio})";
-            resolutionStrings.Add(resolutionString); 
+            string resolutionString =
+                $"{_resolutions[i].width} x {_resolutions[i].height} ({_resolutions[i].refreshRateRatio})";
+            resolutionStrings.Add(resolutionString);
+
+            if (_resolutions[i].width == Screen.width &&
+                _resolutions[i].height == Screen.height)
+            {
+                currentResolutionIndex = i;
+            }
         }
         
         resolutionDropdown.AddOptions(resolutionStrings);
+
+        _currentResolutionIndex = currentResolutionIndex;
+        resolutionDropdown.value = _currentResolutionIndex;
+        resolutionDropdown.RefreshShownValue();
     }
     
     private void OnWindowModeDropdownValueChanged(int value)
@@ -144,7 +161,7 @@ public class OptionsPanelController : MonoBehaviour
     {
         resolutionDropdown.value = value;
 
-        Resolution savedResolution = Screen.resolutions[value];
+        Resolution savedResolution = _resolutions[value];
         Screen.SetResolution(savedResolution.width, savedResolution.height, Screen.fullScreenMode,
             savedResolution.refreshRateRatio);
     }

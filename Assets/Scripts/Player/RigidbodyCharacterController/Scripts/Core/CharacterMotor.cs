@@ -81,8 +81,10 @@ public class CharacterMotor : MonoBehaviour
 
 
     private void Update()
-    {
+    { 
+#if UNITY_EDITOR
         CheckLog();
+#endif
     }
 
     private void FixedUpdate()

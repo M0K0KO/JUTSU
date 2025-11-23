@@ -17,6 +17,7 @@ public class MoumeeCloseButton : MonoBehaviour, IPointerEnterHandler, IPointerEx
     private void Awake()
     {
         _audioSource = GetComponent<AudioSource>();
+        _audioSource.ignoreListenerPause = true;
         _buttonBackground = GetComponent<Image>();
     }
 
@@ -30,22 +31,22 @@ public class MoumeeCloseButton : MonoBehaviour, IPointerEnterHandler, IPointerEx
     public void OnPointerEnter(PointerEventData eventData)
     {
         _audioSource.PlayOneShot(hoverSound);
-        _buttonCross.DOColor(Color.black, 0.1f).SetEase(Ease.OutCubic);
-        _buttonBackground.DOFade(1, 0.15f).SetEase(Ease.OutCubic);
+        _buttonCross.DOColor(Color.black, 0.1f).SetEase(Ease.OutCubic).SetUpdate(true);
+        _buttonBackground.DOFade(1, 0.15f).SetEase(Ease.OutCubic).SetUpdate(true);
         
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        _buttonCross.DOColor(Color.white, 0.1f).SetEase(Ease.InCubic);
-        _buttonBackground.DOFade(0, 0.15f).SetEase(Ease.InCubic);
+        _buttonCross.DOColor(Color.white, 0.1f).SetEase(Ease.InCubic).SetUpdate(true);
+        _buttonBackground.DOFade(0, 0.15f).SetEase(Ease.InCubic).SetUpdate(true);
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         _audioSource.PlayOneShot(clickSound);
 
-        Sequence clickSeq = DOTween.Sequence();
+        Sequence clickSeq = DOTween.Sequence().SetUpdate(true);
         clickSeq.Append(transform.DOScale(0.9f, 0.08f).SetEase(Ease.OutQuad));
         clickSeq.Join(_buttonCross.DOColor(Color.gray, 0.08f));
         clickSeq.Append(transform.DOScale(1f, 0.15f).SetEase(Ease.OutBack));

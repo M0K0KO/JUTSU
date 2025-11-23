@@ -23,6 +23,7 @@ public class PlayerInput : MonoBehaviour
     private InputAction _lockOn;
     private InputAction _jutsu;
 
+    private InputAction _pause;
     
     #region Built-In Functions
     private void Awake()
@@ -38,6 +39,8 @@ public class PlayerInput : MonoBehaviour
         _attack = _playerInputActions.Action.Shoot;
         _lockOn = _playerInputActions.Camera.LockOn;
         _jutsu = _playerInputActions.Action.Jutsu;
+        
+        _pause = _playerInputActions.UI.Pause;
     }
 
     private void OnEnable()
@@ -60,6 +63,11 @@ public class PlayerInput : MonoBehaviour
         _attack.performed += OnAttack;
 
         _jutsu.performed += OnJutsu;
+
+        _pause.performed += OnPause;
+
+        PauseMenuController.Instance.OnGamePaused += OnGamePaused;
+        PauseMenuController.Instance.OnGameResumed += OnGameResumed;
     }
 
     private void OnDisable()
@@ -82,6 +90,11 @@ public class PlayerInput : MonoBehaviour
         _attack.performed -= OnAttack;
 
         _jutsu.performed -= OnJutsu;
+
+        _pause.performed -= OnPause;
+
+        PauseMenuController.Instance.OnGamePaused -= OnGamePaused;
+        PauseMenuController.Instance.OnGameResumed -= OnGameResumed;
     }
 
     private void OnDestroy()
@@ -126,6 +139,12 @@ public class PlayerInput : MonoBehaviour
         if (player.jutsu.isInMuryokusho) return;
         JutsuInput = true;
     }
+
+    private void OnPause(InputAction.CallbackContext context)
+    {
+        PauseMenuController.Instance.OnPauseInputReceived();
+    }
+    
     #endregion
     
     #region ClearInput
@@ -133,5 +152,23 @@ public class PlayerInput : MonoBehaviour
     public void ClearAttackInput() => AttackInput = false;
     public void ClearLockOnInput() => LockOnInput = false;
     public void ClearJutsuInput() => JutsuInput = false;
+    #endregion
+
+    #region Pause Event Call-Back Functions
+
+    private void OnGamePaused()
+    {
+        _playerInputActions.Move.Disable();
+        _playerInputActions.Action.Disable();
+        _playerInputActions.Camera.Disable();
+    }
+
+    private void OnGameResumed()
+    {
+        _playerInputActions.Move.Enable();
+        _playerInputActions.Action.Enable();
+        _playerInputActions.Camera.Enable();
+    }
+
     #endregion
 }

@@ -9,8 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: bf205ef281cab5240afbf116c227fd47
   - enabled: 1
-    path: Assets/Scenes/TestScenes/DummyScene.unity
-    guid: de8abf45e422af44d98093c415ed62e2
+    path: Assets/Scenes/Main Combat Scene.unity
+    guid: a810bb91066083e41945411fc1c18c9e
   m_configObjects:
-    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 45781d063aae7a04582cf945d3dc178d, type: 3}
   m_UseUCBPForAssetBundles: 0

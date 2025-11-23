@@ -7,6 +7,7 @@ public class MusicController : MonoBehaviour
 {
     [SerializeField] private AudioClip musicClip;
     
+    public AudioSource MusicAudioSource => _musicAudioSource;
     private AudioSource _musicAudioSource;
     [SerializeField] private AudioMixer audioMixer;
     

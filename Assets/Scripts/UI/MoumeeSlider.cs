@@ -15,6 +15,7 @@ public class MoumeeSlider : MonoBehaviour, IPointerEnterHandler
     private void Awake()
     {
         _audioSource = GetComponent<AudioSource>();
+        _audioSource.ignoreListenerPause = true;
         _slider = GetComponent<Slider>();
         _sliderValueText = GetComponentInChildren<TMP_Text>();
         

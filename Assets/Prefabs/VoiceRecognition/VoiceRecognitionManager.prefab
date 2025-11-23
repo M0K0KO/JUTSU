@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VoiceRecognitionManager
   microphoneRecord: {fileID: 334764981372165316}
-  whipserManager: {fileID: 7268904971573669472}
+  whisperManager: {fileID: 7268904971573669472}
 --- !u!114 &334764981372165316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -72,9 +72,9 @@ MonoBehaviour:
   vadThd: 1
   vadFreqThd: 100
   vadIndicatorImage: {fileID: 0}
-  vadStop: 0
+  vadStop: 1
   dropVadPart: 1
-  vadStopTime: 1
+  vadStopTime: 0.5
   microphoneDropdown: {fileID: 0}
   microphoneDefaultLabel: Default microphone
 --- !u!114 &7268904971573669472
@@ -101,7 +101,7 @@ MonoBehaviour:
   noContext: 1
   singleSegment: 1
   enableTokens: 0
-  initialPrompt: 'Skill Commands: "Kon"'
+  initialPrompt: 
   stepSec: 3
   keepSec: 0.2
   lengthSec: 10
