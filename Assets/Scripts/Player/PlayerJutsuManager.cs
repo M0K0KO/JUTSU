@@ -18,30 +18,32 @@ public class PlayerJutsuManager : MonoBehaviour
     private const string PlayerFeatureName = "Player";
     private ScriptableRendererFeature enemyFeature;
     private ScriptableRendererFeature playerFeature;
-    
+
 
     [Header("Sequence Settings")]
-    [SerializeField] private float sequenceMaxDuration;
+    [SerializeField]
+    private float sequenceMaxDuration;
 
     [SerializeField, Range(0.1f, 0.9f)] private float slowedTimeScale;
 
     [Header("Jutsu List")]
-    [SerializeField] private List<Jutsu> jutsuList;
+    [SerializeField]
+    private List<Jutsu> jutsuList;
 
     [Header("Muryokusho")]
-    [SerializeField] private Material bloomQuadMaterial;
+    [SerializeField]
+    private Material bloomQuadMaterial;
 
     [SerializeField] private Material dissolveMaterial;
     [SerializeField] private Transform intersectionSphereTransform;
     [SerializeField] private MuryokushoSequenceData muryokushoSequenceData;
 
-    [Header("Aka")] 
-    [SerializeField] private GameObject AkaObject;
+    [Header("Aka")] [SerializeField] private GameObject AkaObject;
     [SerializeField] private AkaSequenceData akaSequenceData;
     private Transform akaSpawnHandLandmark;
+    private Transform akaSpawnBaseHandLandmark;
 
-    [Header("Kon")] 
-    [SerializeField] private GameObject konWolfInstance;
+    [Header("Kon")] [SerializeField] private GameObject konWolfInstance;
     [SerializeField] private Animator konWolfAnimator;
     [SerializeField] private Material konWolfMaterial;
     [SerializeField] private KonSequenceData konSequenceData;
@@ -60,9 +62,9 @@ public class PlayerJutsuManager : MonoBehaviour
     {
         player = GetComponent<PlayerManager>();
         //VoiceRecognitionManager.instance.microphoneRecord.OnRecordStop += OnRecordStop;
-        
+
         konWolfAudioSourceHolder = konWolfInstance.GetComponentInChildren<BaseAudioSourceHolder>();
-        
+
         playerFeature = rendererData.rendererFeatures.Find(f => f.name == PlayerFeatureName);
         enemyFeature = rendererData.rendererFeatures.Find(f => f.name == EnemyFeatureName);
     }
@@ -91,9 +93,9 @@ public class PlayerJutsuManager : MonoBehaviour
     {
         isUsingJutsu = true;
         EventManager.TriggerOnJutsuModeEnter();
-        
+
         HandWorldLandmarkVisualizer.instance.ResetIntensity();
-        
+
         gestureQueue.Clear();
         ResetInitialPrompt();
 
@@ -140,10 +142,10 @@ public class PlayerJutsuManager : MonoBehaviour
                 {
                     gestureQueue.CapacitySafeEnqueue(HandWorldLandmarkVisualizer.instance.currentGesture,
                         gestureQueueCapacity);
-                    
+
                     detectedGesture = HandWorldLandmarkVisualizer.instance.currentGesture;
-                    if (detectedGesture != GestureType.None && 
-                        jutsuDict.ContainsKey(detectedGesture) && 
+                    if (detectedGesture != GestureType.None &&
+                        jutsuDict.ContainsKey(detectedGesture) &&
                         gestureQueue.GetCount(detectedGesture) == gestureQueueCapacity)
                     {
                         jutsu = GetJutsu(detectedGesture);
@@ -156,7 +158,7 @@ public class PlayerJutsuManager : MonoBehaviour
                             $"[Phase 1] Gesture '{detectedGesture}' detected. Listening for '{expectedVoiceCommand}'...");
 
                         StartCoroutine(HandWorldLandmarkVisualizer.instance.Glow());
-                        
+
                         UpdateInitialPrompt(expectedVoiceCommand);
                         voiceTask = RecognizeVoiceAsync(cts.Token);
                     }
@@ -189,7 +191,7 @@ public class PlayerJutsuManager : MonoBehaviour
                             continue;
                         }
                     }
-                    
+
                     gestureQueue.CapacitySafeEnqueue(HandWorldLandmarkVisualizer.instance.currentGesture,
                         gestureQueueCapacity);
 
@@ -247,7 +249,7 @@ public class PlayerJutsuManager : MonoBehaviour
 
             ResetInitialPrompt();
             gestureQueue.Clear();
-            
+
 
             isUsingJutsu = false;
             EventManager.TriggerOnJustuModeExit();
@@ -351,7 +353,7 @@ public class PlayerJutsuManager : MonoBehaviour
 
     private string GetJutsuVoiceCommand(GestureType gestureType) => jutsuDict[gestureType].targetCommand;
 
-    
+
     private void Kon()
     {
         Debug.Log("KON has been called");
@@ -386,7 +388,7 @@ public class PlayerJutsuManager : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         konWolfAudioSourceHolder.sfxDict["Emerge"].PlayAudioClip();
 
-        
+
         player.impulseManager.KonRumbleImpulse();
         yield return new WaitForSeconds(konSequenceData.rumbleDuration);
 
@@ -414,8 +416,8 @@ public class PlayerJutsuManager : MonoBehaviour
                 impact = true;
                 konWolfAudioSourceHolder.sfxDict["Impact"].PlayAudioClip();
             }
-            
-            
+
+
             if (stateInfo.normalizedTime > 0.5f && !cameraUpdated)
             {
                 cameraUpdated = true;
@@ -430,7 +432,6 @@ public class PlayerJutsuManager : MonoBehaviour
     }
 
 
-    
     private void Muryokusho()
     {
         Debug.Log("MURYOKUSHO has been called");
@@ -464,7 +465,7 @@ public class PlayerJutsuManager : MonoBehaviour
 
             yield return null;
         }
-        
+
         SetFeatureActive(false);
 
         elapsedTime = 0f;
@@ -507,7 +508,7 @@ public class PlayerJutsuManager : MonoBehaviour
 
 
         SetFeatureActive(true);
-        
+
         elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.quadBloomDuration)
         {
@@ -524,9 +525,9 @@ public class PlayerJutsuManager : MonoBehaviour
 
             yield return null;
         }
-        
+
         SetFeatureActive(false);
-        
+
         EventManager.TriggerOnMuryokushoEnd();
 
         elapsedTime = 0f;
@@ -546,7 +547,6 @@ public class PlayerJutsuManager : MonoBehaviour
     }
 
 
-    
     private void Aka()
     {
         Debug.Log("AKA has been called");
@@ -555,7 +555,7 @@ public class PlayerJutsuManager : MonoBehaviour
 
     private IEnumerator AkaSequence()
     {
-        Vector3 spawnPos = akaSpawnHandLandmark.position + Vector3.up * 0.3f;
+        Vector3 spawnPos = akaSpawnHandLandmark.position + (akaSpawnHandLandmark.position - akaSpawnBaseHandLandmark.position) * 1.5f;
 
         GameObject aka = Instantiate(AkaObject, spawnPos, Quaternion.identity);
         AkaManager akaManager = aka.GetComponent<AkaManager>();
@@ -564,10 +564,11 @@ public class PlayerJutsuManager : MonoBehaviour
         float elapsedTime = 0f;
         while (elapsedTime < akaSequenceData.waitDuration)
         {
-            if (!PauseMenuController.Instance.IsPaused)  elapsedTime += Time.unscaledDeltaTime;
+            if (!PauseMenuController.Instance.IsPaused) elapsedTime += Time.unscaledDeltaTime;
             aka.transform.position = Vector3.Lerp(aka.transform.position,
-                akaSpawnHandLandmark.position + Vector3.up * 0.3f,
-                akaSequenceData.akaLerpSpeed * Time.unscaledDeltaTime * (PauseMenuController.Instance.IsPaused ? 0f : 1f));
+                akaSpawnHandLandmark.position + (akaSpawnHandLandmark.position - akaSpawnBaseHandLandmark.position) * 1.5f,
+                akaSequenceData.akaLerpSpeed * Time.unscaledDeltaTime *
+                (PauseMenuController.Instance.IsPaused ? 0f : 1f));
             yield return null;
         }
 
@@ -584,7 +585,8 @@ public class PlayerJutsuManager : MonoBehaviour
             Vector3 direction = player.stateMachine.currentTargetHitTarget.position - aka.transform.position;
             direction.Normalize();
 
-            aka.transform.position += direction * (akaSequenceData.akaSpeed * Time.unscaledDeltaTime * (PauseMenuController.Instance.IsPaused ? 0f : 1f));
+            aka.transform.position += direction * (akaSequenceData.akaSpeed * Time.unscaledDeltaTime *
+                                                   (PauseMenuController.Instance.IsPaused ? 0f : 1f));
 
             if (akaManager.isHit)
             {
@@ -599,7 +601,8 @@ public class PlayerJutsuManager : MonoBehaviour
     }
 
     public void RegisterAkaSpawnPoint(Transform fingertip) => akaSpawnHandLandmark = fingertip;
-
+    
+    public void RegisterAkaSpawnPointBase(Transform fingertip) => akaSpawnBaseHandLandmark = fingertip;
 
 
     private void UpdateInitialPrompt(string expectedCommand)
