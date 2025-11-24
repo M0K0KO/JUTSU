@@ -14,10 +14,10 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
-  m_Fog: 0
-  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_Fog: 1
+  m_FogColor: {r: 0.1273683, g: 0.32184574, b: 0.35220122, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.01
+  m_FogDensity: 0.008
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 09f670150b6789e419c9a5c0cb7d4248, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -206,8 +206,8 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 1
-  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 1
+  m_Color: {r: 0.7012578, g: 0.9113238, b: 1, a: 1}
+  m_Intensity: 0.27
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -313,9 +313,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 325932212120927177, guid: 9649f2f7ef35e494c8e979bdded546bf, type: 3}
+      propertyPath: m_RayTraceProcedural
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2707645542021392572, guid: 9649f2f7ef35e494c8e979bdded546bf, type: 3}
       propertyPath: m_Name
       value: Arena (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5810445081928846193, guid: 9649f2f7ef35e494c8e979bdded546bf, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7803555106271875036, guid: 9649f2f7ef35e494c8e979bdded546bf, type: 3}
       propertyPath: m_LocalPosition.x
@@ -995,12 +1003,12 @@ MonoBehaviour:
   player: {fileID: 8359154950952063666}
   landmarkPrefab: {fileID: 7474478527993108329, guid: 78ad5c26a6db4954995d0dad794a9a72, type: 3}
   connectionVisualPrefab: {fileID: 5678733891094599766, guid: 3d04744353f474744867a5e543c3c3c1, type: 3}
-  landmarkScale: 10
+  landmarkScale: 8
   landmarkMaterial: {fileID: 2100000, guid: df1f4f7d31c4b7f46921fee8d5bad086, type: 2}
   connectionMaterial: {fileID: 2100000, guid: f6220e90ec4285e4eaa8e6eefee1166e, type: 2}
   originalIntensity: 0
-  maxIntensity: 10
-  glowDuration: 2.5
+  maxIntensity: 9
+  glowDuration: 2
   visualsPositionSmoothTime: 20
   rootPositionSmoothTime: 20
   minUnityX: -2
