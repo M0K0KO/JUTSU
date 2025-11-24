@@ -61,7 +61,7 @@ public class AkaManager : MonoBehaviour
         float elapsedTime = 0f;
         while (elapsedTime < 2f)
         {
-            elapsedTime += Time.unscaledDeltaTime;
+            elapsedTime += Time.unscaledDeltaTime * (PauseMenuController.Instance.IsPaused ? 0f : 1f);
             sphereMaterial.SetFloat("_Intensity", 
                 Mathf.Lerp(targetIntensity, originalIntensity, elapsedTime / 2f));
             yield return null;

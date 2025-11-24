@@ -6,22 +6,23 @@ public class Lunge : StateMachineBehaviour
     private PlayerManager player;
 
     [SerializeField] private AnimationCurve lungeCurve;
+    [SerializeField] private float moveAmount;
     [SerializeField] private bool isFront = false;
-    
+
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
-    //override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-    //
-    //}
+    override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        if (!player) player = animator.GetComponent<PlayerManager>();
+    }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (!player) player = animator.GetComponent<PlayerManager>();
-        
         float multiplier = isFront ? 1f : -1f;
+        float currentSpeed = lungeCurve.Evaluate(stateInfo.normalizedTime) * moveAmount;
+        Vector3 moveVector = player.transform.forward * currentSpeed * Time.deltaTime * multiplier;
         
-        player.cc.Move( multiplier * player.transform.forward * lungeCurve.Evaluate(stateInfo.normalizedTime));
+        player.cc.Move(moveVector);
     }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
