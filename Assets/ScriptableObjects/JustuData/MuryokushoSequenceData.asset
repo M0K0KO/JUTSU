@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80b2ee72d46235348b02fa3505ef1ef3, type: 3}
   m_Name: MuryokushoSequenceData
   m_EditorClassIdentifier: Assembly-CSharp::MuryokushoSequenceData
-  muryokushoDuration: 1
-  quadBloomDuration: 1.5
+  muryokushoDuration: 1.5
+  quadBloomDuration: 1
   quadBloomCurve:
     serializedVersion: 2
     m_Curve:
@@ -76,7 +76,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  intersectionDuration: 0.75
+  intersectionDuration: 0.5
   minIntersectionSphereScale: 0
   maxIntersectionSphereScale: 200
   intersectionSphereScaleCurve:
