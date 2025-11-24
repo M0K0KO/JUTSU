@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 665b7dfeba676f14b949fe41b7071dbc, type: 3}
   m_Name: AkaSequenceData
   m_EditorClassIdentifier: Assembly-CSharp::AkaSequenceData
-  waitDuration: 3
+  waitDuration: 3.5
   pushDuration: 2
   akaLerpSpeed: 6
   akaSpeed: 30

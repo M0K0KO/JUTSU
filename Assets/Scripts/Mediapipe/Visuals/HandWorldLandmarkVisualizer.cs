@@ -1,11 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using Mediapipe;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
-using Mediapipe.Tasks.Vision.HandLandmarker;
-using Unity.VisualScripting;
 using mptcc = Mediapipe.Tasks.Components.Containers;
 using UnityEngine;
 
@@ -113,6 +108,10 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
             if (i == 8)
             {
                 player.jutsu.RegisterAkaSpawnPoint(landmark.transform);
+            }
+            else if (i == 7)
+            {
+                player.jutsu.RegisterAkaSpawnPointBase(landmark.transform);
             }
 
             var connection = Instantiate(connectionVisualPrefab, transform);
