@@ -1132,6 +1132,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -39.086826
       objectReference: {fileID: 0}
+    - target: {fileID: 1748525481352302310, guid: b223abc4795ad9d45985d7e000e58100, type: 3}
+      propertyPath: m_UpdateMode
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1850567258417677600, guid: b223abc4795ad9d45985d7e000e58100, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -0.063095026
@@ -2086,6 +2090,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCameraStateHandler
   baseCamera: {fileID: 657828183}
+  inputAxisController: {fileID: 657828179}
   strafeCamera: {fileID: 1950098838}
   skillCamera: {fileID: 431764611}
 --- !u!114 &1052430468

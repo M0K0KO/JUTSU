@@ -121,7 +121,7 @@ public class PlayerJutsuManager : MonoBehaviour
         {
             while (elapsedTime < sequenceMaxDuration || (voiceTask != null && !voiceTask.IsCompleted))
             {
-                elapsedTime += Time.unscaledDeltaTime;
+                if (!PauseMenuController.Instance.IsPaused) elapsedTime += Time.unscaledDeltaTime;
 
                 if (elapsedTime >= sequenceMaxDuration && !stopRequested && voiceTask != null && !voiceTask.IsCompleted)
                 {
@@ -383,7 +383,7 @@ public class PlayerJutsuManager : MonoBehaviour
 
 
         konWolfAudioSourceHolder.sfxDict["Rumble"].PlayAudioClip();
-        yield return new WaitForSeconds(0.2f);         
+        yield return new WaitForSeconds(0.2f);
         konWolfAudioSourceHolder.sfxDict["Emerge"].PlayAudioClip();
 
         
@@ -395,7 +395,7 @@ public class PlayerJutsuManager : MonoBehaviour
         konWolfAnimator.SetFloat("AttackSpeed", animationSpeed);
         konWolfAnimator.Play("Attack8");
 
-        yield return null;
+        yield return new WaitForEndOfFrame();
 
         AnimatorStateInfo stateInfo = konWolfAnimator.GetCurrentAnimatorStateInfo(0);
 
@@ -418,7 +418,6 @@ public class PlayerJutsuManager : MonoBehaviour
             
             if (stateInfo.normalizedTime > 0.5f && !cameraUpdated)
             {
-                
                 cameraUpdated = true;
                 PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Strafe,
                     player.stateMachine.currentTargetHitTarget.transform);
@@ -451,7 +450,7 @@ public class PlayerJutsuManager : MonoBehaviour
         float elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.quadBloomDuration)
         {
-            elapsedTime += Time.unscaledDeltaTime;
+            if (!PauseMenuController.Instance.IsPaused) elapsedTime += Time.unscaledDeltaTime;
             float alphaValue =
                 muryokushoSequenceData.quadBloomCurve.Evaluate(elapsedTime / muryokushoSequenceData.quadBloomDuration);
             bloomQuadMaterial.SetFloat("_Alpha", alphaValue);
@@ -471,7 +470,7 @@ public class PlayerJutsuManager : MonoBehaviour
         elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.intersectionDuration)
         {
-            elapsedTime += Time.unscaledDeltaTime;
+            if (!PauseMenuController.Instance.IsPaused) elapsedTime += Time.unscaledDeltaTime;
 
             float curveValue =
                 muryokushoSequenceData.intersectionSphereScaleCurve.Evaluate(elapsedTime /
@@ -489,7 +488,7 @@ public class PlayerJutsuManager : MonoBehaviour
         elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.dissolveDuration)
         {
-            elapsedTime += Time.unscaledDeltaTime;
+            if (!PauseMenuController.Instance.IsPaused) elapsedTime += Time.unscaledDeltaTime;
 
             float curveValue = muryokushoSequenceData.cutoffCurve.Evaluate(
                 elapsedTime / muryokushoSequenceData.dissolveDuration);
@@ -512,7 +511,7 @@ public class PlayerJutsuManager : MonoBehaviour
         elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.quadBloomDuration)
         {
-            elapsedTime += Time.unscaledDeltaTime;
+            if (!PauseMenuController.Instance.IsPaused) elapsedTime += Time.unscaledDeltaTime;
             float alphaValue =
                 muryokushoSequenceData.quadBloomCurve.Evaluate(elapsedTime / muryokushoSequenceData.quadBloomDuration);
             bloomQuadMaterial.SetFloat("_Alpha", alphaValue);
@@ -533,7 +532,7 @@ public class PlayerJutsuManager : MonoBehaviour
         elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.dissolveDuration)
         {
-            elapsedTime += Time.unscaledDeltaTime;
+            if (!PauseMenuController.Instance.IsPaused) elapsedTime += Time.unscaledDeltaTime;
 
             float curveValue = muryokushoSequenceData.cutoffCurve.Evaluate(
                 elapsedTime / muryokushoSequenceData.dissolveDuration);
@@ -565,10 +564,10 @@ public class PlayerJutsuManager : MonoBehaviour
         float elapsedTime = 0f;
         while (elapsedTime < akaSequenceData.waitDuration)
         {
-            elapsedTime += Time.unscaledDeltaTime;
+            if (!PauseMenuController.Instance.IsPaused)  elapsedTime += Time.unscaledDeltaTime;
             aka.transform.position = Vector3.Lerp(aka.transform.position,
                 akaSpawnHandLandmark.position + Vector3.up * 0.3f,
-                akaSequenceData.akaLerpSpeed * Time.unscaledDeltaTime);
+                akaSequenceData.akaLerpSpeed * Time.unscaledDeltaTime * (PauseMenuController.Instance.IsPaused ? 0f : 1f));
             yield return null;
         }
 
@@ -585,7 +584,7 @@ public class PlayerJutsuManager : MonoBehaviour
             Vector3 direction = player.stateMachine.currentTargetHitTarget.position - aka.transform.position;
             direction.Normalize();
 
-            aka.transform.position += direction * (akaSequenceData.akaSpeed * Time.unscaledDeltaTime);
+            aka.transform.position += direction * (akaSequenceData.akaSpeed * Time.unscaledDeltaTime * (PauseMenuController.Instance.IsPaused ? 0f : 1f));
 
             if (akaManager.isHit)
             {

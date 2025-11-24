@@ -261,14 +261,14 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
         transform.localPosition = Vector3.Lerp(
             transform.localPosition,
             rootTargetPosition,
-            rootPositionSmoothTime * Time.unscaledDeltaTime);
+            rootPositionSmoothTime * Time.unscaledDeltaTime * (PauseMenuController.Instance.IsPaused ? 0f : 1f));
         
         for (int i = 0; i < _LandmarkCount; i++)
         {
             landmarkVisuals[i].transform.localPosition = Vector3.Lerp(
                 landmarkVisuals[i].transform.localPosition,
                 landmarkTargetPositions[i], 
-                visualsPositionSmoothTime * Time.unscaledDeltaTime);
+                visualsPositionSmoothTime * Time.unscaledDeltaTime * (PauseMenuController.Instance.IsPaused ? 0f : 1f));
         }
     }
 
@@ -287,7 +287,7 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
 
         while (elapsedTime < glowDuration)
         {
-            elapsedTime += Time.unscaledDeltaTime;
+            elapsedTime += Time.unscaledDeltaTime * (PauseMenuController.Instance.IsPaused ? 0f : 1f);
             
             float value = Mathf.Lerp(originalIntensity, maxIntensity,elapsedTime / glowDuration);
             

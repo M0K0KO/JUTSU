@@ -17,7 +17,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.09
+      value: 0.9
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -44,7 +44,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.6
-      value: -0.07
+      value: -0.7
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -65,13 +65,14 @@ MonoBehaviour:
       value: 0
       inSlope: 0
       outSlope: 0
-      tangentMode: 34
+      tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 0
+      outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  moveAmount: 4.5
   isFront: 0
 --- !u!1101 &-9017941497285364447
 AnimatorStateTransition:
@@ -800,7 +801,7 @@ AnimatorStateMachine:
     m_Position: {x: 240, y: -100, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -1913780168601952497}
-    m_Position: {x: 500, y: 340, z: 0}
+    m_Position: {x: 510, y: 340, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions:
   - {fileID: -2408893776835817536}
@@ -1231,7 +1232,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.15
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -1250,6 +1251,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  moveAmount: 7
   isFront: 0
 --- !u!114 &3327755641193836605
 MonoBehaviour:
@@ -1326,7 +1328,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.14749567
-      value: 0.07
+      value: 0.7
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -1353,7 +1355,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.48519218
-      value: 0.06
+      value: 0.6
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -1381,6 +1383,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  moveAmount: 2.5
   isFront: 1
 --- !u!1101 &5244988619803228478
 AnimatorStateTransition:

@@ -32,7 +32,7 @@ public class GlobalVolumeManager : MonoBehaviour
         vignette.intensity.value = Mathf.Lerp(
             vignette.intensity.value,
             targetVignetteIntensity,
-            vignetteSmoothSpeed * Time.unscaledDeltaTime);
+            vignetteSmoothSpeed * Time.unscaledDeltaTime * (PauseMenuController.Instance.IsPaused ? 0f : 1f));
     }
 
     private void OnEnable()
