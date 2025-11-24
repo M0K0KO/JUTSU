@@ -130,6 +130,8 @@ public class BossStateMachine : MonoBehaviour
         //         BossAnimator.speed = 1f;
         //     }
         // }
+
+        Debug.Log($"Current State: {CurrentState.GetType().Name}");
         
         if (!CanShockwaveAttack)
         {

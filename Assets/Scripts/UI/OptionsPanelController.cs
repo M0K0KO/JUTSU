@@ -121,7 +121,7 @@ public class OptionsPanelController : MonoBehaviour
         _resolutions = Screen.resolutions
             .OrderByDescending(r => r.width)
             .ThenByDescending(r => r.height)
-            .ThenByDescending(r => (float)r.refreshRateRatio.numerator / r.refreshRateRatio.denominator)
+            .ThenByDescending(r => r.refreshRateRatio.value)
             .ToArray();
         resolutionDropdown.ClearOptions();
 
@@ -132,11 +132,12 @@ public class OptionsPanelController : MonoBehaviour
         for (int i = 0; i < _resolutions.Length; i++)
         {
             string resolutionString =
-                $"{_resolutions[i].width} x {_resolutions[i].height} ({_resolutions[i].refreshRateRatio})";
+                $"{_resolutions[i].width} x {_resolutions[i].height} ({_resolutions[i].refreshRateRatio.value:F2}Hz)";
             resolutionStrings.Add(resolutionString);
 
             if (_resolutions[i].width == Screen.width &&
-                _resolutions[i].height == Screen.height)
+                _resolutions[i].height == Screen.height &&
+                Mathf.Approximately((float)_resolutions[i].refreshRateRatio.value, (float)Screen.currentResolution.refreshRateRatio.value))
             {
                 currentResolutionIndex = i;
             }

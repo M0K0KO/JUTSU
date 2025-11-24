@@ -97,6 +97,20 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
+      - time: 0.27329192
+        functionName: EnableWolfCollider
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 5ebebcb4ab3f3cd45bfc130d615e3b72, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.61490685
+        functionName: DisableWolfCollider
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 5ebebcb4ab3f3cd45bfc130d615e3b72, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}
