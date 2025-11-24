@@ -1,4 +1,5 @@
 using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 
 public class AkaManager : MonoBehaviour
@@ -61,7 +62,10 @@ public class AkaManager : MonoBehaviour
         float elapsedTime = 0f;
         while (elapsedTime < 2f)
         {
-            elapsedTime += Time.unscaledDeltaTime;
+            elapsedTime += Time.unscaledDeltaTime * (PauseMenuController.Instance.IsPaused ? 0f : 1f);
+            
+            akaVFX.transform.localScale = Vector3.one * Mathf.Lerp(0f, 1f, elapsedTime / 2f);
+            
             sphereMaterial.SetFloat("_Intensity", 
                 Mathf.Lerp(targetIntensity, originalIntensity, elapsedTime / 2f));
             yield return null;

@@ -18,7 +18,7 @@ public class PauseMenuController : MonoBehaviour
     
     private CanvasGroup _pauseMenuContainerCanvasGroup;
 
-    // private float _savedTimeScale = 1f;
+    private float _savedTimeScale = 1f;
 
     private void Awake()
     {
@@ -82,8 +82,8 @@ public class PauseMenuController : MonoBehaviour
 
         AudioListener.pause = true;
 
-        // _savedTimeScale = Time.timeScale;
-        // Time.timeScale = 0f;
+        _savedTimeScale = Time.timeScale;
+        Time.timeScale = 0f;
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -105,7 +105,7 @@ public class PauseMenuController : MonoBehaviour
 
         AudioListener.pause = false;
         
-        // Time.timeScale = _savedTimeScale;
+        Time.timeScale = _savedTimeScale;
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;

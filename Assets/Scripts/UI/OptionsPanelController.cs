@@ -171,6 +171,7 @@ public class OptionsPanelController : MonoBehaviour
     {
         mouseSensitivitySlider.value = value;
         PlayerPrefs.SetFloat(MouseSensitivityKey, value);
+        PlayerCameraStateHandler.instance.UpdateMouseSensitivity(value);
     }
     
     private void OnMasterVolumeSliderValueChanged(float value)

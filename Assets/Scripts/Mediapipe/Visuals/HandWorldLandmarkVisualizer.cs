@@ -1,11 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using Mediapipe;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
-using Mediapipe.Tasks.Vision.HandLandmarker;
-using Unity.VisualScripting;
 using mptcc = Mediapipe.Tasks.Components.Containers;
 using UnityEngine;
 
@@ -113,6 +108,10 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
             if (i == 8)
             {
                 player.jutsu.RegisterAkaSpawnPoint(landmark.transform);
+            }
+            else if (i == 7)
+            {
+                player.jutsu.RegisterAkaSpawnPointBase(landmark.transform);
             }
 
             var connection = Instantiate(connectionVisualPrefab, transform);
@@ -261,14 +260,14 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
         transform.localPosition = Vector3.Lerp(
             transform.localPosition,
             rootTargetPosition,
-            rootPositionSmoothTime * Time.unscaledDeltaTime);
+            rootPositionSmoothTime * Time.unscaledDeltaTime * (PauseMenuController.Instance.IsPaused ? 0f : 1f));
         
         for (int i = 0; i < _LandmarkCount; i++)
         {
             landmarkVisuals[i].transform.localPosition = Vector3.Lerp(
                 landmarkVisuals[i].transform.localPosition,
                 landmarkTargetPositions[i], 
-                visualsPositionSmoothTime * Time.unscaledDeltaTime);
+                visualsPositionSmoothTime * Time.unscaledDeltaTime * (PauseMenuController.Instance.IsPaused ? 0f : 1f));
         }
     }
 
@@ -287,7 +286,7 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
 
         while (elapsedTime < glowDuration)
         {
-            elapsedTime += Time.unscaledDeltaTime;
+            elapsedTime += Time.unscaledDeltaTime * (PauseMenuController.Instance.IsPaused ? 0f : 1f);
             
             float value = Mathf.Lerp(originalIntensity, maxIntensity,elapsedTime / glowDuration);
             

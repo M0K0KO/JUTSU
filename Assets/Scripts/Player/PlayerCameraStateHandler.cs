@@ -1,3 +1,4 @@
+using System;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -17,6 +18,7 @@ public class PlayerCameraStateHandler : MonoBehaviour
     private Animator animator;
     
     [SerializeField] private CinemachineCamera baseCamera;
+    [SerializeField] private CinemachineInputAxisController inputAxisController;
     [SerializeField] private CinemachineCamera strafeCamera;
     [SerializeField] private CinemachineCamera skillCamera;
 
@@ -29,7 +31,7 @@ public class PlayerCameraStateHandler : MonoBehaviour
         
         animator = GetComponent<Animator>();
     }
-
+    
     private void OnEnable()
     {
         EventManager.OnCameraStateChange += UpdateCameraState;
@@ -56,6 +58,14 @@ public class PlayerCameraStateHandler : MonoBehaviour
                 animator.Play("Skill");
                 skillCamera.LookAt = target;
                 break;
+        }
+    }
+
+    public void UpdateMouseSensitivity(float sensitivity)
+    {
+        foreach (var inputAxis in inputAxisController.Controllers)
+        {
+            inputAxis.Input.Gain = sensitivity * (inputAxis.Name == "Look Orbit Y" ? -1f : 1f);
         }
     }
 }

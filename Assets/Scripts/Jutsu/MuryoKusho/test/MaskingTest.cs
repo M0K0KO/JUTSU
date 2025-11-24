@@ -31,7 +31,7 @@ public class MaskingTest : MonoBehaviour
         float elapsedTime = 0f;
         while (elapsedTime < expansionDuration)
         {
-            elapsedTime += Time.unscaledDeltaTime;
+            elapsedTime += Time.unscaledDeltaTime * (PauseMenuController.Instance.IsPaused ? 0f : 1f);
             Vector3 smoothedScale = Vector3.Lerp(originalScale, targetScale, scaleCurve.Evaluate(elapsedTime / expansionDuration));
             transform.localScale = smoothedScale;
 
