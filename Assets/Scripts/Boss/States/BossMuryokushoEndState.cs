@@ -28,6 +28,15 @@ public class BossMuryokushoEndState : BossBaseState
 
     public override void OnEnter()
     {
+        if (_bossManager.ShouldTransitionToDeathState())
+        {
+            _animator.ResetTrigger(_attackTriggerId);
+            StateMachine.Manager.konHitImpulseSource.GenerateImpulse();
+            StateMachine.ChangeState(StateMachine.DeathState);
+            return;
+        }
+        
+        
         _agent.ResetPath();
 
         _animator.ResetTrigger(_attackTriggerId);

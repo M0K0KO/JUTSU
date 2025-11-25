@@ -6,13 +6,9 @@ using Whisper.Utils;
 public class MicrophoneDropdownInitializer : MonoBehaviour
 {
     [SerializeField] private Dropdown microphoneDropdown;
-    private void Awake()
+    private void Start()
     {
-        MicrophoneRecord microphoneRecord = FindFirstObjectByType<MicrophoneRecord>(FindObjectsInactive.Include);
-        if (microphoneRecord != null)
-        {
-            microphoneRecord.microphoneDropdown = this.microphoneDropdown;
-        }
+        VoiceRecognitionManager.instance.microphoneRecord.UpdateMicrophoneDropdown(microphoneDropdown);
     }
     
 
