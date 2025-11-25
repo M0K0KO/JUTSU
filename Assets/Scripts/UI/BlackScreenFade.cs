@@ -34,7 +34,7 @@ public class BlackScreenFade : MonoBehaviour
         _blackImage.enabled = true;
         _blackImage.DOFade(1f, duration).SetEase(Ease.OutSine).OnComplete(() =>
         {
-            _blackImage.enabled = false;
+            //_blackImage.enabled = false;
             onCompleteCallback?.Invoke();
         });
     }
