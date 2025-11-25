@@ -2,6 +2,7 @@ using System;
 using Unity.Cinemachine;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.SceneManagement;
 
 public class BossManager : MonoBehaviour, IDamageable
 {
@@ -23,7 +24,9 @@ public class BossManager : MonoBehaviour, IDamageable
 
     private bool _shockwaveHitPlayer = false;
     private float _shockwaveHitWidth = 0.5f;
-
+    
+    private BlackScreenFade _blackScreenFade;
+    
     public bool IsKonJutsuActive { get; private set; } = false;
 
     public int AkaHitCount { get; set; } = 0;
@@ -36,6 +39,8 @@ public class BossManager : MonoBehaviour, IDamageable
     private void Awake()
     {
         StateMachine = GetComponent<BossStateMachine>();
+        
+        _blackScreenFade = FindFirstObjectByType<BlackScreenFade>();
         
         SetPerlinNoiseAmplitude(0f);
         
@@ -129,9 +134,13 @@ public class BossManager : MonoBehaviour, IDamageable
         }
     }
 
-    public bool ShouldTransitionToQuickTimeEvent()
+    public bool ShouldTransitionToDeathState()
     {
-        return (AkaHitCount > 0 && KonHitCount > 0 && MuryokushoHitCount > 0);
+        bool allHitLeastOnce = (AkaHitCount >= 1 && KonHitCount >= 1 && MuryokushoHitCount >= 1);
+        
+        bool anyHitTwice = (AkaHitCount >= 2 || KonHitCount >= 2 || MuryokushoHitCount >= 2);
+        
+        return allHitLeastOnce && anyHitTwice;
     }
 
     private void OnAkaHit(Vector3 initialDirection, float duration, float projectileSpeed)
@@ -266,6 +275,18 @@ public class BossManager : MonoBehaviour, IDamageable
     public void DisableRightHandTrigger()
     {
         rightHand.HandCollider.enabled = false;
+    }
+
+    public void LoadExecutionScene()
+    {
+        MusicController musicController = FindFirstObjectByType<MusicController>();
+
+        musicController.MusicAudioSource.DOFade(0, 2f);
+        _blackScreenFade.FadeOut(2f, () =>
+        {
+            SceneManager.LoadSceneAsync("Boss Execution Scene", LoadSceneMode.Single);
+        });
+
     }
     
 }

@@ -8,6 +8,7 @@ public class BossKonHit : BossBaseState
     private Transform _bossTransform;
     private GameObject _player;
     private Rigidbody _rigidbody;
+    private BossManager _bossManager;
     
     private int _attackTriggerId = Animator.StringToHash("Attack");
     private int _hitTypeId = Animator.StringToHash("HitType");
@@ -20,11 +21,18 @@ public class BossKonHit : BossBaseState
         _bossTransform = stateMachine.BossTransform;
         _player = stateMachine.PlayerGameObject;
         _rigidbody = stateMachine.BossRigidbody;
+        _bossManager = stateMachine.Manager;
     }
 
     public override void OnEnter()
     {
-        
+        if (_bossManager.ShouldTransitionToDeathState())
+        {
+            _animator.ResetTrigger(_attackTriggerId);
+            StateMachine.Manager.konHitImpulseSource.GenerateImpulse();
+            StateMachine.ChangeState(StateMachine.DeathState);
+            return;
+        }
         _agent.ResetPath();
 
         _animator.ResetTrigger(_attackTriggerId);

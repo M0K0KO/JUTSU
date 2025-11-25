@@ -156,6 +156,20 @@ namespace Whisper.Utils
             UpdateChunks(micPos);
             UpdateVad(micPos);
         }
+
+        public void UpdateMicrophoneDropdown(Dropdown micDropdown)
+        {
+            microphoneDropdown = micDropdown;
+            if (microphoneDropdown == null) return;
+            
+            microphoneDropdown.options = AvailableMicDevices
+                .Prepend(microphoneDefaultLabel)
+                .Select(text => new Dropdown.OptionData(text))
+                .ToList();
+            microphoneDropdown.value = microphoneDropdown.options
+                .FindIndex(op => op.text == microphoneDefaultLabel);
+            microphoneDropdown.onValueChanged.AddListener(OnMicrophoneChanged);
+        }
         
         private void UpdateChunks(int micPos)
         {

@@ -40,6 +40,15 @@ public class BossAkaHitState : BossBaseState
 
     public override void OnEnter()
     {
+        if (_bossManager.ShouldTransitionToDeathState())
+        {
+            _animator.ResetTrigger(_attackTriggerId);
+            _bossManager.BossHitAkaManager.Explode();
+            StateMachine.Manager.akaNormalEndImpulseSource.GenerateImpulse();
+            StateMachine.ChangeState(StateMachine.DeathState);
+            return;
+        }
+        
         _playingEndAnimation = false;
         _enterTime = Time.time;
         _agent.ResetPath();
@@ -62,6 +71,8 @@ public class BossAkaHitState : BossBaseState
         _rigidbody.linearVelocity = _speed * _initialDirection;
         
         _bossManager.SetPerlinNoiseAmplitude(1.5f);
+
+        
         
     }
 
@@ -73,7 +84,7 @@ public class BossAkaHitState : BossBaseState
                 UnrealInterp.QInterpTo(_bossTransform.rotation, _targetRotation, Time.deltaTime, 10f);
         }
 
-        if (Time.time - _enterTime > _duration)
+        if (Time.time - _enterTime > _duration && !_bossManager.ShouldTransitionToDeathState())
         {
             if (!_playingEndAnimation)
             {
@@ -107,6 +118,8 @@ public class BossAkaHitState : BossBaseState
 
     public override void OnCollisionEnter(Collision collision)
     {
+        if (_bossManager.ShouldTransitionToDeathState()) return;
+        
         if (collision.gameObject.CompareTag("Wall") && !_playingEndAnimation)
         {
             _bossManager.SetPerlinNoiseAmplitude(0f);

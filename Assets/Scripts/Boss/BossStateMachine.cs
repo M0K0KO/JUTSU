@@ -45,6 +45,7 @@ public class BossStateMachine : MonoBehaviour
     public BossAkaHitState AkaHitState { get; private set; }
     public BossKonHit KonHitState { get; private set; }
     public BossMuryokushoEndState MuryokushoEndState { get; private set; }
+    public BossDeathState DeathState { get; private set; }
 
     public BossBaseState CurrentState { get; private set; }
 
@@ -88,6 +89,7 @@ public class BossStateMachine : MonoBehaviour
         AkaHitState = new BossAkaHitState(this);
         KonHitState = new BossKonHit(this);
         MuryokushoEndState = new BossMuryokushoEndState(this);
+        DeathState = new BossDeathState(this);
         
         
         CurrentState = IdleState;

@@ -1,4 +1,5 @@
 using System;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -15,7 +16,8 @@ public class GlobalVolumeManager : MonoBehaviour
     [SerializeField] private float jutsuModeVignetteIntensity = 0.35f;
     [SerializeField] private float vignetteSmoothSpeed = 3f;
     private float targetVignetteIntensity = 0.2f;
-
+    
+    private ChromaticAberration _chromaticAberration;
 
     private void Awake()
     {
@@ -25,6 +27,7 @@ public class GlobalVolumeManager : MonoBehaviour
         volume = GetComponent<Volume>();
 
         volume.profile.TryGet(out vignette);
+        volume.profile.TryGet(out _chromaticAberration);
     }
 
     private void Update()
@@ -52,4 +55,5 @@ public class GlobalVolumeManager : MonoBehaviour
         if (isJutsuMode) targetVignetteIntensity = jutsuModeVignetteIntensity;
         else targetVignetteIntensity = originalVignetteIntensity;
     }
+    
 }
