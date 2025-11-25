@@ -277,14 +277,14 @@ public class BossManager : MonoBehaviour, IDamageable
         rightHand.HandCollider.enabled = false;
     }
 
-    public void LoadExecutionScene()
+    public void LoadMainMenu()
     {
         MusicController musicController = FindFirstObjectByType<MusicController>();
 
         musicController.MusicAudioSource.DOFade(0, 2f);
         _blackScreenFade.FadeOut(2f, () =>
         {
-            SceneManager.LoadSceneAsync("Boss Execution Scene", LoadSceneMode.Single);
+            SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
         });
 
     }

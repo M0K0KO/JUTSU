@@ -27,10 +27,10 @@ public class BossDeathState : BossBaseState
 
     public override void OnUpdate()
     {
-        if (Time.time - _enterTime > 3f && !_loadingScene)
+        if (Time.time - _enterTime > 5f && !_loadingScene)
         {
             _loadingScene = true;
-            _manager.LoadExecutionScene();
+            _manager.LoadMainMenu();
         }
     }
 }

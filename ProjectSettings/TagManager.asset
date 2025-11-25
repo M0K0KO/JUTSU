@@ -9,6 +9,7 @@ TagManager:
   - MicrophoneDropdown
   - Boss
   - Wall
+  - GroundRock
   layers:
   - Default
   - TransparentFX
