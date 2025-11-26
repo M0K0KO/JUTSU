@@ -448,6 +448,8 @@ public class PlayerJutsuManager : MonoBehaviour
 
         SetFeatureActive(true);
 
+        player.audioSourceHolder.sfxDict["MuryokushoStart"].PlayAudioClip();
+        
         float elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.quadBloomDuration)
         {
@@ -484,7 +486,7 @@ public class PlayerJutsuManager : MonoBehaviour
 
             yield return null;
         }
-
+        
 
         elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.dissolveDuration)
@@ -529,6 +531,7 @@ public class PlayerJutsuManager : MonoBehaviour
         SetFeatureActive(false);
 
         EventManager.TriggerOnMuryokushoEnd();
+        player.audioSourceHolder.sfxDict["MuryokushoEnd"].PlayAudioClip();
 
         elapsedTime = 0f;
         while (elapsedTime < muryokushoSequenceData.dissolveDuration)

@@ -48,7 +48,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   originalSkyboxMaterial: {fileID: 2100000, guid: 09f670150b6789e419c9a5c0cb7d4248, type: 2}
-  spaceSkyboxMaterial: {fileID: 2100000, guid: 369b9ebe3a62b904dbc19bd332b44086, type: 2}
+  spaceSkyboxMaterial: {fileID: 2100000, guid: b13109bc4674dd24ebc04b7c12437ad6, type: 2}
   dissolveDuration: 1.25
   minCutoffHeight: -10
   maxCutoffHeight: 60

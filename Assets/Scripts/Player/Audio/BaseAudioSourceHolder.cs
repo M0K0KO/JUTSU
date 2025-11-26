@@ -21,5 +21,7 @@ public class BaseAudioSourceHolder : MonoBehaviour
         {
             sfxDict.Add(sfx.key, sfx.sfx);
         }
+        
+        Debug.Log(sfxDict.Count, gameObject);
     }
 }
