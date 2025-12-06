@@ -51,7 +51,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _HeightLimit: 0.01
+    - _HeightLimit: 0.09
     - _HeightSmoothWidth: 0.01
     - _Opacity: 1
     - _QueueControl: 0
