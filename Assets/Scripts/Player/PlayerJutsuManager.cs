@@ -173,7 +173,7 @@ public class PlayerJutsuManager : MonoBehaviour
                             Debug.Log($"[Phase 2] Voice task completed. Heard: '{voiceResult}'");
 
                             if (voiceResult.Length != 0 &&
-                                StringSimilarity.IsSimilar(voiceResult, expectedVoiceCommand))
+                                StringSimilarity.IsSimilar(voiceResult, expectedVoiceCommand, levenshteinThreshold: 0.6f))
                             {
                                 isTriggered = true;
                                 break;

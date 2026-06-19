@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.IO;
 using Mediapipe.Tasks.Core;
@@ -13,6 +14,11 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
 {
     private Mediapipe.Unity.Experimental.TextureFramePool _textureFramePool;
     private GestureRecognizerOptions options;
+
+    private void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+    }
 
     public override void Stop()
     {

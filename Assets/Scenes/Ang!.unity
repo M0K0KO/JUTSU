@@ -2428,7 +2428,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &1240930987
 AudioListener:
   m_ObjectHideFlags: 0
@@ -4081,6 +4081,10 @@ PrefabInstance:
       propertyPath: ImpulseDefinition.CustomImpulseShape.m_Curve.Array.data[9].tangentMode
       value: 34
       objectReference: {fileID: 0}
+    - target: {fileID: 4262602554338841347, guid: 719f0c13b19e0d8458505419cf87d999, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4653245747067268144, guid: 719f0c13b19e0d8458505419cf87d999, type: 3}
       propertyPath: baseCamPerlin
       value: 
@@ -4191,6 +4195,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5850773066339276477, guid: 719f0c13b19e0d8458505419cf87d999, type: 3}
       propertyPath: ImpulseDefinition.CustomImpulseShape.m_Curve.Array.data[4].outSlope
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5976464833486567024, guid: 719f0c13b19e0d8458505419cf87d999, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6966818931206551410, guid: 719f0c13b19e0d8458505419cf87d999, type: 3}
