@@ -10,9 +10,13 @@ public class MainMenuController : MonoBehaviour
 
     [SerializeField] private Image fadeImage;
     [SerializeField] private GameObject optionsPanel;
+    [SerializeField] private GameObject tutorialPanel;
 
     private void Awake()
     {
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+        
         Time.timeScale = 1f;
         AudioListener.pause = false;
         
@@ -42,6 +46,11 @@ public class MainMenuController : MonoBehaviour
     public void OpenOptions()
     {
         optionsPanel.SetActive(true);
+    }
+
+    public void OpenTutorial()
+    {
+        tutorialPanel.SetActive(true);
     }
 
     public void ExitGame()
