@@ -6,6 +6,12 @@ using UnityEngine.UI;
 public class BlackScreenFade : MonoBehaviour
 {
     private Image _blackImage;
+    private Tween _fadeTween;
+
+    private void OnDestroy()
+    {
+        _fadeTween?.Kill();
+    }
 
     private void Awake()
     {
@@ -19,9 +25,10 @@ public class BlackScreenFade : MonoBehaviour
 
     public void FadeIn(float duration = 2f, Action onCompleteCallback = null)
     {
+        _fadeTween?.Kill();
         _blackImage.color = new Color(0f, 0f, 0f, 1f);
         _blackImage.enabled = true;
-        _blackImage.DOFade(0f, duration).SetEase(Ease.OutSine).OnComplete(() =>
+        _fadeTween = _blackImage.DOFade(0f, duration).SetEase(Ease.OutSine).OnComplete(() =>
         {
             _blackImage.enabled = false;
             onCompleteCallback?.Invoke();
@@ -30,9 +37,10 @@ public class BlackScreenFade : MonoBehaviour
 
     public void FadeOut(float duration = 2f, Action onCompleteCallback = null)
     {
+        _fadeTween?.Kill();
         _blackImage.color = new Color(0f, 0f, 0f, 0f);
         _blackImage.enabled = true;
-        _blackImage.DOFade(1f, duration).SetEase(Ease.OutSine).OnComplete(() =>
+        _fadeTween = _blackImage.DOFade(1f, duration).SetEase(Ease.OutSine).OnComplete(() =>
         {
             //_blackImage.enabled = false;
             onCompleteCallback?.Invoke();

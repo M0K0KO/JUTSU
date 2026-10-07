@@ -65,6 +65,8 @@ public class PlayerJutsuManager : MonoBehaviour
         // its finally block. Detach the voice session before the next scene starts.
         _voiceSessionCancellation?.Cancel();
         _voiceSessionCancellation = null;
+        ResetMuryokushoVisuals(muryokushoSequenceData != null &&
+                              RenderSettings.skybox == muryokushoSequenceData.spaceSkyboxMaterial);
     }
 
     private void Awake()
@@ -76,6 +78,7 @@ public class PlayerJutsuManager : MonoBehaviour
 
         playerFeature = rendererData.rendererFeatures.Find(f => f.name == PlayerFeatureName);
         enemyFeature = rendererData.rendererFeatures.Find(f => f.name == EnemyFeatureName);
+        ResetMuryokushoVisuals(true);
     }
 
     private void Start()
@@ -269,10 +272,11 @@ public class PlayerJutsuManager : MonoBehaviour
 
     private async Task<string> RecognizeVoiceAsync(CancellationToken ct)
     {
+        if (ct.IsCancellationRequested) return string.Empty;
         var mic = VoiceRecognitionManager.instance.microphoneRecord;
         var whisper = VoiceRecognitionManager.instance.whisperManager;
 
-        TaskCompletionSource<string> tcs = new TaskCompletionSource<string>();
+        var tcs = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
         OnRecordStopDelegate onStop = null;
         bool isProcessing = false;
 
@@ -292,7 +296,8 @@ public class PlayerJutsuManager : MonoBehaviour
                 }
                 catch (Exception e)
                 {
-                    tcs.TrySetException(e);
+                    if (ct.IsCancellationRequested) tcs.TrySetResult(string.Empty);
+                    else tcs.TrySetException(e);
                 }
             };
 
@@ -304,7 +309,9 @@ public class PlayerJutsuManager : MonoBehaviour
                    {
                        // Complete this session immediately. A late native result
                        // must not keep an old mic subscription alive for the next cast.
-                       tcs.TrySetCanceled();
+                       // Cancellation is a normal gameplay outcome. Avoid throwing
+                       // through cascading async catch blocks (Unity UUM-114402).
+                       tcs.TrySetResult(string.Empty);
                        if (mic != null && mic.IsRecording)
                        {
                            mic.StopRecord();
@@ -313,10 +320,6 @@ public class PlayerJutsuManager : MonoBehaviour
             {
                 return await tcs.Task;
             }
-        }
-        catch (TaskCanceledException)
-        {
-            return string.Empty;
         }
         catch (Exception e)
         {
@@ -453,8 +456,19 @@ public class PlayerJutsuManager : MonoBehaviour
 
     private IEnumerator MuryokushoSequence()
     {
+        try
+        {
+            yield return MuryokushoSequenceCore();
+        }
+        finally
+        {
+            ResetMuryokushoVisuals(true);
+        }
+    }
+
+    private IEnumerator MuryokushoSequenceCore()
+    {
         EventManager.TriggerOnMuryokushoStart();
-        bool isSkyboxChanged = false;
         isInMuryokusho = true;
 
         SetFeatureActive(true);
@@ -471,7 +485,6 @@ public class PlayerJutsuManager : MonoBehaviour
 
             if (elapsedTime > 0.2f)
             {
-                isSkyboxChanged = true;
                 RenderSettings.skybox = muryokushoSequenceData.spaceSkyboxMaterial;
                 dissolveMaterial.SetFloat("_Cutoff_Height", muryokushoSequenceData.maxCutoffHeight);
             }
@@ -629,8 +642,20 @@ public class PlayerJutsuManager : MonoBehaviour
 
     private void SetFeatureActive(bool isActive)
     {
-        playerFeature.SetActive(isActive);
-        enemyFeature.SetActive(isActive);
-        rendererData.SetDirty();
+        playerFeature?.SetActive(isActive);
+        enemyFeature?.SetActive(isActive);
+        if (rendererData != null) rendererData.SetDirty();
+    }
+
+    private void ResetMuryokushoVisuals(bool restoreSkybox)
+    {
+        SetFeatureActive(false);
+        if (bloomQuadMaterial != null) bloomQuadMaterial.SetFloat("_Alpha", 0f);
+        if (dissolveMaterial != null && muryokushoSequenceData != null)
+            dissolveMaterial.SetFloat("_Cutoff_Height", muryokushoSequenceData.minCutoffHeight);
+        if (intersectionSphereTransform != null) intersectionSphereTransform.localScale = Vector3.zero;
+        if (restoreSkybox && muryokushoSequenceData != null)
+            RenderSettings.skybox = muryokushoSequenceData.originalSkyboxMaterial;
+        isInMuryokusho = false;
     }
 }
