@@ -91,10 +91,19 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
     private void Awake()
     {
         if (instance == null) instance = this;
-        else Destroy(gameObject);
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
         
         rootTargetPosition = transform.localPosition;
         initialPosition = transform.localPosition;
+    }
+
+    private void OnDestroy()
+    {
+        if (instance == this) instance = null;
     }
 
     private void Start()
@@ -155,6 +164,7 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
 
         if (Time.time - lastDataReceivedTime > detectionTimeout)
         {
+            currentGesture = GestureType.None;
             DeactivateVisuals();
         }
     }
@@ -182,7 +192,13 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
             isStale = false;
             lastDataReceivedTime = Time.time;
             
-            if (_currentTarget.handWorldLandmarks != null && _currentTarget.handWorldLandmarks.Count > 0)
+            if (_currentTarget.handWorldLandmarks != null && _currentTarget.handWorldLandmarks.Count > 0 &&
+                _currentTarget.handWorldLandmarks[0].landmarks != null &&
+                _currentTarget.handWorldLandmarks[0].landmarks.Count >= _LandmarkCount &&
+                _currentTarget.handLandmarks != null && _currentTarget.handLandmarks.Count > 0 &&
+                _currentTarget.handLandmarks[0].landmarks != null &&
+                _currentTarget.handLandmarks[0].landmarks.Count >= _LandmarkCount &&
+                player != null && player.jutsu != null)
             {
                 if (player.jutsu.isUsingJutsu) ActivateVisuals();
                 UpdateRootTransform(_currentTarget.handLandmarks);
@@ -190,6 +206,7 @@ public class HandWorldLandmarkVisualizer : MonoBehaviour
             }
             else
             {
+                currentGesture = GestureType.None;
                 DeactivateVisuals();
             }
         }
