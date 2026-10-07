@@ -13,8 +13,9 @@ public class GlobalVolumeManager : MonoBehaviour
     private Vignette vignette;
 
     [SerializeField] private float originalVignetteIntensity = 0.2f;
-    [SerializeField] private float jutsuModeVignetteIntensity = 0.5f;
-    [SerializeField] private float vignetteSmoothSpeed = 3f;
+    [SerializeField] private float jutsuModeVignetteIntensity = 0.4f;
+    // Intensity units per real-time second; reach the target instead of approaching it asymptotically.
+    [SerializeField] private float vignetteSmoothSpeed = 1.5f;
     private float targetVignetteIntensity = 0.2f;
     
     private ChromaticAberration _chromaticAberration;
@@ -40,7 +41,7 @@ public class GlobalVolumeManager : MonoBehaviour
     private void Update()
     {
         if (vignette == null) return;
-        vignette.intensity.value = Mathf.Lerp(
+        vignette.intensity.value = Mathf.MoveTowards(
             vignette.intensity.value,
             targetVignetteIntensity,
             vignetteSmoothSpeed * Time.unscaledDeltaTime *

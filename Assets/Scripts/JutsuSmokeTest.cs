@@ -183,12 +183,23 @@ public class JutsuSmokeTest : MonoBehaviour
     {
         yield return new WaitForEndOfFrame();
         CaptureGameplay("before");
+        var enteredAt = -1f;
+        Action recordEnter = () => enteredAt = Time.unscaledTime;
+        EventManager.OnJutsuModeEnter += recordEnter;
         var mouse = InputSystem.AddDevice<Mouse>("Jutsu diagnostic mouse");
         InputSystem.QueueStateEvent(mouse, new MouseState().WithButton(MouseButton.Right));
         var deadline = Time.realtimeSinceStartup + 2;
         while (!jutsu.isUsingJutsu && Time.realtimeSinceStartup < deadline) yield return null;
+        EventManager.OnJutsuModeEnter -= recordEnter;
         InputSystem.QueueStateEvent(mouse, new MouseState());
         if (!jutsu.isUsingJutsu) { InputSystem.RemoveDevice(mouse); Fail("Right mouse input did not enter jutsu mode."); yield break; }
+        GlobalVolumeManager.instance.volume.profile.TryGet<Vignette>(out var gameplayVignette);
+        while (Mathf.Abs(gameplayVignette.intensity.value - 0.4f) > 0.0001f &&
+               Time.unscaledTime - enteredAt < 0.35f) yield return null;
+        var transitionSeconds = Time.unscaledTime - enteredAt;
+        Debug.Log($"JUTSU_TRANSITION_RESULT: seconds={transitionSeconds}; intensity={gameplayVignette.intensity.value}; timeScale={Time.timeScale}");
+        if (enteredAt < 0 || Mathf.Abs(gameplayVignette.intensity.value - 0.4f) > 0.0001f)
+        { InputSystem.RemoveDevice(mouse); Fail("Gameplay vignette did not reach its target within 0.35 real-time seconds."); yield break; }
         yield return new WaitForSecondsRealtime(2);
         if (!jutsu.isUsingJutsu) { InputSystem.RemoveDevice(mouse); Fail("Right mouse input did not enter jutsu mode."); yield break; }
         yield return new WaitForEndOfFrame();
