@@ -15,7 +15,7 @@ public class GlobalVolumeManager : MonoBehaviour
     [SerializeField] private float originalVignetteIntensity = 0.2f;
     [SerializeField] private float jutsuModeVignetteIntensity = 0.4f;
     // Intensity units per real-time second; reach the target instead of approaching it asymptotically.
-    [SerializeField] private float vignetteSmoothSpeed = 1.5f;
+    [SerializeField] private float vignetteSmoothSpeed = 0.8f;
     private float targetVignetteIntensity = 0.2f;
     
     private ChromaticAberration _chromaticAberration;
