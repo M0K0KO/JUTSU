@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using Mediapipe.Unity.Sample;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.Rendering;
 
 // Opt-in diagnostic mode for the built player. Normal launches do not create it.
 public class JutsuSmokeTest : MonoBehaviour
@@ -15,12 +17,14 @@ public class JutsuSmokeTest : MonoBehaviour
     private Texture2D _image;
     private float _started;
     private bool _failed;
+    private float _vignetteBaselineEdge;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Initialize()
     {
         if (Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuSmokeTest") < 0 &&
-            Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuVoiceCancelSmoke") < 0) return;
+            Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuVoiceCancelSmoke") < 0 &&
+            Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuVignetteProbe") < 0) return;
         var go = new GameObject("JUTSU smoke test");
         DontDestroyOnLoad(go);
         go.AddComponent<JutsuSmokeTest>();
@@ -28,6 +32,8 @@ public class JutsuSmokeTest : MonoBehaviour
 
     private void Awake()
     {
+        Application.runInBackground = true;
+        Application.targetFrameRate = 60;
         _started = Time.realtimeSinceStartup;
         _image = new Texture2D(64, 64, TextureFormat.RGBA32, false);
         _image.SetPixels32(new Color32[64 * 64]);
@@ -69,6 +75,14 @@ public class JutsuSmokeTest : MonoBehaviour
             var whisper = manager.whisperManager;
             // Exercise the actual gameplay cancellation method without accessing a microphone.
             var jutsu = FindFirstObjectByType<PlayerJutsuManager>();
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuVignetteProbe") >= 0)
+            {
+                yield return ProbeVignette(jutsu);
+                Application.Quit(_failed ? 1 : 0);
+                yield break;
+            }
+            if (cycle == 0) yield return ProbeVignette(jutsu);
+            if (_failed) yield break;
             if (!CheckDomainVisuals(jutsu)) yield break;
             var mic = manager.microphoneRecord;
             var wasEnabled = mic.enabled;
@@ -152,6 +166,90 @@ public class JutsuSmokeTest : MonoBehaviour
 
     private static T ReadField<T>(PlayerJutsuManager jutsu, string name) =>
         (T)typeof(PlayerJutsuManager).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).GetValue(jutsu);
+
+    private IEnumerator ProbeVignette(PlayerJutsuManager jutsu)
+    {
+        var camera = Camera.main;
+        var originalMask = camera.cullingMask;
+        var originalFlags = camera.clearFlags;
+        var originalColor = camera.backgroundColor;
+        var canvases = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+        var enabledCanvases = Array.FindAll(canvases, canvas => canvas.enabled);
+        camera.cullingMask = 0;
+        camera.clearFlags = CameraClearFlags.SolidColor;
+        camera.backgroundColor = Color.gray;
+        foreach (var canvas in enabledCanvases) canvas.enabled = false;
+        yield return new WaitForSecondsRealtime(2);
+        CaptureVignette("before");
+        // Verify that gameplay entry restores accidentally disabled volume/camera settings.
+        var volume = GlobalVolumeManager.instance.volume;
+        volume.profile.TryGet<Vignette>(out var vignette);
+        vignette.active = false;
+        vignette.intensity.overrideState = false;
+        camera.GetUniversalAdditionalCameraData().renderPostProcessing = false;
+        camera.GetUniversalAdditionalCameraData().volumeLayerMask = 0;
+        camera.SetVolumeFrameworkUpdateMode(VolumeFrameworkUpdateMode.ViaScripting);
+        var mode = jutsu.StartCoroutine(jutsu.JutsuMode());
+        yield return new WaitForSecondsRealtime(3);
+        CaptureVignette("jutsu");
+        yield return mode;
+        yield return new WaitForSecondsRealtime(3);
+        CaptureVignette("after");
+        camera.cullingMask = originalMask;
+        camera.clearFlags = originalFlags;
+        camera.backgroundColor = originalColor;
+        foreach (var canvas in enabledCanvases) if (canvas != null) canvas.enabled = true;
+        if (!_failed) Debug.Log("JUTSU_VIGNETTE_PROBE: passed (gameplay entry, rendered darkening, exit recovery)");
+    }
+
+    private void CaptureVignette(string phase)
+    {
+        var manager = GlobalVolumeManager.instance;
+        manager.volume.profile.TryGet<Vignette>(out var profile);
+        var camera = Camera.main.GetUniversalAdditionalCameraData();
+        var target = RenderTexture.GetTemporary(640, 360, 24, RenderTextureFormat.ARGB32);
+        var previous = RenderTexture.active;
+        var image = new Texture2D(640, 360, TextureFormat.RGBA32, false);
+        try
+        {
+            RenderPipeline.SubmitRenderRequest(Camera.main,
+                new RenderPipeline.StandardRequest { destination = target });
+            RenderTexture.active = target;
+            image.ReadPixels(new Rect(0, 0, 640, 360), 0, 0);
+            image.Apply();
+        }
+        finally
+        {
+            RenderTexture.active = previous;
+            RenderTexture.ReleaseTemporary(target);
+        }
+        var effective = VolumeManager.instance.stack.GetComponent<Vignette>();
+        Debug.Log($"JUTSU_VIGNETTE_STATE: manager={manager != null}; profile={profile != null}; effective={effective != null}");
+        Debug.Log($"JUTSU_VOLUME_STATE: enabled={manager.volume.enabled}; global={manager.volume.isGlobal}; " +
+                  $"weight={manager.volume.weight}; layer={manager.gameObject.layer}; mask={camera.volumeLayerMask.value}; " +
+                  $"registered={Array.Exists(VolumeManager.instance.GetVolumes(camera.volumeLayerMask), v => v == manager.volume)}");
+        if (profile == null || effective == null) { Destroy(image); Fail("Missing vignette in render stack."); return; }
+        var center = image.GetPixel(image.width / 2, image.height / 2).grayscale;
+        var edge = image.GetPixel(image.width / 20, image.height / 20).grayscale;
+        var args = Environment.GetCommandLineArgs();
+        var index = Array.IndexOf(args, "-jutsuProbePath");
+        if (index >= 0 && index + 1 < args.Length)
+        {
+            Directory.CreateDirectory(args[index + 1]);
+            File.WriteAllBytes(Path.Combine(args[index + 1], phase + ".png"), image.EncodeToPNG());
+        }
+        Destroy(image);
+        Debug.Log($"JUTSU_VIGNETTE_{phase}: profile={profile.intensity.value}; effective={effective.intensity.value}; " +
+                  $"active={effective.active}; override={profile.intensity.overrideState}; post={camera.renderPostProcessing}; " +
+                  $"update={camera.requiresVolumeFrameworkUpdate}; center={center}; edge={edge}");
+        if (Mathf.Abs(profile.intensity.value - effective.intensity.value) > 0.01f || !effective.active || !camera.renderPostProcessing)
+            Fail("The camera did not apply the gameplay vignette.");
+        if (phase == "before") _vignetteBaselineEdge = edge;
+        if (phase == "jutsu" && edge >= _vignetteBaselineEdge - 0.05f)
+            Fail("Jutsu mode did not darken rendered screen edges.");
+        if (phase == "after" && Mathf.Abs(edge - _vignetteBaselineEdge) > 0.02f)
+            Fail("Vignette did not recover after jutsu mode exit.");
+    }
 
     private bool CheckDomainVisuals(PlayerJutsuManager jutsu)
     {

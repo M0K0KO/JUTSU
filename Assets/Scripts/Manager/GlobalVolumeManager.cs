@@ -22,24 +22,34 @@ public class GlobalVolumeManager : MonoBehaviour
     private void Awake()
     {
         if (instance == null) instance = this;
-        else Destroy(gameObject);
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
 
         volume = GetComponent<Volume>();
 
-        volume.profile.TryGet(out vignette);
+        if (!volume.profile.TryGet(out vignette)) vignette = volume.profile.Add<Vignette>(true);
         volume.profile.TryGet(out _chromaticAberration);
+        targetVignetteIntensity = originalVignetteIntensity;
+        vignette.intensity.Override(originalVignetteIntensity);
+        EnsureVignetteVisible();
     }
 
     private void Update()
     {
+        if (vignette == null) return;
         vignette.intensity.value = Mathf.Lerp(
             vignette.intensity.value,
             targetVignetteIntensity,
-            vignetteSmoothSpeed * Time.unscaledDeltaTime * (PauseMenuController.Instance.IsPaused ? 0f : 1f));
+            vignetteSmoothSpeed * Time.unscaledDeltaTime *
+            (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused ? 0f : 1f));
     }
 
     private void OnEnable()
     {
+        if (instance != this) return;
         EventManager.OnJutsuModeEnter += OnJutsuModeEnter;
         EventManager.OnJustuModeExit += OnJutsuModeExit;
     }
@@ -53,8 +63,30 @@ public class GlobalVolumeManager : MonoBehaviour
     private void OnJutsuModeEnter() => SetVignette(true);
     private void OnJutsuModeExit() => SetVignette(false);
 
+    private void OnDestroy()
+    {
+        if (instance == this) instance = null;
+    }
+
+    private void EnsureVignetteVisible()
+    {
+        vignette.active = true;
+        vignette.intensity.overrideState = true;
+        volume.enabled = true;
+        volume.isGlobal = true;
+        volume.weight = 1f;
+
+        var camera = Camera.main;
+        if (camera == null) return;
+        var cameraData = camera.GetUniversalAdditionalCameraData();
+        cameraData.renderPostProcessing = true;
+        cameraData.volumeLayerMask |= 1 << volume.gameObject.layer;
+        camera.SetVolumeFrameworkUpdateMode(VolumeFrameworkUpdateMode.EveryFrame);
+    }
+
     public void SetVignette(bool isJutsuMode)
     {
+        if (isJutsuMode) EnsureVignetteVisible();
         if (isJutsuMode) targetVignetteIntensity = jutsuModeVignetteIntensity;
         else targetVignetteIntensity = originalVignetteIntensity;
     }
