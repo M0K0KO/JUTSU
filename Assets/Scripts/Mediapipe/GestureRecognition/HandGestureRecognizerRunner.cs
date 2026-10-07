@@ -14,6 +14,13 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
 {
     private Mediapipe.Unity.Experimental.TextureFramePool _textureFramePool;
     private GestureRecognizerOptions options;
+    private readonly object _resultLock = new object();
+    private GestureRecognizerResult _pendingResult;
+    private bool _hasPendingResult;
+    private Exception _callbackException;
+    private volatile bool _acceptResults;
+    private AsyncGPUReadbackRequest _readbackRequest;
+    private bool _readbackPending;
 
     private void Awake()
     {
@@ -22,7 +29,20 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
 
     public override void Stop()
     {
+        _acceptResults = false;
+        // A readback must finish before its destination texture is disposed.
+        if (_readbackPending)
+        {
+            _readbackRequest.WaitForCompletion();
+            _readbackPending = false;
+        }
         base.Stop();
+        lock (_resultLock)
+        {
+            _hasPendingResult = false;
+            _pendingResult = default;
+            _callbackException = null;
+        }
         _textureFramePool?.Dispose();
         _textureFramePool = null;
     }
@@ -51,6 +71,7 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
 
         yield return AssetLoader.PrepareAssetAsync(modelPath);
 
+        _acceptResults = true;
         taskApi = GestureRecognizer.CreateFromOptions(options, GpuManager.GpuResources);
         Debug.Log($"using model from {modelPath}");
 
@@ -77,8 +98,7 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
             new Mediapipe.Tasks.Vision.Core.ImageProcessingOptions(
                 rotationDegrees: (int)transformationOptions.rotationAngle);
 
-        AsyncGPUReadbackRequest req = default;
-        var waitUntilReqDone = new WaitUntil(() => req.done);
+        var waitUntilReqDone = new WaitUntil(() => _readbackRequest.done);
 
         var canUseGpuImage = SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLES3 &&
                              GpuManager.GpuResources != null;
@@ -86,6 +106,7 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
 
         while (true)
         {
+            DeliverPendingResult();
             if (isPaused)
             {
                 yield return new WaitWhile(() => isPaused);
@@ -97,38 +118,81 @@ public class HandGestureRecognizerRunner : HandGestureRecognizeVisionTaskApiRunn
                 continue;
             }
 
-            Image image;
-            req = textureFrame.ReadTextureAsync(imageSource.GetCurrentTexture(), flipHorizontally, flipVertically);
-            yield return waitUntilReqDone;
-
-            if (req.hasError)
+            // Always return the borrowed frame, including readback/build failures.
+            try
             {
-                Debug.LogWarning($"Failed to read texture from the image source");
-                continue;
+                _readbackRequest = textureFrame.ReadTextureAsync(
+                    imageSource.GetCurrentTexture(), flipHorizontally, flipVertically);
+                _readbackPending = true;
+                yield return waitUntilReqDone;
+                _readbackPending = false;
+
+                if (_readbackRequest.hasError)
+                {
+                    Debug.LogWarning("Failed to read texture from the image source");
+                    continue;
+                }
+
+                using var image = textureFrame.BuildCPUImage();
+                taskApi.RecognizeAsync(image, GetCurrentTimestampMillisec(), imageProcessingOptions);
             }
-
-            image = textureFrame.BuildCPUImage();
-            textureFrame.Release();
-
-            taskApi.RecognizeAsync(image, GetCurrentTimestampMillisec(), imageProcessingOptions);
+            finally
+            {
+                textureFrame.Release();
+            }
         }
     }
 
     private void OnHandGestureRecognizerOutput(GestureRecognizerResult result, Image image, long timestamp)
     {
-        if (result.gestures != null)
+        // MediaPipe calls this on a worker thread. Do not access Unity objects here,
+        // and never allow a managed exception to escape the native callback.
+        try
         {
-            //Debug.Log(result.handWorldLandmarks.Count);
+            lock (_resultLock)
+            {
+                if (!_acceptResults) return;
+                result.CloneTo(ref _pendingResult);
+                _hasPendingResult = true;
+            }
+        }
+        catch (Exception exception)
+        {
+            lock (_resultLock)
+            {
+                _callbackException = exception;
+            }
+        }
+    }
 
-            HandWorldLandmarkVisualizer.instance.DrawLater(result, GetRecognizedGestureType(result));
+    private void DeliverPendingResult()
+    {
+        lock (_resultLock)
+        {
+            if (_callbackException != null)
+            {
+                Debug.LogException(_callbackException);
+                _callbackException = null;
+            }
 
-            //Debug.Log(result.handWorldLandmarks[0].landmarks[0].z);
-            Debug.Log(result.gestures[0].categories[0].categoryName);
+            if (!_hasPendingResult) return;
+            _hasPendingResult = false;
+            var visualizer = HandWorldLandmarkVisualizer.instance;
+            if (visualizer != null)
+            {
+                visualizer.DrawLater(_pendingResult, GetRecognizedGestureType(_pendingResult));
+            }
         }
     }
 
     private GestureType GetRecognizedGestureType(GestureRecognizerResult result)
     {
+        if (result.gestures == null || result.gestures.Count == 0 ||
+            result.gestures[0].categories == null || result.gestures[0].categories.Count == 0)
+        {
+            return GestureType.None;
+        }
+
         string bestGesture = result.gestures[0].categories[0].categoryName;
 
         if (bestGesture == "none") return GestureType.None;
