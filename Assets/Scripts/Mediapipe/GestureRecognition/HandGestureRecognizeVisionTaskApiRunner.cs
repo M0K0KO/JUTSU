@@ -44,10 +44,23 @@ namespace Mediapipe.Tasks.Vision.GestureRecognizer
         public override void Stop()
         {
             base.Stop();
-            StopCoroutine(_coroutine);
-            ImageSourceProvider.ImageSource.Stop();
-            taskApi?.Close();
+            if (_coroutine != null)
+            {
+                StopCoroutine(_coroutine);
+                _coroutine = null;
+            }
+
+            // Detach first so repeated Stop calls cannot close the same task twice.
+            var taskToClose = taskApi;
             taskApi = null;
+            try
+            {
+                taskToClose?.Close();
+            }
+            finally
+            {
+                ImageSourceProvider.ImageSource?.Stop();
+            }
         }
         
         protected abstract IEnumerator Run();
