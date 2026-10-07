@@ -40,15 +40,18 @@ public class GlobalVolumeManager : MonoBehaviour
 
     private void OnEnable()
     {
-        EventManager.OnJutsuModeEnter += () => SetVignette(true);
-        EventManager.OnJustuModeExit += () => SetVignette(false);
+        EventManager.OnJutsuModeEnter += OnJutsuModeEnter;
+        EventManager.OnJustuModeExit += OnJutsuModeExit;
     }
 
     private void OnDisable()
     {
-        EventManager.OnJutsuModeEnter -= () => SetVignette(true);
-        EventManager.OnJustuModeExit -= () => SetVignette(false);
+        EventManager.OnJutsuModeEnter -= OnJutsuModeEnter;
+        EventManager.OnJustuModeExit -= OnJutsuModeExit;
     }
+
+    private void OnJutsuModeEnter() => SetVignette(true);
+    private void OnJutsuModeExit() => SetVignette(false);
 
     public void SetVignette(bool isJutsuMode)
     {

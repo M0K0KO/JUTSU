@@ -57,6 +57,15 @@ public class PlayerJutsuManager : MonoBehaviour
 
     private const int gestureQueueCapacity = 20;
     private Queue<GestureType> gestureQueue = new Queue<GestureType>(gestureQueueCapacity);
+    private CancellationTokenSource _voiceSessionCancellation;
+
+    private void OnDestroy()
+    {
+        // Unity can stop the casting coroutine on scene unload without running
+        // its finally block. Detach the voice session before the next scene starts.
+        _voiceSessionCancellation?.Cancel();
+        _voiceSessionCancellation = null;
+    }
 
     private void Awake()
     {
@@ -115,6 +124,7 @@ public class PlayerJutsuManager : MonoBehaviour
 
         Task<string> voiceTask = null;
         CancellationTokenSource cts = new CancellationTokenSource();
+        _voiceSessionCancellation = cts;
         var mic = VoiceRecognitionManager.instance.microphoneRecord;
 
         Debug.Log("Jutsu Mode: Started. Waiting for gesture...");
@@ -222,6 +232,7 @@ public class PlayerJutsuManager : MonoBehaviour
         finally
         {
             Debug.Log("Jutsu sequence ending. Cleaning up...");
+            if (_voiceSessionCancellation == cts) _voiceSessionCancellation = null;
             cts.Cancel();
             cts.Dispose();
 
@@ -263,13 +274,14 @@ public class PlayerJutsuManager : MonoBehaviour
 
         TaskCompletionSource<string> tcs = new TaskCompletionSource<string>();
         OnRecordStopDelegate onStop = null;
-        bool isCompleted = false;
+        bool isProcessing = false;
 
         try
         {
             onStop = async (chunk) =>
             {
-                if (tcs.Task.IsCompleted) return;
+                if (tcs.Task.IsCompleted || ct.IsCancellationRequested || isProcessing) return;
+                isProcessing = true;
 
                 try
                 {
@@ -290,14 +302,12 @@ public class PlayerJutsuManager : MonoBehaviour
 
             using (ct.Register(() =>
                    {
+                       // Complete this session immediately. A late native result
+                       // must not keep an old mic subscription alive for the next cast.
+                       tcs.TrySetCanceled();
                        if (mic != null && mic.IsRecording)
                        {
-                           Debug.Log("[Voice] Token cancelled, stopping mic to finalize transcription...");
                            mic.StopRecord();
-                       }
-                       else
-                       {
-                           tcs.TrySetCanceled();
                        }
                    }))
             {
@@ -326,6 +336,7 @@ public class PlayerJutsuManager : MonoBehaviour
                 }
             }
 
+            if (mic != null && mic.IsRecording)
             {
                 mic.StopRecord();
                 Debug.Log("[Voice] Microphone recording stopped (cleanup)");

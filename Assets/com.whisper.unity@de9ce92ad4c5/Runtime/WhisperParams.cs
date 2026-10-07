@@ -368,7 +368,7 @@ namespace Whisper
 
          #endregion
          
-         private void FreeLanguageString()
+         private unsafe void FreeLanguageString()
          {
              // if C# allocated new string before - clear it
              // but only clear C# string, not C++ literals
@@ -376,9 +376,10 @@ namespace Whisper
              if (_languagePtr != IntPtr.Zero)
                  Marshal.FreeHGlobal(_languagePtr);
              _languagePtr = IntPtr.Zero;
+             _param.language = null;
          }
          
-         private void FreeInitialPromptString()
+         private unsafe void FreeInitialPromptString()
          {
              // if C# allocated new string before - clear it
              // but only clear C# string, not C++ literals
@@ -386,6 +387,7 @@ namespace Whisper
              if (_initialPromptPtr != IntPtr.Zero)
                  Marshal.FreeHGlobal(_initialPromptPtr);
              _initialPromptPtr = IntPtr.Zero;
+             _param.initial_prompt = null;
          }
          
          public static WhisperParams GetDefaultParams(WhisperSamplingStrategy strategy =

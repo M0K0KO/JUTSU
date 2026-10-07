@@ -91,7 +91,7 @@ namespace Mediapipe.Unity.Sample
 
     private void DecideInferenceMode()
     {
-#if UNITY_EDITOR_OSX || UNITY_EDITOR_WIN
+#if UNITY_EDITOR_OSX || UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
       if (_appSettings.preferableInferenceMode == InferenceMode.GPU) {
         Debug.LogWarning("Current platform does not support GPU inference mode, so falling back to CPU mode");
       }
@@ -103,6 +103,11 @@ namespace Mediapipe.Unity.Sample
 
     private void OnApplicationQuit()
     {
+      // Close graphs before their shared GPU and logging resources disappear.
+      foreach (var runner in FindObjectsByType<HandGestureRecognizerRunner>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+      {
+        runner.Stop();
+      }
       GpuManager.Shutdown();
 
       if (_isGlogInitialized)

@@ -133,10 +133,21 @@ namespace Whisper
                 }
 
                 // start inference
-                if (!InferenceWhisper(readySamples, nativeParams))
-                    return null;
-            
-                gch.Free();
+                try
+                {
+                    var succeeded = InferenceWhisper(readySamples, nativeParams);
+                    if (userData.CallbackException != null)
+                        throw new InvalidOperationException("Whisper callback failed.", userData.CallbackException);
+                    if (!succeeded)
+                        return null;
+                }
+                finally
+                {
+                    // Also release on inference failure. This handle roots the
+                    // wrapper and parameter strings while native code uses them.
+                    gch.Free();
+                    GC.KeepAlive(nativeParams);
+                }
 
                 LogUtils.Verbose("Trying to get number of text segments...");
                 var n = WhisperNative.whisper_full_n_segments(_whisperCtx);
@@ -193,9 +204,17 @@ namespace Whisper
         [MonoPInvokeCallback(typeof(whisper_new_segment_callback))]
         private static void NewSegmentCallbackStatic(IntPtr ctx, IntPtr state, int nNew, IntPtr userDataPtr)
         {
-            // relay this static function to wrapper instance
-            var userData = (WhisperUserData) GCHandle.FromIntPtr(userDataPtr).Target;
-            userData.Wrapper.NewSegmentCallback(nNew, userData.Param);
+            WhisperUserData userData = null;
+            try
+            {
+                userData = (WhisperUserData) GCHandle.FromIntPtr(userDataPtr).Target;
+                userData.Wrapper.NewSegmentCallback(nNew, userData.Param);
+            }
+            catch (Exception exception)
+            {
+                if (userData != null)
+                    System.Threading.Interlocked.CompareExchange(ref userData.CallbackException, exception, null);
+            }
         }
         
         private void NewSegmentCallback(int nNew, WhisperParams param)
@@ -213,9 +232,17 @@ namespace Whisper
         [MonoPInvokeCallback(typeof(whisper_progress_callback))]
         private static void ProgressCallbackStatic(IntPtr ctx, IntPtr state, int progress, IntPtr userDataPtr)
         {
-            // relay this static function to wrapper instance
-            var userData = (WhisperUserData) GCHandle.FromIntPtr(userDataPtr).Target;
-            userData.Wrapper.ProgressCallback(progress);
+            WhisperUserData userData = null;
+            try
+            {
+                userData = (WhisperUserData) GCHandle.FromIntPtr(userDataPtr).Target;
+                userData.Wrapper.ProgressCallback(progress);
+            }
+            catch (Exception exception)
+            {
+                if (userData != null)
+                    System.Threading.Interlocked.CompareExchange(ref userData.CallbackException, exception, null);
+            }
         }
 
         private void ProgressCallback(int progress)
@@ -400,10 +427,11 @@ namespace Whisper
             return systemInfo;
         }
         
-        private struct WhisperUserData
+        private sealed class WhisperUserData
         {
             public readonly WhisperWrapper Wrapper;
             public readonly WhisperParams Param;
+            public Exception CallbackException;
             
             public WhisperUserData(WhisperWrapper wrapper, WhisperParams param)
             {

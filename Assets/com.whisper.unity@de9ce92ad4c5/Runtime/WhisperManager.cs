@@ -307,6 +307,9 @@ namespace Whisper
         
         private void UpdateParams()
         {
+            // In-flight native inference may still read these unmanaged strings.
+            // Give each request its own parameters instead of freeing its prompt.
+            _params = WhisperParams.GetDefaultParams(strategy);
             _params.Language = language;
             _params.Translate = translateToEnglish;
             _params.NoContext = noContext;

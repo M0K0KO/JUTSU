@@ -55,7 +55,7 @@ namespace Mediapipe.Tasks.Vision.GestureRecognizer
             taskApi = null;
             try
             {
-                taskToClose?.Close();
+                (taskToClose as System.IDisposable)?.Dispose();
             }
             finally
             {

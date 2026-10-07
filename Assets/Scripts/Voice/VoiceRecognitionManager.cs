@@ -3,6 +3,7 @@ using UnityEngine;
 using Whisper;
 using Whisper.Utils;
 
+[DefaultExecutionOrder(-1000)]
 public class VoiceRecognitionManager : MonoBehaviour
 {
     public static VoiceRecognitionManager instance;
@@ -12,12 +13,21 @@ public class VoiceRecognitionManager : MonoBehaviour
 
     private void Awake()
     {
-        if (instance == null) { instance = this; }
-        else Destroy(gameObject);
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            // Prevent the duplicate Whisper component from loading another model.
+            gameObject.SetActive(false);
+            Destroy(gameObject);
+        }
     }
 
-    private void Start()
+    private void OnDestroy()
     {
-        DontDestroyOnLoad(gameObject);
+        if (instance == this) instance = null;
     }
 }
