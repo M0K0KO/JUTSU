@@ -10,6 +10,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Rendering;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
+using Screen = UnityEngine.Screen;
 
 // Opt-in diagnostic mode for the built player. Normal launches do not create it.
 public class JutsuSmokeTest : MonoBehaviour
@@ -24,7 +27,8 @@ public class JutsuSmokeTest : MonoBehaviour
     {
         if (Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuSmokeTest") < 0 &&
             Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuVoiceCancelSmoke") < 0 &&
-            Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuVignetteProbe") < 0) return;
+            Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuVignetteProbe") < 0 &&
+            Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuGameplayProbe") < 0) return;
         var go = new GameObject("JUTSU smoke test");
         DontDestroyOnLoad(go);
         go.AddComponent<JutsuSmokeTest>();
@@ -34,6 +38,8 @@ public class JutsuSmokeTest : MonoBehaviour
     {
         Application.runInBackground = true;
         Application.targetFrameRate = 60;
+        if (Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuGameplayProbe") >= 0)
+            InputSystem.settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
         _started = Time.realtimeSinceStartup;
         _image = new Texture2D(64, 64, TextureFormat.RGBA32, false);
         _image.SetPixels32(new Color32[64 * 64]);
@@ -75,6 +81,12 @@ public class JutsuSmokeTest : MonoBehaviour
             var whisper = manager.whisperManager;
             // Exercise the actual gameplay cancellation method without accessing a microphone.
             var jutsu = FindFirstObjectByType<PlayerJutsuManager>();
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuGameplayProbe") >= 0)
+            {
+                yield return ProbeGameplay(jutsu);
+                Application.Quit(_failed ? 1 : 0);
+                yield break;
+            }
             if (Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuVignetteProbe") >= 0)
             {
                 yield return ProbeVignette(jutsu);
@@ -166,6 +178,82 @@ public class JutsuSmokeTest : MonoBehaviour
 
     private static T ReadField<T>(PlayerJutsuManager jutsu, string name) =>
         (T)typeof(PlayerJutsuManager).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).GetValue(jutsu);
+
+    private IEnumerator ProbeGameplay(PlayerJutsuManager jutsu)
+    {
+        yield return new WaitForEndOfFrame();
+        CaptureGameplay("before");
+        var mouse = InputSystem.AddDevice<Mouse>("Jutsu diagnostic mouse");
+        InputSystem.QueueStateEvent(mouse, new MouseState().WithButton(MouseButton.Right));
+        var deadline = Time.realtimeSinceStartup + 2;
+        while (!jutsu.isUsingJutsu && Time.realtimeSinceStartup < deadline) yield return null;
+        InputSystem.QueueStateEvent(mouse, new MouseState());
+        if (!jutsu.isUsingJutsu) { InputSystem.RemoveDevice(mouse); Fail("Right mouse input did not enter jutsu mode."); yield break; }
+        yield return new WaitForSecondsRealtime(2);
+        if (!jutsu.isUsingJutsu) { InputSystem.RemoveDevice(mouse); Fail("Right mouse input did not enter jutsu mode."); yield break; }
+        yield return new WaitForEndOfFrame();
+        CaptureGameplay("jutsu");
+        CaptureGameplayReference("jutsu-effect-on", false);
+        CaptureGameplayReference("jutsu-v3-strength", false, 0.3f);
+        CaptureGameplayReference("jutsu-effect-off", true);
+        while (jutsu.isUsingJutsu && !_failed) yield return null;
+        yield return new WaitForSecondsRealtime(2);
+        yield return new WaitForEndOfFrame();
+        CaptureGameplay("after");
+        InputSystem.RemoveDevice(mouse);
+        Debug.Log("JUTSU_GAMEPLAY_PROBE: captured actual screen and right mouse input");
+    }
+
+    private static string ProbeDirectory()
+    {
+        var args = Environment.GetCommandLineArgs();
+        var index = Array.IndexOf(args, "-jutsuProbePath");
+        var directory = index >= 0 && index + 1 < args.Length ? args[index + 1] : Application.persistentDataPath;
+        Directory.CreateDirectory(directory);
+        return directory;
+    }
+
+    private void CaptureGameplay(string phase)
+    {
+        var image = ScreenCapture.CaptureScreenshotAsTexture();
+        if (image == null) { Fail("Actual screen capture unavailable."); return; }
+        File.WriteAllBytes(Path.Combine(ProbeDirectory(), phase + ".png"), image.EncodeToPNG());
+        Destroy(image);
+        GlobalVolumeManager.instance.volume.profile.TryGet<Vignette>(out var profile);
+        var camera = Camera.main.GetUniversalAdditionalCameraData();
+        var effective = VolumeManager.instance.stack.GetComponent<Vignette>();
+        Debug.Log($"JUTSU_GAMEPLAY_{phase}: camera={Camera.main.name}; size={Screen.width}x{Screen.height}; " +
+                  $"profile={profile.intensity.value}; effective={effective.intensity.value}; post={camera.renderPostProcessing}; " +
+                  $"cameraState={PlayerCameraStateHandler.instance.currentState}; timeScale={Time.timeScale}");
+    }
+
+    private void CaptureGameplayReference(string phase, bool disableEffect, float? intensity = null)
+    {
+        GlobalVolumeManager.instance.volume.profile.TryGet<Vignette>(out var vignette);
+        var wasActive = vignette.active;
+        var originalIntensity = vignette.intensity.value;
+        var previous = RenderTexture.active;
+        var target = RenderTexture.GetTemporary(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
+        var image = new Texture2D(Screen.width, Screen.height, TextureFormat.RGBA32, false);
+        try
+        {
+            if (disableEffect) vignette.active = false;
+            if (intensity.HasValue) vignette.intensity.value = intensity.Value;
+            RenderPipeline.SubmitRenderRequest(Camera.main, new RenderPipeline.StandardRequest { destination = target });
+            RenderTexture.active = target;
+            image.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+            image.Apply();
+            File.WriteAllBytes(Path.Combine(ProbeDirectory(), phase + ".png"), image.EncodeToPNG());
+        }
+        finally
+        {
+            vignette.active = wasActive;
+            vignette.intensity.value = originalIntensity;
+            RenderTexture.active = previous;
+            RenderTexture.ReleaseTemporary(target);
+            Destroy(image);
+        }
+    }
 
     private IEnumerator ProbeVignette(PlayerJutsuManager jutsu)
     {

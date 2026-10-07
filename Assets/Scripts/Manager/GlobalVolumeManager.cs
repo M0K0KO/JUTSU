@@ -13,7 +13,7 @@ public class GlobalVolumeManager : MonoBehaviour
     private Vignette vignette;
 
     [SerializeField] private float originalVignetteIntensity = 0.2f;
-    [SerializeField] private float jutsuModeVignetteIntensity = 0.35f;
+    [SerializeField] private float jutsuModeVignetteIntensity = 0.5f;
     [SerializeField] private float vignetteSmoothSpeed = 3f;
     private float targetVignetteIntensity = 0.2f;
     

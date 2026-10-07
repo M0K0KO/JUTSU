@@ -3736,7 +3736,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GlobalVolumeManager
   originalVignetteIntensity: 0.2
-  jutsuModeVignetteIntensity: 0.3
+  jutsuModeVignetteIntensity: 0.5
   vignetteSmoothSpeed: 1.5
 --- !u!1 &1950098837
 GameObject:
