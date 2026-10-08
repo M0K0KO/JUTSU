@@ -7239,6 +7239,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerJutsuManager
   rendererData: {fileID: 11400000, guid: f288ae1f4751b564a96ac7587541f7a2, type: 2}
   sequenceMaxDuration: 5
+  voiceProcessingTimeout: 15
   slowedTimeScale: 0.4
   jutsuList:
   - {fileID: 11400000, guid: 0f66913499e6d7d4caa59bbd443b8827, type: 2}

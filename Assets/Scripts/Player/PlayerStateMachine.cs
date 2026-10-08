@@ -165,29 +165,26 @@ public class PlayerStateMachine : MonoBehaviour, IDamageable
         int enemyCount = Physics.OverlapSphereNonAlloc(transform.position,
             detectionRange, nearbyEnemies, enemyLayerMask);
 
-        if (enemyCount > 0)
+        var screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
+        float nearestDistance = Mathf.Infinity;
+        Target_Test nearestTarget = null;
+        for (int i = 0; i < enemyCount; i++)
         {
-            Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
-            Vector2 targetScreenPosition = player.playerCam.WorldToScreenPoint(nearbyEnemies[0].transform.position);
-            float nearestDistance = Vector2.Distance(screenCenter, targetScreenPosition);
-            Collider nearestEnemy = nearbyEnemies[0];
+            // Attack/effect colliders can share the enemy layer without being
+            // lock-on targets. Skip them instead of dereferencing a missing component.
+            var candidate = nearbyEnemies[i].GetComponent<Target_Test>();
+            if (candidate == null || candidate.cameraTarget == null || candidate.hitTarget == null) continue;
+            Vector2 position = player.playerCam.WorldToScreenPoint(nearbyEnemies[i].transform.position);
+            float distance = Vector2.Distance(screenCenter, position);
+            if (distance >= nearestDistance) continue;
+            nearestTarget = candidate;
+            nearestDistance = distance;
+        }
 
-            for (int i = 1; i < enemyCount; i++)
-            {
-                screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
-                targetScreenPosition = player.playerCam.WorldToScreenPoint(nearbyEnemies[i].transform.position);
-                float distance = Vector2.Distance(screenCenter, targetScreenPosition);
-
-                if (distance < nearestDistance)
-                {
-                    nearestEnemy = nearbyEnemies[i];
-                    nearestDistance = distance;
-                }
-            }
-
-            Target_Test enemy = nearestEnemy.gameObject.GetComponent<Target_Test>();
-            target = enemy.cameraTarget;
-            currentTargetHitTarget = enemy.hitTarget;
+        if (nearestTarget != null)
+        {
+            target = nearestTarget.cameraTarget;
+            currentTargetHitTarget = nearestTarget.hitTarget;
             return true;
         }
 

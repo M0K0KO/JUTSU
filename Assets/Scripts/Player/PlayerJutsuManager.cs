@@ -24,6 +24,8 @@ public class PlayerJutsuManager : MonoBehaviour
     [SerializeField]
     private float sequenceMaxDuration;
 
+    [SerializeField, Min(1f)] private float voiceProcessingTimeout = 15f;
+
     [SerializeField, Range(0.1f, 0.9f)] private float slowedTimeScale;
 
     [Header("Jutsu List")]
@@ -101,8 +103,25 @@ public class PlayerJutsuManager : MonoBehaviour
         }
     }
 
-    public IEnumerator JutsuMode()
+    internal sealed class VoiceAttempt
     {
+        internal Task<string> Task;
+        internal bool IsProcessing;
+    }
+
+    public IEnumerator JutsuMode() => RunJutsuMode(StartVoiceRecognition,
+        () => HandWorldLandmarkVisualizer.instance.currentGesture, GetJutsu);
+
+    // The same casting flow is exercised by the opt-in player diagnostics with
+    // scripted voice/gesture input, without opening the user's microphone.
+    internal IEnumerator RunJutsuMode(Func<CancellationToken, VoiceAttempt> recognize,
+        Func<GestureType> readGesture, Func<GestureType, Action> resolveJutsu)
+    {
+        if (!player.stateMachine.CheckNearbyEnemies(out GameObject target, false) || target == null)
+        {
+            Debug.Log("[Jutsu] No valid target. Skipping concentration mode.");
+            yield break;
+        }
         isUsingJutsu = true;
         EventManager.TriggerOnJutsuModeEnter();
 
@@ -111,7 +130,6 @@ public class PlayerJutsuManager : MonoBehaviour
         gestureQueue.Clear();
         ResetInitialPrompt();
 
-        player.stateMachine.CheckNearbyEnemies(out GameObject target, false);
         PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Jutsu, target.transform);
 
         float elapsedTime = 0f;
@@ -125,7 +143,8 @@ public class PlayerJutsuManager : MonoBehaviour
         string expectedVoiceCommand = "";
         GestureType detectedGesture = GestureType.None;
 
-        Task<string> voiceTask = null;
+        VoiceAttempt voice = null;
+        float processingElapsed = 0f;
         CancellationTokenSource cts = new CancellationTokenSource();
         _voiceSessionCancellation = cts;
         var mic = VoiceRecognitionManager.instance.microphoneRecord;
@@ -134,34 +153,66 @@ public class PlayerJutsuManager : MonoBehaviour
 
         try
         {
-            while (elapsedTime < sequenceMaxDuration || (voiceTask != null && !voiceTask.IsCompleted))
+            while (true)
             {
-                if (!PauseMenuController.Instance.IsPaused) elapsedTime += Time.unscaledDeltaTime;
+                float delta = PauseMenuController.Instance.IsPaused ? 0f : Time.unscaledDeltaTime;
+                elapsedTime += delta;
 
-                if (elapsedTime >= sequenceMaxDuration && !stopRequested && voiceTask != null && !voiceTask.IsCompleted)
+                if (elapsedTime >= sequenceMaxDuration && !stopRequested)
                 {
-                    Debug.Log("[Jutsu] Time out! Forcing stop microphone to check result...");
-                    if (mic.IsRecording) mic.StopRecord();
                     stopRequested = true;
+                    Debug.Log("[Jutsu] Input window closed. Waiting for the pending voice result...");
+                    if (voice != null && !voice.Task.IsCompleted && mic.IsRecording) mic.StopRecord();
                 }
 
-                if (elapsedTime >= sequenceMaxDuration + 3.0f)
+                if (voice != null && voice.Task.IsCompleted)
                 {
-                    Debug.Log("[Jutsu] Hard Timeout. Aborting.");
+                    string voiceResult = voice.Task.Status == TaskStatus.RanToCompletion
+                        ? voice.Task.Result : string.Empty;
+                    Debug.Log($"[Phase 2] Voice task completed. Heard: '{voiceResult}'");
+                    if (!string.IsNullOrEmpty(voiceResult) &&
+                        StringSimilarity.IsSimilar(voiceResult, expectedVoiceCommand, levenshteinThreshold: 0.6f))
+                    {
+                        isTriggered = true;
+                        break;
+                    }
+
+                    // A failed result can retry only while the original input
+                    // window is open. Never start another recording after it closes.
+                    if (stopRequested) break;
+                    voice = recognize(cts.Token);
+                    processingElapsed = 0f;
+                    yield return null;
+                    continue;
+                }
+
+                if (voice != null && voice.IsProcessing)
+                {
+                    processingElapsed += delta;
+                    if (processingElapsed >= voiceProcessingTimeout)
+                    {
+                        Debug.Log("[Jutsu] Voice processing timeout. Aborting.");
+                        break;
+                    }
+                }
+                else if (stopRequested)
+                {
+                    // No inference to wait for (including a microphone start failure).
                     break;
                 }
 
+                var currentGesture = readGesture();
                 if (!jutsuGestureTrigger)
                 {
-                    gestureQueue.CapacitySafeEnqueue(HandWorldLandmarkVisualizer.instance.currentGesture,
+                    gestureQueue.CapacitySafeEnqueue(currentGesture,
                         gestureQueueCapacity);
 
-                    detectedGesture = HandWorldLandmarkVisualizer.instance.currentGesture;
+                    detectedGesture = currentGesture;
                     if (detectedGesture != GestureType.None &&
                         jutsuDict.ContainsKey(detectedGesture) &&
                         gestureQueue.GetCount(detectedGesture) == gestureQueueCapacity)
                     {
-                        jutsu = GetJutsu(detectedGesture);
+                        jutsu = resolveJutsu(detectedGesture);
                         expectedVoiceCommand = GetJutsuVoiceCommand(detectedGesture);
 
                         for (int i = 0; i < gestureQueueCapacity; i++) gestureQueue.Enqueue(detectedGesture);
@@ -173,39 +224,13 @@ public class PlayerJutsuManager : MonoBehaviour
                         StartCoroutine(HandWorldLandmarkVisualizer.instance.Glow());
 
                         UpdateInitialPrompt(expectedVoiceCommand);
-                        voiceTask = RecognizeVoiceAsync(cts.Token);
+                        voice = recognize(cts.Token);
+                        processingElapsed = 0f;
                     }
                 }
                 else
                 {
-                    if (voiceTask != null && voiceTask.IsCompleted)
-                    {
-                        if (voiceTask.Status == TaskStatus.RanToCompletion)
-                        {
-                            string voiceResult = voiceTask.Result;
-                            Debug.Log($"[Phase 2] Voice task completed. Heard: '{voiceResult}'");
-
-                            if (voiceResult.Length != 0 &&
-                                StringSimilarity.IsSimilar(voiceResult, expectedVoiceCommand, levenshteinThreshold: 0.6f))
-                            {
-                                isTriggered = true;
-                                break;
-                            }
-                            else
-                            {
-                                voiceTask = RecognizeVoiceAsync(cts.Token);
-                                continue;
-                            }
-                        }
-                        else if (voiceTask.Status == TaskStatus.Canceled || voiceTask.Status == TaskStatus.Faulted)
-                        {
-                            Debug.Log("[Phase 2] Voice task canceled or faulted. Retrying...");
-                            voiceTask = RecognizeVoiceAsync(cts.Token);
-                            continue;
-                        }
-                    }
-
-                    gestureQueue.CapacitySafeEnqueue(HandWorldLandmarkVisualizer.instance.currentGesture,
+                    gestureQueue.CapacitySafeEnqueue(currentGesture,
                         gestureQueueCapacity);
 
                     if (gestureQueue.GetCount(detectedGesture) == 0 && !stopRequested)
@@ -220,17 +245,6 @@ public class PlayerJutsuManager : MonoBehaviour
                 yield return null;
             }
 
-            if (!isTriggered && voiceTask != null && voiceTask.Status == TaskStatus.RanToCompletion)
-            {
-                string voiceResult = voiceTask.Result;
-                Debug.Log($"[Post-Loop Check] Voice task finished. Heard: '{voiceResult}'");
-
-                if (StringSimilarity.IsSimilar(voiceResult, expectedVoiceCommand))
-                {
-                    isTriggered = true;
-                    Debug.Log("[Post-Loop Check] Success! Triggering Jutsu.");
-                }
-            }
         }
         finally
         {
@@ -254,8 +268,9 @@ public class PlayerJutsuManager : MonoBehaviour
             }
             else
             {
-                PlayerCameraStateHandler.instance.UpdateCameraState(PlayerCameraState.Strafe,
-                    player.stateMachine.currentTargetHitTarget.transform);
+                var hitTarget = player.stateMachine.currentTargetHitTarget;
+                PlayerCameraStateHandler.instance.UpdateCameraState(hitTarget != null
+                    ? PlayerCameraState.Strafe : PlayerCameraState.Base, hitTarget);
                 Time.timeScale = 1f;
                 HandWorldLandmarkVisualizer.instance.DeactivateVisuals();
                 Debug.Log("Jutsu Sequence Ended (Timeout or Failed)");
@@ -270,7 +285,16 @@ public class PlayerJutsuManager : MonoBehaviour
         }
     }
 
-    private async Task<string> RecognizeVoiceAsync(CancellationToken ct)
+    private VoiceAttempt StartVoiceRecognition(CancellationToken ct)
+    {
+        var voice = new VoiceAttempt();
+        voice.Task = RecognizeVoiceSessionAsync(ct, voice);
+        return voice;
+    }
+
+    private Task<string> RecognizeVoiceAsync(CancellationToken ct) => StartVoiceRecognition(ct).Task;
+
+    private async Task<string> RecognizeVoiceSessionAsync(CancellationToken ct, VoiceAttempt voice)
     {
         if (ct.IsCancellationRequested) return string.Empty;
         var mic = VoiceRecognitionManager.instance.microphoneRecord;
@@ -278,14 +302,13 @@ public class PlayerJutsuManager : MonoBehaviour
 
         var tcs = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
         OnRecordStopDelegate onStop = null;
-        bool isProcessing = false;
 
         try
         {
             onStop = async (chunk) =>
             {
-                if (tcs.Task.IsCompleted || ct.IsCancellationRequested || isProcessing) return;
-                isProcessing = true;
+                if (tcs.Task.IsCompleted || ct.IsCancellationRequested || voice.IsProcessing) return;
+                voice.IsProcessing = true;
 
                 try
                 {
@@ -328,6 +351,7 @@ public class PlayerJutsuManager : MonoBehaviour
         }
         finally
         {
+            voice.IsProcessing = false;
             if (onStop != null && mic != null)
             {
                 try
