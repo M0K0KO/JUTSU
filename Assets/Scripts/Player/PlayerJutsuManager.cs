@@ -25,6 +25,8 @@ public class PlayerJutsuManager : MonoBehaviour
     private float sequenceMaxDuration;
 
     [SerializeField, Min(1f)] private float voiceProcessingTimeout = 15f;
+    [SerializeField, Range(0.0001f, 0.05f)] private float minimumVoiceRms = 0.003f;
+    [SerializeField, Range(0.1f, 1f)] private float maximumNoSpeechProbability = 0.6f;
 
     [SerializeField, Range(0.1f, 0.9f)] private float slowedTimeScale;
 
@@ -107,6 +109,7 @@ public class PlayerJutsuManager : MonoBehaviour
     {
         internal Task<string> Task;
         internal bool IsProcessing;
+        internal bool HasAudibleInput;
     }
 
     public IEnumerator JutsuMode() => RunJutsuMode(StartVoiceRecognition,
@@ -170,7 +173,7 @@ public class PlayerJutsuManager : MonoBehaviour
                     string voiceResult = voice.Task.Status == TaskStatus.RanToCompletion
                         ? voice.Task.Result : string.Empty;
                     Debug.Log($"[Phase 2] Voice task completed. Heard: '{voiceResult}'");
-                    if (!string.IsNullOrEmpty(voiceResult) &&
+                    if (voice.HasAudibleInput && !string.IsNullOrEmpty(voiceResult) &&
                         StringSimilarity.IsSimilar(voiceResult, expectedVoiceCommand, levenshteinThreshold: 0.6f))
                     {
                         isTriggered = true;
@@ -223,7 +226,6 @@ public class PlayerJutsuManager : MonoBehaviour
 
                         StartCoroutine(HandWorldLandmarkVisualizer.instance.Glow());
 
-                        UpdateInitialPrompt(expectedVoiceCommand);
                         voice = recognize(cts.Token);
                         processingElapsed = 0f;
                     }
@@ -308,13 +310,22 @@ public class PlayerJutsuManager : MonoBehaviour
             onStop = async (chunk) =>
             {
                 if (tcs.Task.IsCompleted || ct.IsCancellationRequested || voice.IsProcessing) return;
+                if (!JutsuVoiceValidation.HasAudibleInput(chunk, minimumVoiceRms))
+                {
+                    Debug.Log("[Voice] Rejected recording: silence, too quiet, or too short.");
+                    tcs.TrySetResult(string.Empty);
+                    return;
+                }
+                voice.HasAudibleInput = true;
                 voice.IsProcessing = true;
 
                 try
                 {
                     var result = await whisper.GetTextAsync(chunk.Data, chunk.Frequency, chunk.Channels);
 
-                    string transcription = result != null ? result.Result.Trim() : string.Empty;
+                    string transcription = JutsuVoiceValidation.GetSpeechText(result, maximumNoSpeechProbability);
+                    if (string.IsNullOrEmpty(transcription))
+                        Debug.Log("[Voice] Rejected transcription: no accepted speech segment.");
                     tcs.TrySetResult(transcription);
                 }
                 catch (Exception e)
@@ -655,11 +666,6 @@ public class PlayerJutsuManager : MonoBehaviour
     
     public void RegisterAkaSpawnPointBase(Transform fingertip) => akaSpawnBaseHandLandmark = fingertip;
 
-
-    private void UpdateInitialPrompt(string expectedCommand)
-    {
-        VoiceRecognitionManager.instance.whisperManager.initialPrompt = $"skill command : \"{expectedCommand}\"";
-    }
 
     private void ResetInitialPrompt() => VoiceRecognitionManager.instance.whisperManager.initialPrompt = "";
 

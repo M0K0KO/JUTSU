@@ -1,15 +1,36 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Mediapipe;
 using UnityEngine;
 using Whisper;
+using Whisper.Utils;
 
 public static class JutsuSafetyChecks
 {
     public static unsafe void Run()
     {
+        var silence = new AudioChunk { Data = new float[48000], Frequency = 16000, Channels = 1 };
+        Require(!JutsuVoiceValidation.HasAudibleInput(silence), "Silence passed the voice amplitude gate.");
+        silence.Data[8000] = 1f;
+        Require(!JutsuVoiceValidation.HasAudibleInput(silence), "A single click passed the voice duration gate.");
+        for (int i = 0; i < silence.Data.Length; i++) silence.Data[i] = 0.1f;
+        Require(!JutsuVoiceValidation.HasAudibleInput(silence), "Microphone DC offset passed the voice gate.");
+        for (int i = 0; i < silence.Data.Length; i++)
+            silence.Data[i] = 0.02f * (float)Math.Sin(i * 2 * Math.PI * 440 / 16000);
+        Require(JutsuVoiceValidation.HasAudibleInput(silence), "Sustained audible input failed the amplitude gate.");
+        var nonSpeech = new WhisperResult(new List<WhisperSegment> { new WhisperSegment(0, "Kon", 0, 20, 0.9f) }, 0);
+        var speech = new WhisperResult(new List<WhisperSegment> { new WhisperSegment(0, "Kon", 0, 20, 0.1f) }, 0);
+        var unknown = new WhisperResult(new List<WhisperSegment> { new WhisperSegment(0, "Kon", 0, 20) }, 0);
+        Require(JutsuVoiceValidation.GetSpeechText(nonSpeech) == string.Empty &&
+                JutsuVoiceValidation.GetSpeechText(unknown) == string.Empty &&
+                JutsuVoiceValidation.GetSpeechText(speech) == "Kon",
+            "No-speech confidence gate accepted invalid evidence or rejected valid speech.");
+        Require(!StringSimilarity.IsSimilar("[Kon]", "Kon"), "An audio annotation was accepted as a command.");
+        Debug.Log("JUTSU_VOICE_VALIDATION_CHECKS: passed (silence, click, DC offset, audible input, no-speech probability, annotations)");
+
         var go = new GameObject("JUTSU safety checks");
         go.SetActive(false);
         try

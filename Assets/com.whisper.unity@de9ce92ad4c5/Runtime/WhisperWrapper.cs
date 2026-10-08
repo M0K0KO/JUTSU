@@ -257,7 +257,8 @@ namespace Whisper
             var text = TextUtils.StringFromNativeUtf8(textPtr);
             var start = WhisperNative.whisper_full_get_segment_t0(_whisperCtx, i);
             var end = WhisperNative.whisper_full_get_segment_t1(_whisperCtx, i);
-            var segment = new WhisperSegment(i, text, start, end);
+            var noSpeechProbability = WhisperNative.whisper_full_get_segment_no_speech_prob(_whisperCtx, i);
+            var segment = new WhisperSegment(i, text, start, end, noSpeechProbability);
 
             // return earlier if tokens are disabled
             if (!param.EnableTokens)

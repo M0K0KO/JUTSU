@@ -8,6 +8,7 @@ public static class StringSimilarity
 {
     private static readonly Regex AsteriskPattern = new Regex(@"\*[^*]*\*", RegexOptions.Compiled);
     private static readonly Regex ParenthesesPattern = new Regex(@"\([^)]*\)", RegexOptions.Compiled);
+    private static readonly Regex BracketsPattern = new Regex(@"\[[^\]]*\]", RegexOptions.Compiled);
     private static readonly Regex PunctuationPattern = new Regex(@"[- .!?,""]", RegexOptions.Compiled);
 
     /// <summary>
@@ -34,6 +35,7 @@ public static class StringSimilarity
         {
             Debug.LogWarning("Normalized string is null or empty! " +
                              $"normalized input: {normalizedInput}, normalized target: {normalizedTarget}");
+            return false;
         }
         
         if (IsTargetStringSingleWord(target))
@@ -167,7 +169,8 @@ public static class StringSimilarity
         
         string asteriskBlockRemoved = AsteriskPattern.Replace(stringToNormalize, "");
         string parenthesesBlockRemoved = ParenthesesPattern.Replace(asteriskBlockRemoved, "");
-        string punctuationRemoved = PunctuationPattern.Replace(parenthesesBlockRemoved, "");
+        string bracketsRemoved = BracketsPattern.Replace(parenthesesBlockRemoved, "");
+        string punctuationRemoved = PunctuationPattern.Replace(bracketsRemoved, "");
         string lowercaseConverted = punctuationRemoved.ToLowerInvariant();
         return lowercaseConverted;
     }

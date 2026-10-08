@@ -53,6 +53,7 @@ namespace Whisper
         /// Segment end timestamp based on transcribed audio.
         /// </summary>
         public readonly TimeSpan End;
+        public readonly float NoSpeechProbability;
 
         /// <summary>
         /// Optional individual tokens with their meta information.
@@ -60,12 +61,13 @@ namespace Whisper
         /// </summary>
         public WhisperTokenData[] Tokens;
 
-        public WhisperSegment(int index, string text, ulong start, ulong end)
+        public WhisperSegment(int index, string text, ulong start, ulong end, float noSpeechProbability = float.NaN)
         {
             Index = index;
             Text = text;
             Start = TimeSpan.FromMilliseconds(start * 10);
             End = TimeSpan.FromMilliseconds(end * 10);
+            NoSpeechProbability = noSpeechProbability;
         }
 
         /// <summary>

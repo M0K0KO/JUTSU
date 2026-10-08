@@ -13,6 +13,7 @@ using UnityEngine.Rendering;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
 using Whisper.Utils;
+using Whisper;
 using Screen = UnityEngine.Screen;
 
 // Opt-in diagnostic mode for the built player. Normal launches do not create it.
@@ -29,6 +30,7 @@ public class JutsuSmokeTest : MonoBehaviour
         if (Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuSmokeTest") < 0 &&
             Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuVoiceCancelSmoke") < 0 &&
             Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuVoiceWaitSmoke") < 0 &&
+            Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuVoiceEvidenceSmoke") < 0 &&
             Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuVignetteProbe") < 0 &&
             Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuGameplayProbe") < 0) return;
         var go = new GameObject("JUTSU smoke test");
@@ -83,6 +85,12 @@ public class JutsuSmokeTest : MonoBehaviour
             var whisper = manager.whisperManager;
             // Exercise the actual gameplay cancellation method without accessing a microphone.
             var jutsu = FindFirstObjectByType<PlayerJutsuManager>();
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuVoiceEvidenceSmoke") >= 0)
+            {
+                yield return ProbeVoiceEvidence(jutsu);
+                Application.Quit(_failed ? 1 : 0);
+                yield break;
+            }
             if (Array.IndexOf(Environment.GetCommandLineArgs(), "-jutsuVoiceWaitSmoke") >= 0)
             {
                 yield return ProbeVoiceWait(jutsu);
@@ -256,10 +264,10 @@ public class JutsuSmokeTest : MonoBehaviour
 
             var command = ReadField<System.Collections.Generic.List<Jutsu>>(jutsu, "jutsuList")
                 .Find(item => item.gestureType == GestureType.Kon).targetCommand;
-            for (var scenario = 0; scenario < 5; ++scenario)
+            for (var scenario = 0; scenario < 7; ++scenario)
             {
                 var completion = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
-                var pending = new PlayerJutsuManager.VoiceAttempt { Task = completion.Task };
+                var pending = new PlayerJutsuManager.VoiceAttempt { Task = completion.Task, HasAudibleInput = scenario != 4 };
                 var calls = 0;
                 var activations = 0;
                 var canceled = false;
@@ -281,7 +289,7 @@ public class JutsuSmokeTest : MonoBehaviour
                 if (!jutsu.isUsingJutsu || mic.IsRecording || calls != (scenario == 2 ? 2 : 1))
                 { Fail("Input deadline ended a pending cast or started another recording."); yield break; }
 
-                if (scenario == 4)
+                if (scenario == 6)
                 {
                     yield return SceneManager.LoadSceneAsync("MainMenu");
                     yield return null;
@@ -302,7 +310,7 @@ public class JutsuSmokeTest : MonoBehaviour
                 if (scenario != 3)
                 {
                     yield return new WaitForSecondsRealtime(0.5f);
-                    completion.TrySetResult(scenario == 1 ? "unrelated words" : command);
+                    completion.TrySetResult(scenario == 1 ? "unrelated words" : scenario == 5 ? "[Kon]" : command);
                 }
                 yield return mode;
                 var elapsed = Time.realtimeSinceStartup - started;
@@ -321,13 +329,123 @@ public class JutsuSmokeTest : MonoBehaviour
             if (remaining != null && Array.Exists(remaining.GetInvocationList(),
                 callback => callback.Method.DeclaringType?.DeclaringType == typeof(PlayerJutsuManager)))
             { Fail("Voice processing kept an old recording subscription."); yield break; }
-            Debug.Log("JUTSU_SMOKE_RESULT: passed (real GPU voice pipeline, late success, late mismatch, retry, processing timeout, scene unload)");
+            Debug.Log("JUTSU_SMOKE_RESULT: passed (GPU voice pipeline, late results, retry, timeout, no-audio and annotation rejection, scene unload)");
         }
         finally
         {
             recording.SetValue(mic, false);
             mic.enabled = wasEnabled;
         }
+    }
+
+    private IEnumerator ProbeVoiceEvidence(PlayerJutsuManager jutsu)
+    {
+        var manager = VoiceRecognitionManager.instance;
+        var whisper = manager.whisperManager;
+        var quiet = new AudioChunk { Data = new float[48000], Frequency = 16000, Channels = 1 };
+        // Observe the old command-specific prompt on silence without invoking a
+        // jutsu. Production recording now rejects this input before inference.
+        foreach (var command in ReadField<System.Collections.Generic.List<Jutsu>>(jutsu, "jutsuList"))
+        {
+            whisper.initialPrompt = $"skill command : \"{command.targetCommand}\"";
+            var biased = whisper.GetTextAsync(quiet.Data, quiet.Frequency, quiet.Channels);
+            while (!biased.IsCompleted && !_failed) yield return null;
+            if (biased.IsFaulted || biased.Result == null)
+            { Fail("Silence baseline inference failed."); yield break; }
+            foreach (var segment in biased.Result.Segments)
+            {
+                if (float.IsNaN(segment.NoSpeechProbability) || segment.NoSpeechProbability < 0 || segment.NoSpeechProbability > 1)
+                { Fail("Native no-speech probability was invalid."); yield break; }
+                Debug.Log($"JUTSU_SILENCE_BASELINE: prompt={command.targetCommand}; text={segment.Text}; noSpeech={segment.NoSpeechProbability}");
+            }
+        }
+        whisper.initialPrompt = string.Empty;
+
+        var args = Environment.GetCommandLineArgs();
+        var fixtureIndex = Array.IndexOf(args, "-jutsuVoiceFixture");
+        if (fixtureIndex < 0 || fixtureIndex + 1 >= args.Length)
+        { Fail("Pass -jutsuVoiceFixture with a PCM16 mono voice WAV."); yield break; }
+        var spoken = ReadVoiceFixture(args[fixtureIndex + 1]);
+        if (!JutsuVoiceValidation.HasAudibleInput(spoken))
+        { Fail("Spoken command fixture failed the amplitude gate."); yield break; }
+        var mic = manager.microphoneRecord;
+        var enabledBefore = mic.enabled;
+        mic.enabled = false;
+        var recording = mic.GetType().GetField("<IsRecording>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic);
+        var callbacks = mic.GetType().GetField("OnRecordStop", BindingFlags.Instance | BindingFlags.NonPublic);
+        var startVoice = typeof(PlayerJutsuManager).GetMethod("StartVoiceRecognition", BindingFlags.Instance | BindingFlags.NonPublic);
+        try
+        {
+            for (var scenario = 0; scenario < 4; scenario++)
+            {
+                var chunk = new AudioChunk { Data = new float[48000], Frequency = 16000, Channels = 1 };
+                if (scenario == 1)
+                {
+                    var random = new System.Random(7);
+                    for (var i = 0; i < chunk.Data.Length; i++) chunk.Data[i] = (float)(random.NextDouble() - 0.5) * 0.0005f;
+                }
+                if (scenario == 2) chunk.Data[8000] = 1f;
+                if (scenario == 3) chunk = spoken;
+                var activations = 0;
+                var inferenceCalls = 0;
+                Application.LogCallback countInference = (message, _, __) =>
+                { if (message == "Inference Whisper on input data...") Interlocked.Increment(ref inferenceCalls); };
+                Application.logMessageReceivedThreaded += countInference;
+                Func<CancellationToken, PlayerJutsuManager.VoiceAttempt> recognize = ct =>
+                {
+                    recording.SetValue(mic, true);
+                    var voice = (PlayerJutsuManager.VoiceAttempt)startVoice.Invoke(jutsu, new object[] { ct });
+                    recording.SetValue(mic, false);
+                    ((OnRecordStopDelegate)callbacks.GetValue(mic)).Invoke(chunk);
+                    return voice;
+                };
+                yield return jutsu.StartCoroutine(jutsu.RunJutsuMode(recognize, () => GestureType.Kon, _ => () => ++activations));
+                Application.logMessageReceivedThreaded -= countInference;
+                if (activations != (scenario == 3 ? 1 : 0) || (scenario != 3 && inferenceCalls != 0) ||
+                    (scenario == 3 && inferenceCalls != 1))
+                { Fail($"Voice evidence scenario {scenario} failed; activations={activations}; inferenceCalls={inferenceCalls}."); yield break; }
+                Debug.Log($"JUTSU_VOICE_EVIDENCE_CASE: scenario={scenario}; activations={activations}; inferenceCalls={inferenceCalls}; passed");
+            }
+            Debug.Log("JUTSU_SMOKE_RESULT: passed (gesture with silence, quiet noise, click: no cast; spoken command: one cast)");
+        }
+        finally
+        {
+            recording.SetValue(mic, false);
+            mic.enabled = enabledBefore;
+            whisper.initialPrompt = string.Empty;
+        }
+    }
+
+    private static AudioChunk ReadVoiceFixture(string path)
+    {
+        using var reader = new BinaryReader(File.OpenRead(path));
+        if (new string(reader.ReadChars(4)) != "RIFF") throw new InvalidDataException("Not a WAV file.");
+        reader.ReadInt32();
+        if (new string(reader.ReadChars(4)) != "WAVE") throw new InvalidDataException("Not a WAV file.");
+        int frequency = 0, channels = 0;
+        while (reader.BaseStream.Position + 8 <= reader.BaseStream.Length)
+        {
+            string type = new string(reader.ReadChars(4));
+            int length = reader.ReadInt32();
+            long next = reader.BaseStream.Position + length + (length & 1);
+            if (type == "fmt ")
+            {
+                if (reader.ReadInt16() != 1) throw new InvalidDataException("Expected PCM WAV.");
+                channels = reader.ReadInt16();
+                frequency = reader.ReadInt32();
+                reader.ReadInt32();
+                reader.ReadInt16();
+                if (reader.ReadInt16() != 16) throw new InvalidDataException("Expected PCM16 WAV.");
+            }
+            if (type == "data")
+            {
+                var audio = new float[length / 2];
+                for (var i = 0; i < audio.Length; i++) audio[i] = reader.ReadInt16() / 32768f;
+                return new AudioChunk { Data = audio, Frequency = frequency, Channels = channels };
+            }
+            reader.BaseStream.Position = next;
+        }
+        throw new InvalidDataException("WAV audio data missing.");
     }
 
     private IEnumerator ProbeGameplay(PlayerJutsuManager jutsu)
