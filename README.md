@@ -3,4 +3,4 @@
 > 👆 **Click the image above to view full gameplay video**
 >
 
-[Game Download Link](https://drive.google.com/file/d/1Z8g4f909AJjUKnJYZ0RgTEIgEAvtmnVo/view?usp=sharing)
+[Game Download Link](https://drive.google.com/file/d/1do7ZGDZU4VlzBPy3asO1QVmQLroLe664/view?usp=sharing)
