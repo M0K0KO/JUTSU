@@ -325,6 +325,7 @@ namespace Whisper
             var context = WhisperContextParams.GetDefaultParams();
             context.UseGpu = useGpu;
             context.FlashAttn = flashAttention;
+            LogUtils.Log($"Whisper backend requested: {(useGpu ? "GPU" : "CPU")}.");
             return context;
         }
 

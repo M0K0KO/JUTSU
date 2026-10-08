@@ -1352,7 +1352,7 @@ MonoBehaviour:
   modelPath: ggml-small.en.bin
   isModelPathInStreamingAssets: 1
   initOnAwake: 1
-  useGpu: 1
+  useGpu: 0
   flashAttention: 0
   language: en
   translateToEnglish: 0
